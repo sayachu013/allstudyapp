@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中学英語 3-Step 語順トレーナー（クリア記録機能付き）</title>
+    <style>
+        :root {
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --primary-color: #3b82f6;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --warn-color: #f59e0b;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .app-container {
+            background-color: var(--card-bg);
+            max-width: 900px;
+            width: 100%;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-top: 0;
+        }
+
+        h1 { font-size: 26px; margin-bottom: 30px; }
+        h2 { font-size: 20px; margin-bottom: 20px; }
+
+        /* ローディング・エラー画面 */
+        #loading-screen { text-align: center; padding: 50px 0; }
+        .spinner {
+            width: 50px; height: 50px; border: 5px solid #e2e8f0; border-top-color: var(--primary-color);
+            border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        #error-screen { display: none; text-align: center; padding: 40px; background-color: #fef2f2; border: 1px solid #fca5a5; border-radius: 12px; color: #991b1b; }
+
+        /* ================= ホームメニュー（クリア仕様変更） ================= */
+        #home-menu { display: none; }
+        .grade-section { margin-bottom: 25px; }
+        .grade-title { font-size: 18px; font-weight: bold; color: #1e293b; border-bottom: 2px solid #cbd5e1; padding-bottom: 5px; margin-bottom: 15px; }
+        .grammar-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+        
+        /* 通常のメニューボタン */
+        .grammar-btn {
+            background-color: #fff; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px;
+            cursor: pointer; font-size: 15px; font-weight: 500; transition: all 0.2s; text-align: center;
+            position: relative; color: var(--text-color);
+        }
+        .grammar-btn:hover { border-color: var(--primary-color); background-color: #eff6ff; transform: translateY(-2px); }
+        
+        /* 【追加】クリア済みのメニューボタンの見た目 */
+        .grammar-btn.cleared {
+            background-color: #ecfdf5 !important;
+            border-color: var(--success-color) !important;
+            color: #065f46 !important;
+            box-shadow: inset 0 0 0 1px rgba(16, 185, 129, 0.2);
+        }
+        .grammar-btn.cleared::before {
+            content: '✓ ';
+            font-weight: bold;
+            color: var(--success-color);
+        }
+
+        /* ================= トレーニング画面 ================= */
+        #game-view { display: none; }
+
+        /* ゲームステータス */
+        .game-status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #f8fafc;
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+        }
+        .status-item { font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .heart { color: var(--error-color); font-size: 20px; letter-spacing: 2px; }
+        .combo-dot {
+            display: inline-block; width: 14px; height: 14px; border-radius: 50%;
+            background-color: #cbd5e1; margin-left: 5px; vertical-align: middle;
+        }
+        .combo-dot.fill { background-color: var(--success-color); box-shadow: 0 0 8px var(--success-color); }
+
+        /* 進捗インジケーター */
+        .steps-indicator { display: flex; justify-content: space-between; margin: 20px auto 30px; max-width: 400px; position: relative; }
+        .steps-indicator::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 2px; background-color: #e2e8f0; z-index: 1; transform: translateY(-50%); }
+        .step-dot {
+            width: 36px; height: 36px; border-radius: 50%; background-color: #e2e8f0; color: var(--text-muted);
+            display: flex; justify-content: center; align-items: center; font-weight: bold; z-index: 2; transition: all 0.3s ease;
+        }
+        .step-dot.active { background-color: var(--primary-color); color: white; box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2); }
+        .step-dot.completed { background-color: var(--success-color); color: white; }
+
+        .instruction { font-size: 18px; font-weight: bold; margin-bottom: 15px; padding-left: 10px; border-left: 4px solid var(--primary-color); }
+        .game-section { display: none; }
+        .game-section.active { display: block; }
+
+        /* Step 1: スラッシュ区切りエリア（1行固定） */
+        .interactive-phrasing-box {
+            display: flex; flex-wrap: nowrap; overflow-x: auto; white-space: nowrap; justify-content: flex-start; align-items: center;
+            background-color: #f8fafc; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0;
+            font-size: 24px; font-weight: bold; line-height: 2; letter-spacing: 2px; margin-bottom: 25px; user-select: none; scrollbar-width: thin;
+        }
+        .char-node { display: inline-block; flex-shrink: 0; }
+        .slash-gap {
+            display: inline-flex; justify-content: center; align-items: center; width: 16px; height: 36px; margin: 0 2px;
+            cursor: pointer; color: #cbd5e1; font-size: 16px; transition: all 0.1s; border-radius: 4px; vertical-align: middle; flex-shrink: 0;
+        }
+        .slash-gap:hover { background-color: #e2e8f0; color: #94a3b8; }
+        .slash-gap.inserted { color: var(--primary-color); font-size: 26px; font-weight: bold; width: 20px; }
+
+        /* カード・プール（折り返し可能） */
+        .card-pool { display: flex; flex-wrap: wrap; gap: 12px; min-height: 60px; padding: 15px; background-color: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 8px; margin-bottom: 20px; align-items: center; justify-content: center; }
+        .card {
+            background-color: var(--card-bg); color: var(--text-color); padding: 10px 18px; border-radius: 6px; border: 1px solid #cbd5e1;
+            cursor: pointer; user-select: none; font-size: 16px; font-weight: 500; box-shadow: 0 2px 4px rgba(0,0,0,0.05); transition: all 0.2s ease; white-space: nowrap; flex-shrink: 0;
+        }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-color: var(--primary-color); }
+
+        /* Step 2: 解答ゾーン（1行固定） */
+        .target-sentence-zone { display: flex; flex-wrap: nowrap; overflow-x: auto; align-items: center; justify-content: flex-start; gap: 8px; min-height: 70px; padding: 15px; background-color: #fff; border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 20px; font-size: 18px; scrollbar-width: thin; }
+        .slash-divider { color: var(--primary-color); font-weight: bold; font-size: 20px; user-select: none; margin: 0 2px; flex-shrink: 0; }
+
+        /* Step 3: 横並び連動レイアウト（1行固定） */
+        .step3-horizontal-container { display: flex; flex-direction: column; gap: 20px; background-color: #fff; border: 2px solid #e2e8f0; border-radius: 8px; padding: 20px; margin-bottom: 20px; overflow-x: auto; scrollbar-width: thin; }
+        .ja-order-row { display: flex; flex-wrap: nowrap; justify-content: flex-start; gap: 30px; border-bottom: 1px dashed #e2e8f0; padding-bottom: 15px; align-items: center; }
+        .ja-chunk-block { text-align: center; font-size: 15px; color: var(--text-muted); font-weight: bold; min-width: 120px; flex-shrink: 0; white-space: nowrap; }
+        .en-slots-row { display: flex; flex-wrap: nowrap; justify-content: flex-start; gap: 30px; align-items: center; }
+        .english-slot-wrapper { display: flex; flex-direction: column; align-items: center; min-width: 120px; flex-shrink: 0; }
+        .english-drop-slot { width: 100%; min-height: 45px; background-color: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 6px; display: flex; justify-content: center; align-items: center; font-weight: bold; font-size: 16px; cursor: pointer; box-sizing: border-box; padding: 5px 10px; white-space: nowrap; }
+        .english-drop-slot.active-slot { border-color: var(--primary-color); background-color: #eff6ff; }
+
+        /* ボタン関係 */
+        .btn-container { display: flex; justify-content: space-between; margin-top: 30px; }
+        .btn { background-color: var(--primary-color); color: white; border: none; padding: 12px 25px; font-size: 15px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: background-color 0.2s; }
+        .btn:hover { background-color: #2563eb; }
+        .btn-secondary { background-color: #64748b; }
+        .btn-secondary:hover { background-color: #475569; }
+
+        /* 結果・解説 */
+        .result-overlay { display: none; margin-top: 20px; padding: 20px; border-radius: 8px; animation: fadeIn 0.3s ease; }
+        .result-overlay.success { display: block; background-color: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+        .result-overlay.error { display: block; background-color: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; }
+        .explanation { margin-top: 10px; font-size: 15px; line-height: 1.6; color: var(--text-color); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <p style="color: var(--text-muted); font-weight: bold;">スプレッドシートから問題を読み込んでいます...</p>
+    </div>
+
+    <div id="error-screen">
+        <h3>データの取得に失敗しました</h3>
+        <p>GASのデプロイ設定、またはアクセス権限（「全員」になっているか）を確認してください。</p>
+    </div>
+    
+    <div id="home-menu">
+        <h1>中学英語 語順トレーニング</h1>
+        <h2>学習する文法項目を選んでください</h2>
+        
+        <div class="grade-section">
+            <div class="grade-title">中学1年生</div>
+            <div class="grammar-list" id="g-list-1"></div>
+        </div>
+        <div class="grade-section">
+            <div class="grade-title">中学2年生</div>
+            <div class="grammar-list" id="g-list-2"></div>
+        </div>
+        <div class="grade-section">
+            <div class="grade-title">中学3年生</div>
+            <div class="grammar-list" id="g-list-3"></div>
+        </div>
+    </div>
+
+    <div id="game-view">
+        
+        <div class="game-status-bar">
+            <div class="status-item">
+                <span>ライフ:</span>
+                <span id="life-icons" class="heart">❤❤❤</span>
+            </div>
+            <div class="status-item">
+                <span>クリアまで:</span>
+                <div>
+                    <span class="combo-dot" id="combo-1"></span>
+                    <span class="combo-dot" id="combo-2"></span>
+                    <span class="combo-dot" id="combo-3"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="steps-indicator">
+            <div class="step-dot active" id="dot-1">1</div>
+            <div class="step-dot" id="dot-2">2</div>
+            <div class="step-dot" id="dot-3">3</div>
+        </div>
+
+        <div class="game-section" id="section-1">
+            <div class="instruction">Step 1: 日本語の「塊（カタマり）」の切れ目をタップして区切ろう</div>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">文字の間をタップすると「／」が入ります。意味の塊ごとに正しく区切ってください。</p>
+            <div class="interactive-phrasing-box" id="step1-interactive-zone"></div>
+            <div class="btn-container">
+                <button class="btn btn-secondary" id="step1-abort-btn" onclick="abortGame()">メニューに戻る</button>
+                <button class="btn" id="step1-check-btn" onclick="checkStep1()">区切りをチェックする</button>
+            </div>
+        </div>
+
+        <div class="game-section" id="section-2">
+            <div class="instruction">Step 2: 日本語を「英語の語順」に並び替える</div>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">カードをタップして、英語と同じ語順（誰が ➔ する ➔ 何を…）に並び替えてください。</p>
+            <div class="target-sentence-zone" id="step2-target"></div>
+            <div class="card-pool" id="step2-pool"></div>
+            <div class="btn-container">
+                <button class="btn btn-secondary" id="step2-reset-btn" onclick="initStep2()">やり直す</button>
+                <button class="btn" id="step2-check-btn" onclick="checkStep2()">語順をチェック</button>
+            </div>
+        </div>
+
+        <div class="game-section" id="section-3">
+            <div class="instruction">Step 3: 英語の語順に合わせて英単語を配置する</div>
+            <p style="color: var(--text-muted); margin-bottom: 20px;">並べた日本語の下の空欄に、正しい英単語をはめ込んでください。<span style="color: var(--error-color); font-weight: bold;">（使わないダミーが2語混ざっています！）</span></p>
+            <div class="step3-horizontal-container">
+                <div class="ja-order-row" id="step3-ja-row"></div>
+                <div class="en-slots-row" id="step3-en-row"></div>
+            </div>
+            <div class="card-pool" id="step3-pool"></div>
+            <div class="btn-container">
+                <button class="btn btn-secondary" id="step3-reset-btn" onclick="initStep3()">やり直す</button>
+                <button class="btn" id="step3-check-btn" onclick="checkStep3()">最終解答をチェック</button>
+            </div>
+        </div>
+
+        <div class="result-overlay" id="result-box">
+            <strong id="result-title"></strong>
+            <div class="explanation" id="result-text"></div>
+            <button class="btn" id="next-action-btn" style="margin-top: 15px; display: none;" onclick="advanceNext()">次の問題へ</button>
+            <button class="btn" id="finish-btn" style="margin-top: 15px; display: none;" onclick="backToHome()">メニューに戻る</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbyCiiA6EXNnibMJMqI3eokaRRQ4BKQIfcCO_Uzd5vXaX7Jpp2gCpd8hgh2lnIUwxZQN8g/exec";
+
+    let rawDatabase = []; 
+    let uniqueGrammarList = []; 
+    let currentGrammarPool = []; 
+    let currentProblemIndex = 0; 
+    let currentProblem = null;
+    let activeGrammarName = ""; // 現在挑戦中の単元名
+
+    let lives = 3;
+    let consecutiveCorrect = 0;
+
+    let selectedStep3Answers = [];
+    let activeSlotIndex = 0;
+
+    window.onload = function() { fetchProblems(); };
+
+    function fetchProblems() {
+        fetch(API_URL)
+            .then(response => { if (!response.ok) throw new Error('Network response was not ok'); return response.json(); })
+            .then(data => {
+                rawDatabase = data;
+                document.getElementById('loading-screen').style.display = 'none';
+                document.getElementById('home-menu').style.display = 'block';
+                buildMenu();
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                document.getElementById('loading-screen').style.display = 'none';
+                document.getElementById('error-screen').style.display = 'block';
+            });
+    }
+
+    // メニュー画面の生成（クリア記録の反映付き）
+    function buildMenu() {
+        for(let i=1; i<=3; i++) {
+            const list = document.getElementById(`g-list-${i}`);
+            if(list) list.innerHTML = '';
+        }
+        
+        uniqueGrammarList = [];
+        rawDatabase.forEach(item => {
+            if (!uniqueGrammarList.some(g => g.grammar === item.grammar && g.grade === item.grade)) {
+                uniqueGrammarList.push({ grade: item.grade, grammar: item.grammar });
+            }
+        });
+
+        // 端末に記録されているクリアデータを取得
+        const clearedGrammars = JSON.parse(localStorage.getItem('clearedGrammarList') || "[]");
+
+        uniqueGrammarList.forEach(g => {
+            const btn = document.createElement('button');
+            btn.className = 'grammar-btn';
+            btn.innerText = g.grammar;
+            btn.id = `btn-${g.grade}-${g.grammar}`;
+            
+            // 【変更箇所】もし過去にクリアした文法なら専用の「cleared」クラスをつける
+            if (clearedGrammars.includes(g.grammar)) {
+                btn.classList.add('cleared');
+            }
+
+            btn.onclick = () => startGrammarSession(g.grammar);
+            const targetList = document.getElementById(`g-list-${g.grade}`);
+            if(targetList) targetList.appendChild(btn);
+        });
+    }
+
+    function startGrammarSession(grammarName) {
+        activeGrammarName = grammarName;
+        currentGrammarPool = rawDatabase.filter(item => item.grammar === grammarName)
+                                         .sort(() => Math.random() - 0.5);
+        
+        if (currentGrammarPool.length === 0) {
+            alert("この単元の問題データが見つかりません。");
+            return;
+        }
+
+        lives = 3;
+        consecutiveCorrect = 0;
+        currentProblemIndex = 0;
+
+        document.getElementById('home-menu').style.display = 'none';
+        document.getElementById('game-view').style.display = 'block';
+        
+        updateStatusDisplay();
+        setControlsLock(false);
+        loadProblem();
+    }
+
+    function loadProblem() {
+        if (currentProblemIndex >= currentGrammarPool.length) {
+            currentGrammarPool.sort(() => Math.random() - 0.5);
+            currentProblemIndex = 0;
+        }
+
+        currentProblem = currentGrammarPool[currentProblemIndex];
+        resetStepIndicator();
+        setControlsLock(false);
+        initStep1();
+    }
+
+    function updateStatusDisplay() {
+        const lifeBox = document.getElementById('life-icons');
+        lifeBox.innerText = "❤".repeat(Math.max(0, lives)) + "🖤".repeat(Math.max(0, 3 - lives));
+        
+        for (let i = 1; i <= 3; i++) {
+            const dot = document.getElementById(`combo-${i}`);
+            if (i <= consecutiveCorrect) {
+                dot.classList.add('fill');
+            } else {
+                dot.classList.remove('fill');
+            }
+        }
+    }
+
+    function setControlsLock(isLocked) {
+        const buttons = [
+            'step1-check-btn', 'step2-check-btn', 'step3-check-btn',
+            'step2-reset-btn', 'step3-reset-btn'
+        ];
+        buttons.forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) btn.disabled = isLocked;
+        });
+
+        const pools = ['step2-pool', 'step3-pool', 'step2-target', 'step1-interactive-zone'];
+        pools.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.style.pointerEvents = isLocked ? 'none' : 'auto';
+        });
+    }
+
+    function handleMiss() {
+        lives--;
+        consecutiveCorrect = 0; 
+        updateStatusDisplay();
+
+        if (lives <= 0) {
+            setControlsLock(true);
+            showResult(false, "ゲームオーバー！", "3回ミスしてしまいました。この単元は最初からやり直しです！");
+            document.getElementById('next-action-btn').style.display = 'none';
+            document.getElementById('finish-btn').style.display = 'inline-block';
+            document.getElementById('finish-btn').innerText = "メニューに戻る";
+        } else {
+            showResult(false, "ミス！ライフが減りました", "文法ルールをもう一度思い出して、最初から解き直してみましょう！");
+            document.getElementById('next-action-btn').style.display = 'inline-block';
+            document.getElementById('next-action-btn').innerText = "この問題をもう一度解く";
+        }
+    }
+
+    function advanceNext() {
+        document.getElementById('result-box').style.display = 'none';
+        document.getElementById('next-action-btn').style.display = 'none';
+        if (lives > 0) {
+            loadProblem();
+        }
+    }
+
+    function abortGame() {
+        if(confirm("途中でメニューに戻ると、現在のクリア進捗はリセットされます。よろしいですか？")) {
+            backToHome();
+        }
+    }
+
+    function backToHome() {
+        document.getElementById('game-view').style.display = 'none';
+        document.getElementById('home-menu').style.display = 'block';
+        document.getElementById('result-box').style.display = 'none';
+        document.getElementById('next-action-btn').style.display = 'none';
+        document.getElementById('finish-btn').style.display = 'none';
+        setControlsLock(false);
+        buildMenu(); // クリア状況の見た目を反映してメニューを再構築
+    }
+
+    function resetStepIndicator() {
+        for(let i=1; i<=3; i++) {
+            const dot = document.getElementById(`dot-${i}`);
+            dot.className = 'step-dot';
+        }
+        document.getElementById('dot-1').classList.add('active');
+        document.getElementById('result-box').style.display = 'none';
+    }
+
+    // ================= STEP 1 =================
+    let selectedStep1Slashes = [];
+    let correctStep1Slashes = [];
+    function initStep1() {
+        showSection(1);
+        const zone = document.getElementById('step1-interactive-zone');
+        zone.innerHTML = '';
+        selectedStep1Slashes = [];
+        correctStep1Slashes = [];
+        
+        const rawText = currentProblem.raw_japanese;
+        const csvParts = currentProblem.step1_csv.split(',');
+
+        let charCounter = 0;
+        for(let i=0; i<csvParts.length - 1; i++) {
+            charCounter += csvParts[i].length;
+            correctStep1Slashes.push(charCounter);
+        }
+
+        for(let i=0; i<rawText.length; i++) {
+            const charSpan = document.createElement('span');
+            charSpan.className = 'char-node';
+            charSpan.innerText = rawText[i];
+            zone.appendChild(charSpan);
+
+            if(i < rawText.length - 1) {
+                const gapSpan = document.createElement('span');
+                gapSpan.className = 'slash-gap';
+                gapSpan.innerText = '⦀'; 
+                const gapIndex = i + 1; 
+                
+                gapSpan.onclick = () => toggleSlash(gapSpan, gapIndex);
+                zone.appendChild(gapSpan);
+            }
+        }
+    }
+
+    function toggleSlash(element, index) {
+        document.getElementById('result-box').style.display = 'none';
+        if(selectedStep1Slashes.includes(index)) {
+            selectedStep1Slashes = selectedStep1Slashes.filter(i => i !== index);
+            element.classList.remove('inserted');
+            element.innerText = '⦀';
+        } else {
+            selectedStep1Slashes.push(index);
+            element.classList.add('inserted');
+            element.innerText = '／';
+        }
+    }
+
+    function checkStep1() {
+        selectedStep1Slashes.sort((a, b) => a - b);
+        
+        let isCorrect = true;
+        if(selectedStep1Slashes.length !== correctStep1Slashes.length) {
+            isCorrect = false;
+        } else {
+            for(let i=0; i<correctStep1Slashes.length; i++) {
+                if(selectedStep1Slashes[i] !== correctStep1Slashes[i]) {
+                    isCorrect = false;
+                    break;
+                }
+            }
+        }
+
+        if(isCorrect) {
+            parsedChunks = currentProblem.step1_csv.replace(/。/g, '').split(','); 
+            showResult(true, "正解です！見事に塊を見抜けました。Step 2へ進みます。");
+            setTimeout(() => { goToStep2(); }, 1200);
+        } else {
+            handleMiss();
+        }
+    }
+
+    // ================= STEP 2 =================
+    function goToStep2() {
+        document.getElementById('result-box').style.display = 'none';
+        document.getElementById('dot-1').classList.add('completed');
+        document.getElementById('dot-2').classList.add('active');
+        initStep2();
+    }
+
+    function initStep2() {
+        showSection(2);
+        const pool = document.getElementById('step2-pool');
+        const target = document.getElementById('step2-target');
+        pool.innerHTML = '';
+        target.innerHTML = '';
+
+        const shuffled = [...parsedChunks].sort(() => Math.random() - 0.5);
+        shuffled.forEach(chunk => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerText = chunk;
+            card.onclick = () => handleStep2Click(card);
+            pool.appendChild(card);
+        });
+    }
+
+    function handleStep2Click(card) {
+        const pool = document.getElementById('step2-pool');
+        const target = document.getElementById('step2-target');
+        document.getElementById('result-box').style.display = 'none';
+
+        if (card.parentNode === pool) {
+            if (target.querySelectorAll('.card').length > 0) {
+                const slash = document.createElement('span');
+                slash.className = 'slash-divider';
+                slash.innerText = ' ／ ';
+                target.appendChild(slash);
+            }
+            target.appendChild(card);
+        } else {
+            const prevSlash = card.previousElementSibling;
+            if (prevSlash && prevSlash.className === 'slash-divider') {
+                target.removeChild(prevSlash);
+            } else {
+                const nextSlash = card.nextElementSibling;
+                if (nextSlash && nextSlash.className === 'slash-divider') {
+                    target.removeChild(nextSlash);
+                }
+            }
+            pool.appendChild(card);
+        }
+    }
+
+    function checkStep2() {
+        const targetZone = document.getElementById('step2-target');
+        const cardsInTarget = targetZone.querySelectorAll('.card');
+        
+        if (cardsInTarget.length !== currentProblem.step2_order.length) {
+            showResult(false, "エラー", "すべての日本語カードを並び替えてください。");
+            return;
+        }
+
+        let isCorrect = true;
+        let currentAnswers = [];
+        
+        cardsInTarget.forEach(card => {
+            currentAnswers.push(card.innerText.replace(/[。、]/g, '').trim());
+        });
+
+        for (let i = 0; i < currentAnswers.length; i++) {
+            const cleanTarget = currentProblem.step2_order[i].replace(/[。、]/g, '').trim();
+            if (currentAnswers[i] !== cleanTarget) {
+                isCorrect = false;
+                break;
+            }
+        }
+
+        if (isCorrect) {
+            showResult(true, "正解です！英語の語順が作れました。最終Stepへ進みます。");
+            setTimeout(() => { goToStep3(); }, 1200);
+        } else {
+            handleMiss();
+        }
+    }
+
+    // ================= STEP 3 =================
+    function goToStep3() {
+        document.getElementById('result-box').style.display = 'none';
+        document.getElementById('dot-2').classList.add('completed');
+        document.getElementById('dot-3').classList.add('active');
+        initStep3();
+    }
+
+    function initStep3() {
+        showSection(3);
+        const jaRow = document.getElementById('step3-ja-row');
+        const enRow = document.getElementById('step3-en-row');
+        const pool = document.getElementById('step3-pool');
+        
+        jaRow.innerHTML = '';
+        enRow.innerHTML = '';
+        pool.innerHTML = '';
+        
+        selectedStep3Answers = new Array(currentProblem.step3_english.length).fill(null);
+        activeSlotIndex = 0;
+
+        currentProblem.step2_order.forEach((jaChunk, index) => {
+            const jaBlock = document.createElement('div');
+            jaBlock.className = 'ja-chunk-block';
+            jaBlock.innerText = jaChunk;
+            jaRow.appendChild(jaBlock);
+
+            if(index < currentProblem.step2_order.length - 1) {
+                const slash = document.createElement('span');
+                slash.className = 'slash-divider';
+                slash.innerText = '／';
+                jaRow.appendChild(slash);
+            }
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'english-slot-wrapper';
+            
+            const slot = document.createElement('div');
+            slot.className = 'english-drop-slot';
+            slot.id = `slot-${index}`;
+            slot.innerText = '???';
+            slot.onclick = () => handleSlotClick(index);
+            
+            wrapper.appendChild(slot);
+            enRow.appendChild(wrapper);
+        });
+
+        updateActiveSlotHighlight();
+
+        const allWords = [...currentProblem.step3_english, ...currentProblem.dummies];
+        const shuffledWords = allWords.sort(() => Math.random() - 0.5);
+
+        shuffledWords.forEach((word, idx) => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerText = word;
+            card.onclick = () => handleEnglishCardClick(card, word);
+            pool.appendChild(card);
+        });
+    }
+
+    function handleEnglishCardClick(card, word) {
+        if (activeSlotIndex >= currentProblem.step3_english.length || activeSlotIndex === -1) return;
+
+        const currentSlot = document.getElementById(`slot-${activeSlotIndex}`);
+        currentSlot.innerText = word;
+        currentSlot.style.color = 'var(--primary-color)';
+        
+        selectedStep3Answers[activeSlotIndex] = word;
+        card.style.visibility = 'hidden'; 
+        card.setAttribute('data-target-slot', activeSlotIndex);
+
+        activeSlotIndex = selectedStep3Answers.indexOf(null);
+        updateActiveSlotHighlight();
+    }
+
+    function handleSlotClick(index) {
+        const word = selectedStep3Answers[index];
+        if (!word) return;
+
+        const cards = document.getElementById('step3-pool').children;
+        for (let card of cards) {
+            if (card.innerText === word && card.style.visibility === 'hidden' && card.getAttribute('data-target-slot') == index) {
+                card.style.visibility = 'visible';
+                break;
+            }
+        }
+
+        const slot = document.getElementById(`slot-${index}`);
+        slot.innerText = '???';
+        slot.style.color = 'var(--text-muted)';
+        selectedStep3Answers[index] = null;
+
+        activeSlotIndex = selectedStep3Answers.indexOf(null);
+        updateActiveSlotHighlight();
+    }
+
+    function updateActiveSlotHighlight() {
+        for(let i=0; i<currentProblem.step3_english.length; i++) {
+            const slot = document.getElementById(`slot-${i}`);
+            if(slot) slot.classList.remove('active-slot');
+        }
+        if(activeSlotIndex !== -1) {
+            const activeSlot = document.getElementById(`slot-${activeSlotIndex}`);
+            if(activeSlot) activeSlot.classList.add('active-slot');
+        }
+    }
+
+    function checkStep3() {
+        if (selectedStep3Answers.includes(null)) {
+            showResult(false, "エラー", "すべての空欄を埋めてください。");
+            return;
+        }
+
+        let isAllCorrect = true;
+        for (let i = 0; i < selectedStep3Answers.length; i++) {
+            if (selectedStep3Answers[i] !== currentProblem.step3_english[i]) {
+                isAllCorrect = false;
+                break;
+            }
+        }
+
+        if (isAllCorrect) {
+            consecutiveCorrect++;
+            updateStatusDisplay();
+            document.getElementById('dot-3').classList.add('completed');
+
+            if (consecutiveCorrect >= 3) {
+                setControlsLock(true); 
+
+                // 【追加箇所】現在の文法単元を「クリア済み」としてブラウザに保存
+                let clearedGrammars = JSON.parse(localStorage.getItem('clearedGrammarList') || "[]");
+                if (!clearedGrammars.includes(activeGrammarName)) {
+                    clearedGrammars.push(activeGrammarName);
+                    localStorage.setItem('clearedGrammarList', JSON.stringify(clearedGrammars));
+                }
+
+                showResult(true, "ステージクリア！完全制覇！🎉", currentProblem.explanation + "<br><br><strong style='color:var(--success-color); font-size:18px;'>見事に3問連続一発クリアを達成しました！メニューに戻って次の文法に挑戦しましょう。</strong>");
+                document.getElementById('next-action-btn').style.display = 'none';
+                document.getElementById('finish-btn').style.display = 'inline-block';
+                document.getElementById('finish-btn').innerText = "メニューに戻る";
+            } else {
+                showResult(true, `大正解！これで ${consecutiveCorrect} 問連続正解！🎉`, currentProblem.explanation);
+                document.getElementById('next-action-btn').style.display = 'inline-block';
+                document.getElementById('next-action-btn').innerText = "次の問題へ進む";
+                currentProblemIndex++; 
+            }
+        } else {
+            handleMiss();
+        }
+    }
+
+    function showSection(num) {
+        for(let i=1; i<=3; i++) {
+            document.getElementById(`section-${i}`).classList.remove('active');
+        }
+        document.getElementById(`section-${num}`).classList.add('active');
+        document.getElementById('result-box').style.display = 'none'; 
+    }
+
+    function showResult(isSuccess, title, msg = "") {
+        const resultBox = document.getElementById('result-box');
+        const resultTitle = document.getElementById('result-title');
+        const resultText = document.getElementById('result-text');
+
+        resultBox.style.display = 'block';
+        resultBox.className = 'result-overlay ' + (isSuccess ? 'success' : 'error');
+        resultTitle.innerText = isSuccess ? "⭕️ " + title : "❌ " + title;
+        resultText.innerHTML = msg;
+        
+        resultBox.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>

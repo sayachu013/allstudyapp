@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3年国語 1学期期末対策テスト</title>
+    <style>
+        /* --- 画面表示用（通常スタイル） --- */
+        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f0f2f5; color: #333; }
+        .page { display: none; }
+        .active { display: block; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        h1 { color: #1a365d; text-align: center; border-bottom: 3px solid #1a365d; padding-bottom: 10px; margin-bottom: 30px; margin-top: 10px; }
+        #timer-bar, #score-bar { position: sticky; top: 0; background: #c53030; color: white; padding: 10px; text-align: center; font-weight: bold; border-radius: 5px; z-index: 1000; font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        #score-bar { background: #2f855a; top: 50px; display: none; }
+        .question-item { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #cbd5e0; position: relative; }
+        .q-num { font-weight: bold; color: #2b6cb0; margin-right: 10px; }
+        .q-type { font-size: 0.8em; background: #edf2f7; padding: 2px 8px; border-radius: 4px; margin-left: 10px; color: #4a5568; }
+        .options-container { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .option-item { background: #fff; border: 1px solid #2b6cb0; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; color: #2b6cb0; }
+        .btn { display: block; width: 100%; padding: 15px; background: #2b6cb0; color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; text-align: center; margin-top: 20px; text-decoration: none; }
+        .btn:hover { background: #2c5282; }
+        .scoring-btns { margin-top: 10px; display: flex; gap: 10px; }
+        .score-btn { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-correct { background: #e6fffa; color: #234e52; border: 1px solid #38b2ac; }
+        .btn-correct.selected { background: #38b2ac; color: white; }
+        .btn-wrong { background: #fff5f5; color: #742a2a; border: 1px solid #f56565; }
+        .btn-wrong.selected { background: #f56565; color: white; }
+        .ans-item { margin-bottom: 20px; padding: 15px; background: #f7fafc; border-left: 4px solid #2f855a; }
+        .ans-q-text { font-size: 0.95em; color: #4a5568; margin: 10px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+        .ans-correct { font-weight: bold; color: #2f855a; font-size: 1.1em; }
+        .ans-explanation { font-size: 0.9em; color: #4a5568; margin-top: 5px; background: #fff; padding: 10px; border-radius: 4px; line-height: 1.5; }
+        .category-header { background: #4a5568; color: white; padding: 8px 15px; margin: 30px 0 15px 0; border-radius: 5px; font-size: 1em; font-weight: bold; }
+        .text-box { background: #f7fafc; border: 1px solid #cbd5e0; padding: 12px; margin: 8px 0; border-radius: 6px; font-family: "Georgia", serif; font-size: 1.05em; }
+
+        .print-ans-space, .print-score-table, .print-header-meta { display: none; }
+
+        /* --- 印刷用スタイル（Ctrl+Pで自動適用） --- */
+        @media print {
+            @page {
+                size: A4;
+                margin: 12mm 12mm 12mm 12mm;
+            }
+            body { background-color: #fff; color: #000; padding: 0; font-size: 10pt; max-width: 100%; }
+            .card { box-shadow: none; padding: 0; margin: 0; }
+            h1 { font-size: 16pt; color: #000; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 5px; }
+            
+            #timer-bar, #score-bar, .btn, .scoring-btns, .q-type, .card > p { display: none !important; }
+            
+            .print-header-meta { display: flex; justify-content: flex-end; gap: 20px; font-size: 10.5pt; margin-bottom: 15px; border-bottom: 1px solid #000; padding-bottom: 5px; }
+            .print-score-table { display: table; border-collapse: collapse; float: left; margin-right: 20px; }
+            .print-score-table td { border: 1px solid #000; padding: 4px 12px; text-align: center; font-size: 9.5pt; }
+            
+            .category-header { background: none !important; color: #000 !important; font-weight: bold; font-size: 11pt; border: 1px solid #000; padding: 3px 8px; margin: 15px 0 10px 0; border-radius: 0; page-break-after: avoid; }
+            
+            #questions-container-2 {
+                column-count: 2;
+                column-gap: 25px;
+                column-fill: auto;
+            }
+            
+            .question-item { page-break-inside: avoid; break-inside: avoid; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dotted #ccc; }
+            .q-num { color: #000; }
+            
+            .options-container { display: block; margin-top: 3px; }
+            .option-item { border: none; padding: 0; margin-right: 12px; display: inline-block; color: #000; font-size: 9.5pt; }
+            
+            .print-ans-space { display: block; margin-top: 5px; font-size: 9.5pt; color: #000; }
+            .ans-line { display: inline-block; width: 75%; border-bottom: 1px solid #000; margin-left: 5px; height: 16px; vertical-align: bottom; }
+            .ans-box { border: 1px solid #000; min-height: 40px; margin-top: 4px; width: 95%; }
+            
+            #questions-container-3, #questions-container-4 { column-count: 1 !important; }
+            
+            .ans-item { background: #fff; border: none; border-bottom: 1px dashed #000; padding: 8px 0; page-break-inside: avoid; }
+            .ans-q-text { color: #000; border-bottom: none; padding-bottom: 0; }
+            .ans-correct { color: #000; font-weight: bold; }
+            .ans-explanation { background: none; padding: 0; margin-top: 4px; font-size: 9pt; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="test-page" class="page active">
+    <div id="timer-bar">残り時間: <span id="timer">40:00</span></div>
+    
+    <div class="print-header-meta">
+        <table class="print-score-table">
+            <tr><td>得点</td><td style="width:60px; height:20px;">/100</td></tr>
+        </table>
+        <div>3年 &nbsp; &nbsp; 組 &nbsp; &nbsp; 番 &nbsp; 氏名：____________________</div>
+    </div>
+
+    <h1>3年国語 1学期期末対策テスト</h1>
+    <div class="card">
+        <p>※ノートを用意して解答を記入してください。最後に「テストを終了して採点ページへ」を押すと正解と詳細な解説が表示されます。</p>
+        <div id="test-container">
+            <div class="category-header">第1ブロック：一問一答（25問）［新出漢字・重要語句・俳句の基本知識］</div>
+            <div id="questions-container-2"></div>
+            <div class="category-header">第2ブロック：記述問題（15問）［文法・内容理解・抜き出し記述］</div>
+            <div id="questions-container-3"></div>
+            <div class="category-header">第3ブロック：発展・応用・高難易度（14問）［論理展開の分析・初見の考察記述］</div>
+            <div id="questions-container-4"></div>
+        </div>
+        <button class="btn" onclick="showAnswers()">テストを終了して採点ページへ</button>
+    </div>
+</div>
+
+<div id="answer-page" class="page">
+    <div id="score-bar">正答率: <span id="score-val">0</span>% (<span id="correct-count">0</span>/54問)</div>
+    <h1>解答・解説一覧</h1>
+    <div class="card" id="answers-container"></div>
+    <button class="btn" onclick="location.reload()">トップに戻る</button>
+</div>
+
+<script>
+const questions = [
+    // ＝第1ブロック：一問一答 (1-25)＝
+    { id: 1, type: "一問一答", cat: 2, q: "「作られた『物語』を超えて」より漢字書き取り：映画の上演などのために「物語をキャクセキする」の「キャクセキ」を漢字で書きなさい[cite: 8]。", a: "脚色", e: "「脚色（きゃくしょく）」は、小説や事件などを舞台や映画で上演できるように脚本にすること、また事実をおもしろく伝えるために色をつけることを意味します[cite: 8]。" },
+    { id: 2, type: "一問一答", cat: 2, q: "「作られた『物語』を超えて」より漢字書き取り：事実を大げさに「話をコチョウして伝える」の「コチョウ」を漢字で書きなさい[cite: 8]。", a: "誇張", e: "「誇張（こちょう）」は、実際よりも大げさに表現することを意味する漢字です[cite: 8]。" },
+    { id: 3, type: "一問一答", cat: 2, q: "「作られた『物語』を超えて」より漢字書き取り：「ヒサンな体験をする」の「ヒサン」を漢字で書きなさい[cite: 8]。", a: "悲惨", e: "「悲惨（ひさん）」は、みじめで、いたましく、むごい様子を表します[cite: 8]。" },
+    { id: 4, type: "一問一答", cat: 2, q: "「作られた『物語』を超えて」より漢字書き取り：「オウベイの家具を買う」の「オウベイ」を漢字で書きなさい[cite: 8]。", a: "欧米", e: "ヨーロッパ（欧州）とアメリカ（米国）を指す言葉です[cite: 8]。" },
+    { id: 5, type: "一問一答", cat: 2, q: "「作られた『物語』を超えて」より漢字書き取り：「大切な書類をフンシツした」の「フンシツ」を漢字で書きなさい[cite: 8]。", a: "紛失", e: "「紛（まぎれる）」と「失（うしなう）」の漢字を正確に組み合わせます[cite: 8]。" },
+    { id: 6, type: "一問一答", cat: 2, q: "「作られた『物語』を超えて」より重要表現：うわさなどが「予定をそれて勝手に一人で動き始めること」を意味する、作中に登場する四字の言葉を答えなさい[cite: 8]。", a: "独り歩き", e: "「うわさが独り歩きする」のように、本来の意図を離れて勝手に広まる現象を指します[cite: 8]。" },
+    { id: 7, type: "一問一答", cat: 2, q: "「作られた『物語』を超えて」より重要表現：「他の人の考えを聞こうとせず、自分だけでそれでよいと思いこむこと」を意味する、作中の言葉を答えなさい[cite: 8]。", a: "独りよがり", e: "自分勝手な解釈を避けるべきだという文脈で登場する重要語句です[cite: 8]。" },
+    { id: 8, type: "一問一答", cat: 2, q: "「作られた『物語』を超えて」より重要表現：「邪魔なものを押しのけてそこから除くこと」を意味する漢字2字の言葉を答えなさい[cite: 8]。", a: "排除", e: "意味を取り違えて相手を「排除」してはならない、という筆者の主張に関わる語句です[cite: 8]。" },
+    { id: 9, type: "一問一答", cat: 2, q: "「作られた『物語』を超えて」より漢字の読み：「知恵のゴンゲと言われている」の「権化」の読みをひらがなで書きなさい[cite: 8]。", a: "ごんげ", e: "抽象的な性質が、具体的な形をとってこの世に現れたかのように思える人やものを指します[cite: 8]。" },
+    { id: 10, type: "一問一答", cat: 2, q: "「作られた『物語』を超えて」より重要表現：おたがいに憎らしく思って争うことを、「〇〇〇合う」というか。〇〇〇に入る平仮名3字を答えなさい[cite: 8]。", a: "いがみ", e: "「兄弟でいがみ合う」などの形で使われる言葉です[cite: 8]。" },
+    { id: 11, type: "一問一答", cat: 2, q: "「俳句の可能性」より漢字書き取り：「転んでヒザに擦り傷ができてしまった」の「ヒザ」を漢字で書きなさい[cite: 8]。", a: "膝", e: "にくづき（月）に「漆」の右側のようなパーツを組み合わせる、3年生の新出漢字です[cite: 8]。" },
+    { id: 12, type: "一問一答", cat: 2, q: "「俳句の可能性」より重要表現：時間の制限など、行動の自由を縛る条件を、「〇〇」というか。漢字2字で答えなさい[cite: 8]。", a: "制約", e: "「定型という制約」の文脈で登場する重要語句です[cite: 8]。" },
+    { id: 13, type: "一問一答", cat: 2, q: "「俳句の可能性」より重要表現：悪天候のため登頂を諦める、などのように物事を途中で諦めることを漢字2字で答えなさい[cite: 8]。", a: "断念", e: "子規の句において、定型の中でこれ以上言えないという「断念」を表すのに切れ字が使われていると解説されます[cite: 8]。" },
+    { id: 14, type: "一問一答", cat: 2, q: "「俳句の可能性」より重要表現：芸術作品を深く味わうことを意味する、漢字2字の言葉を答えなさい[cite: 8]。", a: "鑑賞", e: "「映画を鑑賞する」「俳句を鑑賞する」のように、深く味わう意味で使われます[cite: 8]。" },
+    { id: 15, type: "一問一答", cat: 2, q: "「俳句の可能性」より、五・七・五という決まった音数の形式のことを、俳句の用語で何というか。漢字2字で答えなさい[cite: 8]。", a: "定型", e: "五・七・五の定型は、俳句を支える基本的な約束の1つです[cite: 8]。" },
+    { id: 16, type: "一問一答", cat: 2, q: "俳句において、特定の季節を示すために詠み込む言葉を何というか。漢字2字で答えなさい[cite: 8]。", a: "季語", e: "季語によって示される季節感を基にして、情景やイメージを膨らませます[cite: 8]。" },
+    { id: 17, type: "一問一答", cat: 2, q: "句の中に柱となる季語を用い、それを五・七・五の定型で表現するという俳句を作るうえでの約束を何というか。漢字4字で答えなさい[cite: 8]。", a: "有季定型", e: "季語がある「有季」と、五・七・五という「定型」の約束を合わせた表現です[cite: 8]。" },
+    { id: 18, type: "一問一答", cat: 2, q: "俳句に使われるさまざまな季語のほか、解説や例句が季節・月ごとにまとめられている本を何というか。漢字3字で答えなさい[cite: 8]。", a: "歳時記", e: "一年の行事やその折々の風物などを集めて解説した書物です[cite: 8]。" },
+    { id: 19, type: "一問一答", cat: 2, q: "飯田龍太の句「どの子にも涼しく風の吹く日かな」において使われている、季節を表す言葉（季語）は何か。そのまま3字で抜き出しなさい[cite: 8]。", a: "涼し", e: "「涼し」は夏を表す季語です[cite: 8]。" },
+    { id: 20, type: "一問一答", cat: 2, q: "上の飯田龍太の句（問19）の季節（春夏秋冬）を答えなさい[cite: 8]。", a: "夏", e: "「涼し」という季語が含まれているため、季節は「夏」になります[cite: 8]。" },
+    { id: 21, type: "一問一答", cat: 2, q: "正岡子規の句「いくたびも雪の深さを尋ねけり」において使われている、季節を表す言葉（季語）は何か。そのまま1字で抜き出しなさい[cite: 8]。", a: "雪", e: "「雪」は冬を表す季語です[cite: 8]。" },
+    { id: 22, type: "一問一答", cat: 2, q: "上の正岡子規の句（問21）の季節（春夏秋冬）を答えなさい[cite: 8]。", a: "冬", e: "「雪」という季語が含まれているため、季節は「冬」になります[cite: 8]。" },
+    { id: 23, type: "一問一答", cat: 2, q: "句の切れ目に使い、定型の中では言い尽くせないことを余情として表現する働きをもつ、「や」「かな」「けり」などの言葉を何というか。漢字3字で答えなさい[cite: 8]。", a: "切れ字", e: "代表的な切れ字には「や・かな・けり・ぞ」などがあります[cite: 8]。" },
+    { id: 24, type: "一問一答", cat: 2, q: "種田山頭火の句「分け入つても分け入つても青い山」のように、五・七・五の定型にとらわれずに作られた自由な音律の俳句を何というか。漢字5字で答えなさい[cite: 8]。", a: "自由律俳句", e: "定型の制約を超えて、独自の自由なリズムを表現する形式の俳句です[cite: 8]。" },
+    { id: 25, type: "一問一答", cat: 2, q: "同じく種田山頭火の句のように、句の中に季節を表す言葉（季語）が含まれていない俳句のことを何というか。漢字4字で答えなさい[cite: 8]。", a: "無季俳句", e: "季語のない俳句を「無季俳句」と呼びます[cite: 8]。" },
+
+    // ＝第2ブロック：記述問題 (26-40)＝
+    { id: 26, type: "記述", cat: 3, q: "【文法】「弟は走って先に出かけた姉を追いかけた。」という一文において、読点（、）の位置によって意味のまとまりが変わります。走っているのが「弟」であると解釈できるように、適切な位置に読点を入れた一文を書きなさい[cite: 8]。", a: "弟は走って、先に出かけた姉を追いかけた。", e: "「弟は走って、」と読点を入れることで、「走って」が「弟は」にかかる意味のまとまりになり、走っているのが弟であると明確になります[cite: 8]。" },
+    { id: 27, type: "記述", cat: 3, q: "【文法】同じ文章において、走っているのが「姉」であると解釈できるように、適切な位置に読点を入れた一文を書きなさい[cite: 8]。", a: "弟は、走って先に出かけた姉を追いかけた。", e: "「弟は、」の直後に読点を入れることで、「走って先に出かけた姉」がひとまとまりの修飾語になり、走っているのが姉であると明確になります[cite: 8]。" },
+    { id: 28, type: "記述", cat: 3, q: "「作られた『物語』を超えて」より：筆者が研究しているゴリラについて、人間はどのような誤解に基づく「物語」を作り出したか、文章中から14字でそのまま書き抜きなさい[cite: 8]。", a: "ゴリラは好戦的で凶暴な動物だ", e: "ヨーロッパの探検家たちがドラミングを戦いの宣言だと都合よく解釈し、作り上げた誤解の内容です[cite: 8]。" },
+    { id: 29, type: "記述", cat: 3, q: "「作られた『物語』を超えて」より：人間が作った誤解の「物語」が、それを受け取ったゴリラたちにどのような結果をもたらしたか、文章中から6字でそのまま書き抜きなさい[cite: 8]。", a: "悲惨な運命", e: "人間による勝手なイメージ付けにより、ゴリラは「悲惨な運命」へと追いやられました[cite: 8]。" },
+    { id: 30, type: "記述", cat: 3, q: "「作られた『物語』を超えて」より：人間において、ゴリラのドラミングに対する誤解がこれほど世界中に広まってしまったのは、人間がどのような性質をもっているからだと筆者は説明していますか。「印象」という言葉を使って説明しなさい[cite: 8]。", a: "人間がある印象を基に「物語」を作り、それを仲間に伝えたがる性質。", e: "人間には、自分が得た一部の印象を脚色して他人に語りたがる本質的な性質があると指摘されています[cite: 8]。" },
+    { id: 31, type: "記述", cat: 3, q: "「作られた『物語』を超えて」より：人間の発明した「言葉」は、社会に知識を蓄積させた一方で、どのようなマイナスの力（罪の部分）をもっていると筆者は述べていますか。「脚色」という言葉を使って説明しなさい[cite: 8]。", a: "自分の体験を脚色したり誇張したりして、誤解に基づいた「物語」を作り出してしまう力。", e: "言葉は、実際には見ていないことすらあたかも体験したかのように語る力をもつため、誤解を社会の常識に変えてしまいかねません[cite: 8]。" },
+    { id: 32, type: "記述", cat: 3, q: "「作られた『物語』を超えて」より：言葉や文化の違う民族の間で、誤解に基づいた「物語」が修復されないまま独り歩きをすると、どのような悲劇を招きかねないと述べられているか、文章中から11字でそのまま書き抜きなさい[cite: 8]。", a: "敵対意識を増幅しかねない", e: "言葉の通じない間柄では誤解が解けず、互いに相手を悪とする都合のよい「物語」を継承してしまうと説明されています[cite: 8]。" },
+    { id: 33, type: "記述", cat: 3, q: "「作られた『物語』を超えて」より：作られた「物語」による誤解や偏見を解くために、私たちは今後どのような態度や視点をもつことが最も重要であると筆者は主張していますか。最後の段落から説明しなさい[cite: 8]。", a: "自分勝手な独りよがりな解釈を避け、これまでの常識を疑うこと、 shadowにいる存在に思いを巡らすこと、そして自分を相手の立場に置き換えて考えてみる視点。", e: "相手の立場に立ち、一つ一つの行動にどんな意味があるかを照らし合わせて考えることが大切だと結ばれています[cite: 8]。" },
+    { id: 34, type: "記述", cat: 3, q: "「俳句の可能性」より：俳句という表現形式が、一般的な文章（散文）や報道記事などと決定的に異なっている最大の特徴は何か。「省略」という言葉を使って説明しなさい[cite: 8]。", a: "詳しい説明が省略されているため、その省略された部分を読む人が自身の自由な解釈で補って鑑賞できる点。", e: "商用文章とは異なり、俳句は短さゆえに多くを省略しますが、それによって読む側の多様な想像力をかきたてることができます[cite: 8]。" },
+    { id: 35, type: "記述", cat: 3, q: "「俳句の可能性」より：正岡子規の句「いくたびも雪の深さを尋ねけり」において、最後の「けり」という切れ字は、具体的にどのような役割を果たしていると説明されていますか。「制約」という言葉を使って説明しなさい[cite: 8]。", a: "五・七・五という定型の制約の中ではこれ以上は言い尽くせないという断念を表しつつ、言い尽くせない心情や余情を補う役割。", e: "病床に伏せり雪を確かめられないもどかしさと、定型の制限による限界（断念）を切れ字が補っていると解説されています[cite: 8]。" },
+    { id: 36, type: "記述", cat: 3, q: "「俳句を味わう」より、中村草田男の句「萬緑の中や吾子の歯生え初むる」において、この句に表現されている鮮やかな「色彩の対比」を2つの色を明記して説明しなさい[cite: 8]。", a: "見渡すかぎりの山々の「緑」と、我が子の口元に生え始めたばかりの小さな歯の「白」との対比。", e: "萬緑（ばんりょく）の圧倒的な緑の中に、点として存在する赤ん坊の歯の白さが際立つ、視覚的・色彩的な美しさをもつ句です[cite: 8]。" },
+    { id: 37, type: "記述", cat: 3, q: "「俳句を味わう」より、友岡子郷の句「跳箱の突き手一瞬冬が来る」において、「一瞬」と「冬」という2つの時間を結びつけることで、どのような効果が生み出されているか説明しなさい[cite: 8]。", a: "跳び箱に手を突いた短い「一瞬」の躍動感と、長い時間をかけて訪れる「冬」というスケールの異なる時間を結びつけ、初冬の季節感を鮮烈に表現する効果。", e: "一瞬の動作の宙で触れた澄んだ大気に、冬の訪れをハッと察知した感覚が見事に表現されています[cite: 8]。" },
+    { id: 38, type: "記述", cat: 3, q: "「重要語句」：「鑑賞」という言葉を正しく使って、文学作品や美術品などに対する短い例文を一つ作りなさい[cite: 8]。", a: "（例）週末は美術館へ出かけて、有名な画家の絵画をじっくり鑑賞した。", e: "「観賞（見て楽しむ）」とは異なり、芸術作品の価値を深く味わうという意味で正しく使います[cite: 8]。" },
+    { id: 39, type: "記述", cat: 3, q: "「重要語句」：「制約」という言葉を正しく使って、ルールや限界などの条件に関する短い例文を一つ作りなさい[cite: 8]。", a: "（例）このテストは時間の制約があるため、簡単な問題から解く必要がある。", e: "条件や制限によって行動の自由が縛られている様子を表現する文を作成します[cite: 8]。" },
+    { id: 40, type: "記述", cat: 3, q: "「重要語句」：「断念」という言葉を正しく使って、諦めることに関する短い例文を一つ作りなさい[cite: 8]。", a: "（例）激しい豪雨に見舞われたため、楽しみにしていたイベントを断念した。", e: "事情により、しようと思っていた行動を諦めるという文脈で正しく使用します[cite: 8]。" },
+
+    // ＝第3ブロック：発展・応用・高難易度 (41-54)＝
+    { id: 41, type: "発展", cat: 4, q: "「作られた『物語』を超えて」において、筆者は「具体例（ゴリラの事例）」からどのような「抽象的な人間一般の性質」を導き出していますか。論理の展開を踏まえて詳しく説明しなさい[cite: 8]。", a: "人間は自分自身の都合の良いように物事を解釈し、ある一部の印象だけを基にして主観的な「物語」を作り上げ、それをさらに他人に伝えたがるという性質。", e: "ゴリラが凶暴であるという誤った物語が広まった経緯から、人間全般がもつ共通の性質を抽象化して説明しています[cite: 8]。" },
+    { id: 42, type: "発展", cat: 4, q: "筆者の主張によると、誤解に基づいた「物語」が「独り歩き」をしてしまうことは、人間の社会においてどのような具体的な悲劇や危機を引き起こす原因になると述べていますか。詳しく説明しなさい[cite: 8]。", a: "何気ない行為が誤解されてうわさ話として誇張され、言葉や文化の違う民族間では誤解が修復されないまま敵対意識や紛争・衝突といった果てしない戦いを招く原因になる。", e: "異なる文化圏では誤解の修復が難しく、互いに相手を悪とする都合のよい「物語」を継承してしまうことが、世界中で争いが絶えない原因であると分析しています[cite: 8]。" },
+    { id: 43, type: "発展", cat: 4, q: "加藤楸邨の句「たんぽぽのぽぽと絮毛の飛び散るよ」における「ぽぽ」という言葉の表現について、筆者は声に出して読んだときにどのような効果があると評価していますか。詳しく説明しなさい[cite: 8]。", a: "「ぽぽ」という音の響きや発音するときの唇の形が、たんぽぽの絮毛のやわらかく軽やかに舞い上がる様子をよく表しており、声に出して読むことで言葉が生き生きと感じられる効果。", e: "音律や発音時の身体的な響きが、韻文ならではの生命感を読者にもたらしていると肯定的に評価されています[cite: 8]。" },
+    { id: 44, type: "発展", cat: 4, q: "種田山頭火の句「分け入つても分け入つても青い山」において、「分け入つても」という言葉を同じ形で繰り返している表現には、どのような情景や効果があると説明されていますか。詳しく説明しなさい[cite: 8]。", a: "「分け入っても」という言葉を繰り返すことで、どこまでもうっそうと続く深い山の中を、ひたすら一歩一歩進んでいく孤独で力強い歩調を想起させる効果。", e: "定型をはみ出した自由律の中で、言葉の反復がそのまま山道を歩く単調で重いリズム（歩調）と重なり合っていると述べられています[cite: 8]。" },
+    { id: 45, type: "発展", cat: 4, q: "飯田龍太の句「どの子にも涼しく風の吹く日かな」は、子供たちの遊ぶ具体的な場所や時間、背景の説明が何も書かれていません[cite: 8]。この「省略」が、読む人にどのような鑑賞をもたらすか、詳しく説明しなさい[cite: 8]。", a: "詳しい説明が省略されていることで、読む人が自分の過去の体験や校庭の木陰での思い出、海辺で遊んだ記憶など、それぞれの自由な解釈で情景を補って深く味わうことができる。", e: "限定的な情報をあえて提示しないことで、読者それぞれの脳内にある風景やイメージを引き出すという省略の美学を説明しています[cite: 8]。" },
+    { id: 46, type: "発展", cat: 4, q: "「作られた『物語』を超えて」の文章全体において、筆者が自分の主張（考え）を読者にわかりやすく伝え、納得させるために用いている「文章の構成・論理の展開のしかた」の特徴を説明しなさい[cite: 8]。", a: "ゴリラなどの具体的な事例（具体）を提示したあとに、人間がもつ共通の性質（抽象）を導き出すなど、具体と抽象を往き来しながら論を展開していく構成。", e: "身近なゴリラの誤解からスタートし、人間社会の紛争という大きなテーマへ論を展開する（具体⇄抽象の往来）ことで、文章に強い説得力を生み出しています[cite: 8]。" },
+    { id: 47, type: "発展", cat: 4, q: "尾崎放哉の句「咳をしても一人」について、この句の形式的な特徴を、「定型」と「季語」という2つの言葉を用いて説明しなさい[cite: 8]。", a: "五・七・五という約束の音数にとらわれない「自由律俳句」であり、かつ、句の中に季節を示す言葉が含まれていない「無季俳句」であるという特徴。", e: "従来の俳句の約束（有季定型）をあえてはみ出すことで、短い言葉の中に強烈な孤独感や寂寥感を際立たせている名句です[cite: 8]。" },
+    { id: 48, type: "発展", cat: 4, q: "教科書に掲載されている「歳時記」の説明として正しいものを、次のア〜エから1つ選び、記号で答えなさい[cite: 8]。<br>ア：昔の有名な俳人が作った歴史的な傑作ばかりを集めた名作集。<br>イ：季語を季節ごとに分類し、それぞれの意味の解説や例句を載せてまとめた本。<br>ウ：五・七・五の定型を作るための音数や、切れ字の正しい使い方を解説した本。<br>エ：自然現象や社会の出来事などの常識を疑うための科学的な記録集。", a: "イ", ans_literal: "イ", e: "歳時記（さいじき）とは、季語を春夏秋冬に分類し、解説や代表的な例句を添えて検索しやすくした俳句の辞書のようなものです[cite: 8]。" },
+    { id: 49, type: "発展", cat: 4, q: "山極寿一は、ゴリラの誤解を解いた先（物語を超えた先）に、「ゴリラが人間とは別の表現を用いて平和を保っている」という豊かな新しい世界を発見しました[cite: 8]。彼がゴリラの視点に立つために必要だったこととして述べている内容を説明しなさい[cite: 8]。", a: "自分勝手な解釈を避けてこれまでの常識を疑い、その動物が実際に暮らしている自然環境をよく知ること。", e: "人間の常識の枠を外して、相手が暮らす自然や文化の背景にまで思いを巡らせ、よく理解することが真実を知る鍵だと述べています[cite: 8]。" },
+    { id: 50, type: "発展", cat: 4, q: "国語の資料にある、ハイエナに関するテレビ番組の事例において、人々が抱いていた「ずる賢い動物」というイメージ（作られた物語）と、実際の「生態の真実」にはどのような大きなズレ（間違い）がありましたか。説明しなさい[cite: 8]。", a: "他の肉食動物の獲物を横取りするずる賢い動物だと思われていたが、実際には六割以上の食物を自力で入手しているという真実とのズレ。", e: "人間が都合よく作り上げた「ずる賢いハイエナ」という物語も、実際の詳細な観察（真実）によって大きな間違いであると覆される一例です[cite: 8]。" },
+    { id: 51, type: "発展", cat: 4, q: "水原秋櫻子の句「冬菊のまとふはおのがひかりのみ」における「表記のしかた（漢字と平仮名の使い分け）」が、読む人に与える表現効果について詳しく説明しなさい[cite: 8]。", a: "「冬菊」だけを漢字で書くことで主役としての強い存在感を浮かび上がらせ、後半の「まとふはおのがひかりのみ」という平仮名の連続によって、冬菊の放つ光のやわらかく静かな美しさを引き立てる効果。", e: "視覚的な文字の並びの硬軟を使い分けることで、冬菊の凛とした気高さと孤独な美の意図を表現しています[cite: 8]。" },
+    { id: 52, type: "発展", cat: 4, q: "宇多喜代子は、俳句という韻文において「定型」や「季語」という基本的な約束が存在することには、どのような意義や力があると言っていますか。説明しなさい[cite: 8]。", a: "短い句の中で、さまざまな想像をかきたてられる個々別々の言葉を、一つにしっかりとつなぎ合わせ、韻文としての表現を支える大きな力になるという意義。", e: "有季定型という確固たるベースがあるからこそ、短い言葉の中に豊かな情景や、それを超えた無季・自由律といった新たな可能性が成り立つと説いています[cite: 8]。" },
+    { id: 53, type: "発展", cat: 4, q: "山極寿一が本文中で述べている「言葉のもたらした功罪（良い面と悪い面）」について、それぞれ「知識の蓄積」と「誤解の独り歩き」という2つの言葉を用いて簡潔に説明しなさい[cite: 8]。", a: "言葉によって体験していない事柄を学び、社会に知識を蓄積して飛躍的に発展できたという「功」の一方で、自分の体験を脚色・誇張して誤解に基づいた物語を独り歩きさせ、社会に悲劇を招くという「罪」がある点。", e: "言葉は人間の可能性を爆発的に広げた一方で、デマや偏見を一瞬で拡散させて定着させてしまうという、両刃の剣の性質を持っていることを論じています[cite: 8]。" },
+    { id: 54, type: "発展", cat: 4, q: "「いくたびも雪の深さを尋ねけり」の句において、正岡子規が病室の外の雪景色を見ることができない「具体的な身体の状況」と、それでも雪の深さを尋ねる彼の「心情」を説明しなさい[cite: 8]。", a: "重い病気で寝たきりになっており、障子の穴から僅かに外が見えるだけで自ら雪を確かめられない状況。それでも何度も人に尋ねることで、外に広がる美しい雪景色を懸命に想像し、味わおうとする心情。", e: "自由を奪われた過酷な病床にあっても、他者の言葉を借りて外の世界とつながろうとする子規の旺盛な精神性と執念が描かれています[cite: 8]。" }
+];
+
+let timeLeft = 40 * 60;
+const timerDisplay = document.getElementById('timer');
+const userScores = new Array(questions.length).fill(null);
+
+function generateQuestions() {
+    questions.forEach(q => {
+        const container = document.getElementById(`questions-container-${q.cat}`);
+        const div = document.createElement('div');
+        div.className = 'question-item';
+        let content = `<span class="q-num">問${q.id}</span> <span class="q-type">${q.type}</span><br>${q.q}`;
+        
+        if (q.type === "記号選択" && q.options) {
+            content += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                content += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            content += `</div>`;
+            content += `<div class="print-ans-space">答：[ &nbsp; &nbsp; ]</div>`;
+        } else {
+            if (q.type === "記述" || q.id === 41 || q.id === 42 || q.id === 51 || q.id === 53 || q.id === 54) {
+                content += `<div class="print-ans-space">答：<div class="ans-box"></div></div>`;
+            } else {
+                content += `<div class="print-ans-space">答：<span class="ans-line"></span></div>`;
+            }
+        }
+        
+        div.innerHTML = content;
+        container.appendChild(div);
+    });
+}
+
+function showAnswers() {
+    clearInterval(countdown);
+    document.getElementById('test-page').classList.remove('active');
+    document.getElementById('answer-page').classList.add('active');
+    document.getElementById('score-bar').style.display = 'block';
+    
+    const container = document.getElementById('answers-container');
+    questions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'ans-item';
+        div.id = `ans-item-${idx}`;
+        
+        let qContent = `<div class="ans-q-text"><span class="q-num">問${q.id}</span> [${q.type}] ${q.q}`;
+        if (q.type === "記号選択" && q.options) {
+            qContent += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                qContent += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            qContent += `</div>`;
+        }
+        qContent += `</div>`;
+
+        let targetAnswer = q.a;
+        if (q.type === "記号選択" && q.ans_literal) {
+            targetAnswer = `${q.a} （${q.ans_literal}）`;
+        }
+
+        div.innerHTML = `
+            ${qContent}
+            <div><span class="ans-correct">模範解答・正解：${targetAnswer}</span></div>
+            <div class="ans-explanation"><strong>採点基準・詳細解説:</strong> ${q.e}</div>
+            <div class="scoring-btns">
+                <button class="score-btn btn-correct" id="btn-c-${idx}" onclick="setScore(${idx}, true)">○ 正解</button>
+                <button class="score-btn btn-wrong" id="btn-w-${idx}" onclick="setScore(${idx}, false)">× 不正解</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+    window.scrollTo(0, 0);
+}
+
+function setScore(idx, isCorrect) {
+    userScores[idx] = isCorrect;
+    document.getElementById(`btn-c-${idx}`).classList.toggle('selected', isCorrect);
+    document.getElementById(`btn-w-${idx}`).classList.toggle('selected', !isCorrect);
+    updateScore();
+}
+
+function updateScore() {
+    const correctCount = userScores.filter(s => s === true).length;
+    document.getElementById('correct-count').innerText = correctCount;
+    document.getElementById('score-val').innerText = Math.round((correctCount / questions.length) * 100);
+}
+
+const countdown = setInterval(() => {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+    timerDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    if (timeLeft <= 0) {
+        clearInterval(countdown);
+        alert('時間終了です！採点ページへ移ります。');
+        showAnswers();
+    }
+    timeLeft--;
+}, 1000);
+
+generateQuestions();
+</script>
+
+</body>
+</html>

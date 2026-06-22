@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中2数学 確認テスト（式の計算・乗除）＆ 中1数学 データの活用</title>
+    <style>
+        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f0f2f5; color: #333; }
+        .page { display: none; }
+        .active { display: block; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        h1 { color: #2c5282; text-align: center; border-bottom: 3px solid #2c5282; padding-bottom: 10px; }
+        #timer-bar, #score-bar { position: sticky; top: 0; background: #c53030; color: white; padding: 10px; text-align: center; font-weight: bold; border-radius: 5px; z-index: 1000; font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        #score-bar { background: #2f855a; top: 50px; display: none; }
+        .question-item { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #cbd5e0; }
+        .q-num { font-weight: bold; color: #2b6cb0; margin-right: 10px; }
+        .q-type { font-size: 0.8em; background: #edf2f7; padding: 2px 8px; border-radius: 4px; margin-left: 10px; color: #4a5568; }
+        .options-container { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .option-item { background: #fff; border: 1px solid #2b6cb0; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; color: #2b6cb0; }
+        .btn { display: block; width: 100%; padding: 15px; background: #2b6cb0; color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; text-align: center; margin-top: 20px; text-decoration: none; }
+        .btn:hover { background: #2c5282; }
+        .scoring-btns { margin-top: 10px; display: flex; gap: 10px; }
+        .score-btn { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-correct { background: #e6fffa; color: #234e52; border: 1px solid #38b2ac; }
+        .btn-correct.selected { background: #38b2ac; color: white; }
+        .btn-wrong { background: #fff5f5; color: #742a2a; border: 1px solid #f56565; }
+        .btn-wrong.selected { background: #f56565; color: white; }
+        .ans-item { margin-bottom: 20px; padding: 15px; background: #f7fafc; border-left: 4px solid #2f855a; }
+        .ans-q-text { font-size: 0.95em; color: #4a5568; margin: 10px 0; border-bottom: 1px solid #e2e880; padding-bottom: 10px; }
+        .ans-correct { font-weight: bold; color: #2f855a; font-size: 1.1em; }
+        .ans-explanation { font-size: 0.9em; color: #4a5568; margin-top: 5px; background: #fff; padding: 10px; border-radius: 4px; }
+        .category-header { background: #4a5568; color: white; padding: 8px 15px; margin: 30px 0 15px 0; border-radius: 5px; font-size: 1em; }
+        
+        /* 縦書き計算（筆算）の表示崩れ防止スタイル */
+        .vertical-calc-box {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1.2em;
+            line-height: 1.3;
+            background: #f8fafc;
+            padding: 12px 20px;
+            border-radius: 6px;
+            display: inline-block;
+            margin: 10px 0;
+            border: 1px solid #cbd5e0;
+            text-align: right;
+            letter-spacing: 2px;
+        }
+        .vertical-calc-line {
+            border-bottom: 2px solid #333;
+            margin-top: 2px;
+            margin-bottom: 4px;
+        }
+        
+        /* 度数分布表用スタイル */
+        .q-table { border-collapse: collapse; margin-top: 10px; margin-bottom: 10px; min-width: 280px; }
+        .q-table th, .q-table td { border: 1px solid #cbd5e0; padding: 6px 12px; text-align: center; font-size: 0.9em; }
+        .q-table th { background: #edf2f7; }
+    </style>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            chtml: {
+                matchFontHeight: false
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+
+<div id="test-page" class="page active">
+    <div id="timer-bar">残り時間: <span id="timer">40:00</span></div>
+    <h1>中2数学 確認テスト（式の計算・乗除）＆ 中1数学 データの活用</h1>
+    <div class="card">
+        <p>※ノートに解答を記入し、最後に「採点ページへ」を押して確認してください。</p>
+        <div id="test-container">
+            <div class="category-header">第1ブロック：記号選択（10問）</div>
+            <div id="questions-container-1"></div>
+            <div class="category-header">第2ブロック：基本公式・同類項の計算（15問）</div>
+            <div id="questions-container-2"></div>
+            <div class="category-header">第3ブロック：式の乗法・除法 計算（20問）</div>
+            <div id="questions-container-3"></div>
+            <div class="category-header">第4ブロック：複雑な計算・式の値【応用】（11問）</div>
+            <div id="questions-container-4"></div>
+            <div class="category-header">第5ブロック：データの活用・統計（14問）</div>
+            <div id="questions-container-5"></div>
+        </div>
+        <button class="btn" onclick="showAnswers()">テストを終了して採点ページへ</button>
+    </div>
+</div>
+
+<div id="answer-page" class="page">
+    <div id="score-bar">正答率: <span id="score-val">0</span>% (<span id="correct-count">0</span>/70問)</div>
+    <h1>解答・解説一覧</h1>
+    <div class="card" id="answers-container"></div>
+    <button class="btn" onclick="location.reload()">テストTOPに戻る</button>
+</div>
+
+<script>
+const questions = [
+    // 第1ブロック：記号選択 (1-10) [式の計算の分類・次数・統計用語]
+    { id: 1, type: "記号選択", cat: 1, q: "次の式の中から「単項式」をすべて選び、正しい組み合わせを答えなさい。<br>ア：$2x+3y$ &nbsp;&nbsp; イ：$x^2$ &nbsp;&nbsp; ウ：$8-x$ &nbsp;&nbsp; エ：$-3xyz$", options: ["ア と ウ", "イ と エ", "ア と イ", "ウ と エ"], a: "イ", ans_literal: "イ と エ", e: "数や文字のかけ算だけで表された式を単項式といいます。$x^2$ と $-3xyz$ が単項式です。アとウは単項式の和で表された多項式です。" },
+    { id: 2, type: "記号選択", cat: 1, q: "次の多項式の中から「2次式」であるものをすべて選び、正しい組み合わせを答えなさい。<br>ア：$\\frac{ab}{2}+\\frac{bc}{3}$ &nbsp;&nbsp; イ：$5x^2+2x+1$ &nbsp;&nbsp; ウ：$-3a^3+4a^2b$", options: ["ア と イ", "イ と ウ", "ア と ウ", "すべて2次式"], a: "ア", ans_literal: "ア と イ", e: "各項の次数のうち最も高いものをその式の次数といいます。アは各項とも文字が2つ（2次）、イは最高次が2乗（2次）なのでともに2次式です。ウは $4a^2b$ の項が3つの文字を含むため3次式になります。" },
+    { id: 3, type: "記号選択", cat: 1, q: "式 $-2xy^2$ の次数を答えなさい。", options: ["1次", "2次", "3次", "4次"], a: "ウ", ans_literal: "3次", e: "掛け合わされている文字の個数を次数といいます。$x$が1個、$y$が2個で計3個の文字が掛け合わされているため、次数は3（3次式）です。" },
+    { id: 4, type: "記号選択", cat: 1, q: "多項式 $4a-3b+2-5a-6$ の同類項の正しい組み合わせを選びなさい。", options: ["$4a$ と $-3b$, $2$ と $-6$", "$4a$ と $-5a$, $-3b$ と $+2$", "$4a$ と $-5a$, $2$ と $-6$", "すべて同類項である"], a: "ウ", ans_literal: "$4a$ と $-5a$, $2$ と $-6$", e: "文字の部分がまったく同じである項を同類項といいます。また、数だけの項どうしも同類項としてまとめられます。" },
+    { id: 5, type: "記号選択", cat: 1, q: "式 $-3a^3+4a^2b$ は、何次式ですか。", options: ["2次式", "3次式", "4次式", "5次式"], a: "イ", ans_literal: "3次式", e: "項 $-3a^3$ の次数は3、項 $4a^2b$ の次数は3です。最も高い次数が3なので、この多項式は3次式です。" },
+    { id: 6, type: "記号選択", cat: 1, q: "度数分布表において、区切った区間（「20kg以上24kg未満」など）の幅のことを何といいますか。", options: ["階級の値", "階級の幅", "相対度数", "累積度数"], a: "イ", ans_literal: "階級の幅", e: "データを整理するために区切った区間の幅を「階級の幅」といいます。" },
+    { id: 7, type: "記号選択", cat: 1, q: "ある階級の度数の、全体に対する割合を表した統計量を何といいますか。", options: ["累積度数", "最頻値", "相対度数", "平均値"], a: "ウ", ans_literal: "相対度数", e: "（その階級の度数）÷（度数の合計）で求められる割合を「相対度数」といいます。" },
+    { id: 8, type: "記号選択", cat: 1, q: "度数分布表において、最も度数（人数など）が大きい階級の真ん中の値（階級値）のことを何といいますか。", options: ["中央値（メジアン）", "最頻値（モード）", "平均値", "相対度数"], a: "イ", ans_literal: "最頻値（モード）", e: "データの中で最も頻繁に現れる値を最頻値（モード）といい、度数分布表では最も度数が大きい階級の階級値を用います。" },
+    { id: 9, type: "記号選択", cat: 1, q: "最初の階級からその階級までの度数を順に足し合わせたもののことを何といいますか。", options: ["累積度数", "相対度数", "累積相対度数", "平均値"], a: "ア", ans_literal: "累積度数", e: "各階級の度数を、最小の階級から順に対象の階級まで積み上げた合計を「累積度数」といいます。" },
+    { id: 10, type: "記号選択", cat: 1, q: "相対度数の合計は、データの総数や内容に関わらず常にいくつになりますか。", options: ["0.1", "0.5", "1", "100"], a: "ウ", ans_literal: "1", e: "すべての階級の相対度数を合計すると、割合の全体系である「1」（または1.00）になります。" },
+
+    // 第2ブロック：基本公式・同類項の計算 (11-25) [同類項・縦書き・横書き加減]
+    { id: 11, type: "一問一答", cat: 2, q: "次の式の同類項をまとめなさい。<br>$2x-5y-x+3y$", a: "$x-2y$", e: "$2x-x=x$, $-5y+3y=-2y$ となります。まとめて $x-2y$ です。" },
+    { id: 12, type: "一問一答", cat: 2, q: "次の式の同類項をまとめなさい。<br>$-x+2y+7x-8y$", a: "$6x-6y$", e: "$-x+7x=6x$, $2y-8y=-6y$ より、$6x-6y$ となります。" },
+    { id: 13, type: "一問一答", cat: 2, q: "次の式の同類項をまとめなさい。<br>$4a-3b+2-5a-6$", a: "$-a-3b-4$", e: "$4a-5a=-a$, $b$の項は $-3b$, 定数項は $2-6=-4$。よって $-a-3b-4$ です。" },
+    { id: 14, type: "一問一答", cat: 2, q: "次の式の同類項をまとめなさい。<br>$2a^2-4a-9a^2-2a$", a: "$-7a^2-6a$", e: "$a^2$の項と$a$の項は同類項ではないので別々に計算します。$2a^2-9a^2=-7a^2$, $-4a-2a=-6a$ より $-7a^2-6a$ です。" },
+    { id: 15, type: "一問一答", cat: 2, q: "次の計算をしなさい。<br>$(3a-2b)+(a+b)$", a: "$4a-b$", e: "かっこを外して同類項をまとめます。$3a-2b+a+b = 4a-b$ です。" },
+    { id: 16, type: "一問一答", cat: 2, q: "次の計算をしなさい。<br>$(x^2-4x+3)+(x^2+3x)$", a: "$2x^2-x+3$", e: "かっこを外すと $x^2-4x+3+x^2+3x$ となり、整理して $2x^2-x+3$ です。" },
+    { id: 17, type: "一問一答", cat: 2, q: "次の計算をしなさい。<br>$(2x-3y)-(5x+2y)$", a: "$-3x-5y$", e: "後ろのかっこを外すとき、符号が反転します。$2x-3y-5x-2y = -3x-5y$ です。" },
+    { id: 18, type: "一問一答", cat: 2, q: "次の計算をしなさい。<br>$(a-b+5)-(3a-2b+1)$", a: "$-2a+b+4$", e: "符号に注意して展開します。$a-b+5-3a+2b-1 = -2a+b+4$ です。" },
+    { id: 19, type: "一問一答", cat: 2, q: "次の計算をしなさい。<br>$(4x-5y)+(3x+2y)$", a: "$7x-3y$", e: "$4x+3x=7x$, $-5y+2y=-3y$ より $7x-3y$ となります。" },
+    { id: 20, type: "一問一答", cat: 2, q: "次の計算をしなさい。<br>$(3a^2-2a)+(2a^2-7a-5)$", a: "$5a^2-9a-5$", e: "$3a^2+2a^2=5a^2$, $-2a-7a=-9a$, 定数は $-5$。合わせて $5a^2-9a-5$ です。" },
+    { id: 21, type: "一問一答", cat: 2, q: "次の計算をしなさい。<br>$(2x-y)-(3x-4y)$", a: "$-x+3y$", e: "後ろの符号が変わります。$2x-y-3x+4y = -x+3y$ です。" },
+    { id: 22, type: "一問一答", cat: 2, q: "次の計算をしなさい。<br>$(3x+6y-4)-(5x-2y-2)$", a: "$-2x+8y-2$", e: "$3x+6y-4-5x+2y+2 = -2x+8y-2$ です。" },
+    { id: 23, type: "一問一答", cat: 2, q: "次の縦書きの計算をしなさい。<br><div class='vertical-calc-box'>&nbsp;&nbsp;5a - 6b<br>+)&nbsp;-a + 3b<br><div class='vertical-calc-line'></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>", a: "$4a-3b$", e: "各列をそのまま縦に足します。$5a + (-a) = 4a$, $-6b + 3b = -3b$。よって $4a-3b$ です。" },
+    { id: 24, type: "一問一答", cat: 2, q: "次の縦書きの計算をしなさい。<br><div class='vertical-calc-box'>&nbsp;&nbsp;2x - &nbsp;y<br>+)&nbsp;3x - 5y<br><div class='vertical-calc-line'></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>", a: "$5x-6y$", e: "縦に足し算します。$2x+3x=5x$, $-y+(-5y)=-6y$ より $5x-6y$ です。" },
+    { id: 25, type: "一問一答", cat: 2, q: "次の縦書きの計算をしなさい。<br><div class='vertical-calc-box'>&nbsp;&nbsp;3a + 5b<br>-)&nbsp;-4a + 8b<br><div class='vertical-calc-line'></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>", a: "$7a-3b$", e: "引き算なので、下の式の符号を入れ替えて足します。$3a - (-4a) = 7a$, $5b - 8b = -3b$ より $7a-3b$ です。" },
+
+    // 第3ブロック：式の乗法・除法 計算 (26-45) [単項式乗除・分配法則]
+    { id: 26, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$-4ab \\times (-3ab)$", a: "$12a^2b^2$", e: "マイナス×マイナスで符号はプラス。係数は $4 \\times 3 = 12$, 文字は $a \\times a = a^2$, $b \\times b = b^2$。よって $12a^2b^2$ です。" },
+    { id: 27, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$(-6a)^2$", a: "$36a^2$", e: "$(-6a) \\times (-6a) = 36a^2$ となります。符号がプラスになることに注意してください。" },
+    { id: 28, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$9a^3 \\div (-3a^2)$", a: "$-3a$", e: "符号はマイナス。$\\frac{9a^3}{-3a^2} = -3a$ となります。" },
+    { id: 29, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$-2(5a-b)$", a: "$-10a+2b$", e: "分配法則を使ってかっこの中の各項に $-2$ を掛けます。$-2 \times 5a + (-2) \times (-b) = -10a+2b$ です。" },
+    { id: 30, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$(6x^2-9x) \\div (-3)$", a: "$-2x^2+3x$", e: "各項を $-3$ で割ります。$\\frac{6x^2}{-3} + \\frac{-9x}{-3} = -2x^2+3x$ です。" },
+    { id: 31, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$(-3x)^3$", a: "$-27x^3$", e: "$-3$を3回掛けると $-27$。文字は $x^3$ なので、$-27x^3$ です。" },
+    { id: 32, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$-28x^2y \\div (-7xy)$", a: "$4x$", e: "負の数どうしの割り算なのでプラスになります。$\\frac{-28x^2y}{-7xy} = 4x$ です。" },
+    { id: 33, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$4(x+2y)-3(2x+3y)$", a: "$-2x-y$", e: "展開すると $4x+8y-6x-9y$。同類項をまとめて $-2x-y$ です。" },
+    { id: 34, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$3(3x-y)-2(6x+5y)$", a: "$-3x-13y$", e: "展開すると $9x-3y-12x-10y = -3x-13y$ となります。" },
+    { id: 35, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$(-8a^2+16a-12) \\times (-\\frac{1}{4})$", a: "$2a^2-4a+3$", e: "各項に $-\\frac{1}{4}$ を分配して掛けます。符号の変化に気をつけましょう。$2a^2-4a+3$ です。" },
+    { id: 36, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$(8x^2-12x) \\div (-\\frac{1}{4})$", a: "$-32x^2+48x$", e: "割り算を掛け算に直すと $\times (-4)$ となります。各項に $-4$ を掛けて $-32x^2+48x$ です。" },
+    { id: 37, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$(42x^2-54x-6) \\div (-6)$", a: "$-7x^2+9x+1$", e: "各項を $-6$ で割ります。最後の $-6 \\div (-6) = +1$ を忘れないようにしましょう。" },
+    { id: 38, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$2b \\times 4a \\times (-3ab)$", a: "$-24a^2b^2$", e: "係数を掛けて $2 \times 4 \times (-3) = -24$。文字をまとめて $a^2b^2$ です。" },
+    { id: 39, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$(12x^2y - 9xy^2) \\div 3xy$", a: "$4x-3y$", e: "それぞれの項を $3xy$ で割ります。$\\frac{12x^2y}{3xy} - \\frac{9xy^2}{3xy} = 4x-3y$ です。" },
+    { id: 40, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$-a(3a-5b+2)$", a: "$-3a^2+5ab-2a$", e: "$-a$ をそれぞれの項に分配して掛け算をします。$-3a^2+5ab-2a$ となります。" },
+    { id: 41, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$(-2a)^2 \\times 3b$", a: "$12a^2b$", e: "先に累乗の計算をします。$4a^2 \times 3b = 12a^2b$ となります。" },
+    { id: 42, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$15x^2y^2 \\div (-5xy^2)$", a: "$-3x$", e: "$\\frac{15x^2y^2}{-5xy^2} = -3x$ です。$y^2$は完全に相殺されます。" },
+    { id: 43, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$5(a-2b) + 2(3a+4b)$", a: "$11a-2b$", e: "展開すると $5a-10b+6a+8b$。同類項を整理して $11a-2b$ です。" },
+    { id: 44, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$-4(x-2y) - 3(2x-y)$", a: "$-10x+11y$", e: "展開時の符号に注意します。$-4x+8y-6x+3y = -10x+11y$ です。" },
+    { id: 45, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$(6ab-9a+12) \\div (-\\frac{3}{4})$", a: "$-8ab+12a-16$", e: "逆数である $-\\frac{4}{3}$ を各項に掛けます。$6ab \\times (-\\frac{4}{3}) = -8ab$, $-9a \times (-\\frac{4}{3}) = 12a$, $12 \times (-\frac{4}{3}) = -16$。よって $-8ab+12a-16$ です。" },
+
+    // 第4ブロック：複雑な計算・式の値【応用】 (46-56) [分数・3つ以上の項の乗除・式の値] (全11問すべて応用)
+    { id: 46, type: "発展応用", cat: 4, q: "次の計算をしなさい。<br>$8x^2y \\div (-\\frac{4}{5}xy)$", a: "$-10x$", e: "割り算を逆数の掛け算に直します。$8x^2y \\times (-\\frac{5}{4xy}) = -10x$ となります。" },
+    { id: 47, type: "発展応用", cat: 4, q: "次の計算をしなさい。<br>$2a^2b \\times (-3ab) \\div ab^2$", a: "$-6a^3$", e: "乗除が混ざった式は一つの分数にまとめます。$\\frac{2a^2b \times (-3ab)}{ab^2} = \\frac{-6a^3b^2}{ab^2} = -6a^3$ です。" },
+    { id: 48, type: "発展応用", cat: 4, q: "次の計算をしなさい。<br>$\\frac{3}{2}xy \\times (-4y)$", a: "$-6xy^2$", e: "$\\frac{3 \times (-4)}{2}xy^2 = -6xy^2$ です。分数と整数の約分を正確に行いましょう。" },
+    { id: 49, type: "発展応用", cat: 4, q: "次の計算をしなさい。<br>$\\frac{2}{3}xy^2 \\div (-\\frac{8}{9}y)$", a: "$-\\frac{3}{4}x$", e: "逆数の掛け算にします。$\\frac{2}{3}xy^2 \\times (-\\frac{9}{8y}) = -\frac{3}{4}x$ です。" },
+    { id: 50, type: "発展応用", cat: 4, q: "次の計算をしなさい。<br>$9xy^2 \\times (-2x) \\div \\frac{3}{4}y$", a: "$-24x^2y$", e: "$\\div \\frac{3}{4}y$ は $\\times \\frac{4}{3y}$ となります。$9xy^2 \\times (-2x) \\times \\frac{4}{3y} = -24x^2y$ です。" },
+    { id: 51, type: "発展応用", cat: 4, q: "次の計算をしなさい。<br>$-24a^4 \\div (-3a) \\div (-2a)^2$", a: "$2a$", e: "先に累乗の処理をします。$(-2a)^2 = 4a^2$。式は $-24a^4 \\div (-3a) \\div 4a^2 = \\frac{-24a^4}{-3a \times 4a^2} = \\frac{-24a^4}{-12a^3} = 2a$ となります。" },
+    { id: 52, type: "発展応用", cat: 4, q: "次の計算をしなさい。<br>$\\frac{a-b}{2}+\\frac{2a+b}{3}$", a: "$\\frac{7a-b}{6}$", e: "分母を6に通分します。$\\frac{3(a-b)+2(2a+b)}{6} = \\frac{3a-3b+4a+2b}{6} = \\frac{7a-b}{6}$ となります。" },
+    { id: 53, type: "発展応用", cat: 4, q: "次の計算をしなさい。<br>$\\frac{3x+y}{4}+\\frac{2x-3y}{3}$", a: "$\\frac{17x-9y}{12}$", e: "分母を12に通分します。$\\frac{3(3x+y)+4(2x-3y)}{12} = \\frac{9x+3y+8x-12y}{12} = \\frac{17x-9y}{12}$ です。" },
+    { id: 54, type: "発展応用", cat: 4, q: "$-\\frac{2}{3}x+y+2x-\\frac{3}{2}y$", a: "$\\frac{4}{3}x-\\frac{1}{2}y$", e: "同類項ごとに通分します。$x$の項：$(-\\frac{2}{3}+2)x = \\frac{4}{3}x$。$y$の項：$(1-\frac{3}{2})y = -\\frac{1}{2}y$。合わせて $\\frac{4}{3}x-\\frac{1}{2}y$ です。" },
+    { id: 55, type: "発展応用", cat: 4, q: "$x=-3, y=4$ のとき、次の式の値を求めなさい。<br>$2x-5y$", a: "$-26$", e: "$x$ に $-3$、$y$ に $4$ を代入します。$2 \times (-3) - 5 \times 4 = -6 - 20 = -26$ です。" },
+    { id: 56, type: "発展応用", cat: 4, q: "$x=3, y=-\\frac{1}{2}$ のとき、次の式の値を求めなさい。<br>$3(x-2y)-2(3x-4y)$", a: "$-10$", e: "代入する前にまず式を単純化します。$3x-6y-6x+8y = -3x+2y$。ここに値を代入して、$-3 \times 3 + 2 \times (-\\frac{1}{2}) = -9 - 1 = -10$ となります。" },
+
+    // 第5ブロック：データの活用・統計 (57-70) [データ活用14問：内、応用4問]
+    { id: 57, type: "一問一答", cat: 5, q: "次のデータはあるクラスの男子20人の握力測定結果です。このデータの「階級の幅」は何kgですか。<br>階級：20kg以上24kg未満, 24kg以上28kg未満...", a: "4kg", e: "$24 - 20 = 4$ より、区切られている区間の幅（階級の幅）は 4kg とわかります。" },
+    { id: 58, type: "一問一答", cat: 5, q: "次の度数分布表（生徒10人の体重）において、44kg以上48kg未満の階級の「相対度数」を求めなさい。<br><table class='q-table'><tr><th>階級(kg)</th><th>度数(人)</th></tr><tr><td>40~44</td><td>2</td></tr><tr><td>44~48</td><td>4</td></tr><tr><td>48~52</td><td>3</td></tr><tr><td>52~56</td><td>1</td></tr><tr><td>計</td><td>10</td></tr></table>", a: "0.4", e: "全体の人数が10人で、該当階級の度数が4人なので、相対度数は $\\frac{4}{10} = 0.4$ です。" },
+    { id: 59, type: "一問一答", cat: 5, q: "上の度数分布表において、48kg以上52kg未満の階級の「累積度数」を求めなさい。", a: "9人", e: "40~44kgの2人、44~48kgの4人、48~52kgの3人をすべて足し合わせます。$2 + 4 + 3 = 9$人となります。" },
+    { id: 60, type: "一問一答", cat: 5, q: "次の度数分布表において、「最頻値（モード）」を求めなさい。<br><table class='q-table'><tr><th>階級(秒)</th><th>度数(人)</th></tr><tr><td>20~30</td><td>2</td></tr><tr><td>30~40</td><td>7</td></tr><tr><td>40~50</td><td>14</td></tr><tr><td>50~60</td><td>9</td></tr><tr><td>計</td><td>32</td></tr></table>", a: "45秒", e: "最も度数が大きいのは「40秒以上50秒未満」の14人です。この階級の真ん中の値（階級値）である 45秒 が最頻値となります。" },
+    { id: 61, type: "一問一答", cat: 5, q: "次の女子20人の50m走の度数分布表において、記録が9.1秒の生徒は、どの階級に入りますか。〇秒以上〇秒未満の形で答えなさい。<br><table class='q-table'><tr><th>階級(秒)</th><th>度数(人)</th></tr><tr><td>7.5~8.0</td><td>2</td></tr><tr><td>8.0~8.5</td><td>3</td></tr><tr><td>8.5~9.0</td><td>7</td></tr><tr><td>9.0~9.5</td><td>5</td></tr><tr><td>9.5~10.0</td><td>2</td></tr><tr><td>10.0~10.5</td><td>1</td></tr><tr><td>計</td><td>20</td></tr></table>", a: "9.0秒以上9.5秒未満", e: "9.1秒は、9.0以上9.5未満の範囲に含まれるため、「9.0秒以上9.5秒未満」の階級に入ります。" },
+    { id: 62, type: "一問一答", cat: 5, q: "上の50m走の表において、8.5秒以上9.0秒未満の階級の「累積度数」を求めなさい。", a: "12人", e: "最初の階級から順に足します。$2 + 3 + 7 = 12$人です。" },
+    { id: 63, type: "一問一答", cat: 5, q: "上の50m走の表において、9.5秒以上10.0秒未満の階級の「相対度数」を求めなさい。", a: "0.1", e: "該当階級の度数は2人、全体の総数は20人です。$2 \\div 20 = 0.1$ となります。" },
+    { id: 64, type: "一問一答", cat: 5, q: "上の50m走の表において、最も度数が大きい階級の「階級値」を求めなさい。", a: "8.75秒", e: "最も度数が大きいのは「8.5~9.0秒」の7人です。その階級値は $(8.5 + 9.0) \\div 2 = 8.75$秒 となります。" },
+    { id: 65, type: "一問一答", cat: 5, q: "ある階級の度数が5人で、全体の度数の合計が25人のとき、この階級の相対度数を求めなさい。", a: "0.2", e: "$5 \\div 25 = 0.2$ となります。" },
+    { id: 66, type: "一問一答", cat: 5, q: "ある度数分布表で累積度数が18人、全体の度数の合計が20人のとき、この階級の「累積相対度数」を求めなさい。", a: "0.9", e: "累積度数を全体の合計で割ります。$18 \\div 20 = 0.9$ となります。" },
+    
+    // 以下、第5ブロック内の応用問題 (67-70) (すべて応用)
+    { id: 67, type: "発展応用", cat: 5, q: "問61の50m走の表において、9.0秒以上9.5秒未満の階級の「累積相対度数」を求めなさい。", a: "0.85", e: "9.0~9.5秒の階級までの累積度数は $2+3+7+5 = 17$人。よって累積相対度数は $\\frac{17}{20} = 0.85$ です。" },
+    { id: 68, type: "発展応用", cat: 5, q: "次の通学時間の度数分布表の空欄（ア、イ、ウ、エ）を埋め、(階級値) $\\times$ (度数)の合計である「エ」の値を求めなさい。<br><table class='q-table'><tr><th>階級(分)</th><th>階級値</th><th>度数(人)</th><th>(階級値) $\\times$ (度数)</th></tr><tr><td>0~10</td><td>5</td><td>ア</td><td>25</td></tr><tr><td>10~20</td><td>15</td><td>10</td><td>150</td></tr><tr><td>20~30</td><td>25</td><td>13</td><td>325</td></tr><tr><td>30~40</td><td>35</td><td>イ</td><td>ウ</td></tr><tr><td>計</td><td>-</td><td>30</td><td>エ</td></tr></table>", a: "570", e: "ア: $25 \\div 5 = 5$人。全体の計が30人なので、イ: $30 - (5+10+13) = 2$人。ウ: $35 \\times 2 = 70$。これらを全て足した合計エは $25 + 150 + 325 + 70 = 570$ となります。" },
+    { id: 69, type: "発展応用", cat: 5, q: "上の通学時間の度数分布表（問68）から、生徒30人の通学時間の「平均値」を求めなさい。", a: "19分", e: "平均値 ＝ （階級値 $\\times$ 度数の総計） $\div$ （度数の合計） で求められます。$570 \\div 30 = 19$分 となります。" },
+    { id: 70, type: "発展応用", cat: 5, q: "あるクラス40人でテストを行ったところ、度数分布表の最高階級（90点以上100点未満）の相対度数が 0.15 でした。この階級に入っている生徒は何人ですか。", a: "6人", e: "（度数） ＝ （合計の度数） $\\times$ （相対度数） で求まります。$40 \\times 0.15 = 6$人 となります。" }
+];
+
+let timeLeft = 40 * 60;
+const timerDisplay = document.getElementById('timer');
+const userScores = new Array(questions.length).fill(null);
+
+function generateQuestions() {
+    questions.forEach(q => {
+        const container = document.getElementById(`questions-container-${q.cat}`);
+        const div = document.createElement('div');
+        div.className = 'question-item';
+        let content = `<span class="q-num">問${q.id}</span> <span class="q-type">${q.type}</span><br>${q.q}`;
+        
+        if (q.type === "記号選択" && q.options) {
+            content += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                content += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            content += `</div>`;
+        }
+        
+        div.innerHTML = content;
+        container.appendChild(div);
+    });
+
+    if (window.MathJax) {
+        MathJax.typesetPromise();
+    }
+}
+
+function showAnswers() {
+    clearInterval(countdown);
+    document.getElementById('test-page').classList.remove('active');
+    document.getElementById('answer-page').classList.add('active');
+    document.getElementById('score-bar').style.display = 'block';
+    
+    const container = document.getElementById('answers-container');
+    questions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'ans-item';
+        div.id = `ans-item-${idx}`;
+        
+        let qContent = `<div class="ans-q-text"><span class="q-num">問${q.id}</span> [${q.type}] ${q.q}`;
+        if (q.type === "記号選択" && q.options) {
+            qContent += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                qContent += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            qContent += `</div>`;
+        }
+        qContent += `</div>`;
+
+        // 記号選択問題の場合、ア〜エの記号と正解の文字列の両方を表示する
+        let targetAnswer = q.a;
+        if (q.type === "記号選択" && q.ans_literal) {
+            targetAnswer = `${q.a} （${q.ans_literal}）`;
+        }
+
+        div.innerHTML = `
+            ${qContent}
+            <div><span class="ans-correct">正解：${targetAnswer}</span></div>
+            <div class="ans-explanation"><strong>解説:</strong> ${q.e}</div>
+            <div class="scoring-btns">
+                <button class="score-btn btn-correct" id="btn-c-${idx}" onclick="setScore(${idx}, true)">○ 正解</button>
+                <button class="score-btn btn-wrong" id="btn-w-${idx}" onclick="setScore(${idx}, false)">× 不正解</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+
+    if (window.MathJax) {
+        MathJax.typesetPromise();
+    }
+
+    window.scrollTo(0, 0);
+}
+
+const countdown = setInterval(() => {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+    timerDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    if (timeLeft <= 0) {
+        clearInterval(countdown);
+        alert('時間終了です！採点ページへ移ります。');
+        showAnswers();
+    }
+    timeLeft--;
+}, 1000);
+
+function setScore(idx, isCorrect) {
+    userScores[idx] = isCorrect;
+    document.getElementById(`btn-c-${idx}`).classList.toggle('selected', isCorrect);
+    document.getElementById(`btn-w-${idx}`).classList.toggle('selected', !isCorrect);
+    updateScore();
+}
+
+function updateScore() {
+    const correctCount = userScores.filter(s => s === true).length;
+    document.getElementById('correct-count').innerText = correctCount;
+    document.getElementById('score-val').innerText = Math.round((correctCount / questions.length) * 100);
+}
+
+generateQuestions();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>マイ アプリポータル</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background-color: #f6f8fa;
+        }
+        header {
+            background-color: #ffffff;
+            padding: 15px 20px;
+            border-bottom: 1px solid #d0d7de;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: max-height 0.3s ease-in-out, padding 0.3s ease-in-out, border 0.3s;
+            overflow: hidden;
+            max-height: 800px;
+        }
+        header.closed {
+            max-height: 0;
+            padding-top: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .toggle-container {
+            position: fixed;
+            top: 10px;
+            right: 20px;
+            z-index: 1000;
+        }
+        .toggle-btn {
+            padding: 6px 12px;
+            background-color: #24292f;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .toggle-btn:hover {
+            background-color: #444c56;
+        }
+
+        h1 {
+            margin: 0 0 15px 0;
+            font-size: 1.3rem;
+            color: #24292f;
+        }
+
+        /* 📁 各セクション（見出し）のデザイン */
+        .menu-section {
+            margin-bottom: 8px;
+            background-color: #fafafa;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .section-title {
+            font-size: 0.85rem;
+            color: #24292f;
+            font-weight: bold;
+            padding: 10px 14px;
+            cursor: pointer;
+            background-color: #f6f8fa;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        .section-title:hover {
+            background-color: #eaeef2;
+        }
+        /* 開閉用の矢印マーク */
+        .section-title::after {
+            content: '▼';
+            font-size: 0.7rem;
+            color: #57606a;
+            transition: transform 0.3s;
+        }
+        .menu-section.active .section-title::after {
+            transform: rotate(180deg);
+        }
+
+        /* 中身のナビゲーションリンク（最初は非表示） */
+        nav {
+            display: none;
+            gap: 8px;
+            flex-wrap: wrap;
+            padding: 12px;
+            background-color: #ffffff;
+            border-top: 1px solid #e1e4e8;
+        }
+        /* activeクラスがついたら中身を表示 */
+        .menu-section.active nav {
+            display: flex;
+        }
+
+        nav a {
+            display: inline-block;
+            padding: 8px 14px;
+            background-color: #ffffff;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            color: #0969da;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+        nav a:hover {
+            background-color: #f3f4f6;
+            border-color: #0969da;
+        }
+        #main-frame {
+            flex-grow: 1;
+            width: 100%;
+            border: none;
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toggle-container">
+        <button class="toggle-btn" onclick="toggleMenu()" id="btn-text">メニューを閉じる</button>
+    </div>
+
+    <header id="app-header">
+        <h1>My App Portal</h1>
+        
+        <div class="menu-section">
+            <div class="section-title">📅 2026中央3年 1学期期末対策</div>
+            <nav>
+                <a href="テスト対策/2026中央3年1学期期末/英語/index.html" target="content-frame">英語</a>
+                <a href="テスト対策/2026中央3年1学期期末/国語/index.html" target="content-frame">国語</a>
+                <a href="テスト対策/2026中央3年1学期期末/社会/index.html" target="content-frame">社会</a>
+                <a href="テスト対策/2026中央3年1学期期末/数学/index.html" target="content-frame">数学</a>
+                <a href="テスト対策/2026中央3年1学期期末/理科/index.html" target="content-frame">理科</a>
+            </nav>
+        </div>
+
+        <div class="menu-section">
+            <div class="section-title">🎯 北辰対策</div>
+            <nav>
+                <a href="北辰対策/第2回 英語/index.html" target="content-frame">第2回 英語</a>
+                <a href="北辰対策/第2回 数学/index.html" target="content-frame">第2回 数学</a>
+            </nav>
+        </div>
+
+        <div class="menu-section">
+            <div class="section-title">✍️ 英検対策</div>
+            <nav>
+                <a href="英検対策/2級単語/index.html" target="content-frame">2級 単語</a>
+                <a href="英検対策/準2級単語/index.html" target="content-frame">準2級 単語</a>
+                <a href="英検対策/準2級大問1〜2/index.html" target="content-frame">準2級 大問1〜2</a>
+                <a href="英検対策/準2級英作文/index.html" target="content-frame">準2級 英作文</a>
+                <a href="英検対策/3級単語/index.html" target="content-frame">3級 単語</a>
+                <a href="英検対策/3級大問1・2/index.html" target="content-frame">3級 大問1・2</a>
+                <a href="英検対策/3級大問4作文/index.html" target="content-frame">3級 大問4作文</a>
+                <a href="英検対策/3級大問5作文/index.html" target="content-frame">3級 大問5作文</a>
+                <a href="英検対策/4級単語/index.html" target="content-frame">4級 単語</a>
+                <a href="英検対策/4級大問1〜3/index.html" target="content-frame">4級 大問1〜3</a>
+                <a href="英検対策/5級単語/index.html" target="content-frame">5級 単語</a>
+            </nav>
+        </div>
+
+        <div class="menu-section">
+            <div class="section-title">🌿 普段の学習（英・国・理・社）</div>
+            <nav>
+                <a href="【英文法】整除和文英訳マスター/index.html" target="content-frame">【英文法】整除和文英訳マスター</a>
+                <a href="国語語彙クエスト/index.html" target="content-frame">国語語彙クエスト</a>
+                <a href="【暗記帳】理社一問一答/index.html" target="content-frame">【暗記帳】理社一問一答</a>
+                <a href="【反復チャレンジ】理社一問一答/index.html" target="content-frame">【反復チャレンジ】理社一問一答</a>
+                <a href="イオン＋近代年号マスター/index.html" target="content-frame">イオン＋近代年号マスター</a>
+            </nav>
+        </div>
+
+        <div class="menu-section">
+            <div class="section-title">🧮 普段の学習（数学計算）</div>
+            <nav>
+                <a href="【中1】数学計算マスター/index.html" target="content-frame">中1 数学計算マスター</a>
+                <a href="中1数学総復習アプリ/index.html" target="content-frame">中1 数学総復習</a>
+                <a href="【中2】数学計算マスター/index.html" target="content-frame">中2 数学計算マスター</a>
+                <a href="【中3】数学計算マスター/index.html" target="content-frame">中3 数学計算マスター</a>
+                <a href="【個人対応】数学計算演習/index.html" target="content-frame">【個人対応】数学計算演習</a>
+            </nav>
+        </div>
+
+        <div class="menu-section">
+            <div class="section-title">🛠️ 学習管理ツール</div>
+            <nav>
+                <a href="学習ToDoリスト/index.html" target="content-frame">学習ToDoリスト</a>
+            </nav>
+        </div>
+    </header>
+
+    <iframe name="content-frame" id="main-frame" src="about:blank"></iframe>
+
+    <script>
+        // メニュー全体の開閉用
+        function toggleMenu() {
+            const header = document.getElementById('app-header');
+            const btnText = document.getElementById('btn-text');
+            header.classList.toggle('closed');
+            if (header.classList.contains('closed')) {
+                btnText.textContent = 'メニューを開く';
+            } else {
+                btnText.textContent = 'メニューを閉じる';
+            }
+        }
+
+        // 📁 見出しごとの個別開閉用プログラム
+        document.querySelectorAll('.section-title').forEach(title => {
+            title.addEventListener('click', () => {
+                const section = title.parentElement;
+                section.classList.toggle('active');
+            });
+        });
+    </script>
+
+</body>
+</html>

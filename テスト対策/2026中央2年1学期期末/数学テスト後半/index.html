@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中2数学 確認テスト（連立方程式 全50問マスター）</title>
+    <style>
+        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f0f2f5; color: #333; }
+        .page { display: none; }
+        .active { display: block; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        h1 { color: #2c5282; text-align: center; border-bottom: 3px solid #2c5282; padding-bottom: 10px; }
+        #timer-bar, #score-bar { position: sticky; top: 0; background: #c53030; color: white; padding: 10px; text-align: center; font-weight: bold; border-radius: 5px; z-index: 1000; font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        #score-bar { background: #2f855a; top: 50px; display: none; }
+        .question-item { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #cbd5e0; }
+        .q-num { font-weight: bold; color: #2b6cb0; margin-right: 10px; }
+        .q-type { font-size: 0.8em; background: #edf2f7; padding: 2px 8px; border-radius: 4px; margin-left: 10px; color: #4a5568; }
+        .options-container { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .option-item { background: #fff; border: 1px solid #2b6cb0; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; color: #2b6cb0; }
+        .btn { display: block; width: 100%; padding: 15px; background: #2b6cb0; color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; text-align: center; margin-top: 20px; text-decoration: none; }
+        .btn:hover { background: #2c5282; }
+        .scoring-btns { margin-top: 10px; display: flex; gap: 10px; }
+        .score-btn { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-correct { background: #e6fffa; color: #234e52; border: 1px solid #38b2ac; }
+        .btn-correct.selected { background: #38b2ac; color: white; }
+        .btn-wrong { background: #fff5f5; color: #742a2a; border: 1px solid #f56565; }
+        .btn-wrong.selected { background: #f56565; color: white; }
+        .ans-item { margin-bottom: 20px; padding: 15px; background: #f7fafc; border-left: 4px solid #2f855a; }
+        .ans-q-text { font-size: 0.95em; color: #4a5568; margin: 10px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+        .ans-correct { font-weight: bold; color: #2f855a; font-size: 1.1em; }
+        .ans-explanation { font-size: 0.9em; color: #4a5568; margin-top: 5px; background: #fff; padding: 10px; border-radius: 4px; }
+        .category-header { background: #4a5568; color: white; padding: 8px 15px; margin: 30px 0 15px 0; border-radius: 5px; font-size: 1em; }
+        
+        .vertical-calc-box {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1.2em;
+            line-height: 1.3;
+            background: #f8fafc;
+            padding: 12px 20px;
+            border-radius: 6px;
+            display: inline-block;
+            margin: 10px 0;
+            border: 1px solid #cbd5e0;
+            text-align: right;
+            letter-spacing: 2px;
+        }
+        .vertical-calc-line {
+            border-bottom: 2px solid #333;
+            margin-top: 2px;
+            margin-bottom: 4px;
+        }
+    </style>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            chtml: {
+                matchFontHeight: false
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+
+<div id="test-page" class="page active">
+    <div id="timer-bar">残り時間: <span id="timer">50:00</span></div>
+    <h1>中2数学 確認テスト（連立方程式 全50問マスター）</h1>
+    <div class="card">
+        <p>※ノートに解答を記入し、最後に「テストを終了して採点ページへ」を押して確認してください。</p>
+        <div id="test-container">
+            <div class="category-header">第1ブロック：連立方程式とその解（10問）</div>
+            <div id="questions-container-1"></div>
+            <div class="category-header">第2ブロック：連立方程式の解き方―加減法（15問）</div>
+            <div id="questions-container-2"></div>
+            <div class="category-header">第3ブロック：連立方程式の解き方―代入法（10問）</div>
+            <div id="questions-container-3"></div>
+            <div class="category-header">第4ブロック：いろいろな連立方程式―かっこ・小数・分数（15問）</div>
+            <div id="questions-container-4"></div>
+        </div>
+        <button class="btn" onclick="showAnswers()">テストを終了して採点ページへ</button>
+    </div>
+</div>
+
+<div id="answer-page" class="page">
+    <div id="score-bar">正答率: <span id="score-val">0</span>% (<span id="correct-count">0</span>/50問)</div>
+    <h1>解答・解説一覧</h1>
+    <div class="card" id="answers-container"></div>
+    <button class="btn" onclick="location.reload()">テストTOPに戻る</button>
+</div>
+
+<script>
+const selectedQuestions = [
+    // 第1ブロック：連立方程式とその解 (1-10)
+    { id: 1, type: "記号選択", cat: 1, q: "二元一次方程式 $x+y=5$ の解について正しい記述をしたものを次から選びなさい。", options: ["$x=2, y=3$ の1組だけが解である。", "等式を成り立たせる整数 $x, y$ の組だけが解である。", "等式を成り立たせる $x, y$ のすべての値の組が解である。", "解は存在しない。"], a: "ウ", ans_literal: "等式を成り立たせる $x, y$ のすべての値の組が解である。", e: "二元一次方程式を満たす解は、小数や分数を含めると無数に存在し、それら全てが解となります。" },
+    { id: 2, type: "一問一答", cat: 1, q: "1個120円のりんご $x$ 個と、1個80円のオレンジ $y$ 個を買ったときの合計金額が960円でした。この数量の関係を二元一次方程式で表しなさい。", a: "$120x+80y=960$", e: "りんごの代金 $120x$ 円とオレンジの代金 $80y$ 円の合計が $960$ 円となります。" },
+    { id: 3, type: "記号選択", cat: 1, q: "$x, y$ の値の組 $(2, 3)$ が解である連立方程式を選びなさい。<br>(ア) $\\begin{cases}x+y=5\\\\ 2x-y=1\\end{cases}$ &nbsp;&nbsp; (イ) $\\begin{cases}x-y=-1\\\\ 3x+y=8\\end{cases}$", options: ["(ア)のみ", "(イ)のみ", "(ア)と(イ)の両方", "どちらでもない"], a: "ウ", ans_literal: "(ア)と(イ)の両方", e: "$x=2, y=3$ を代入すると、(ア)も(イ)も2つの等式がともに成り立ちます。" },
+    { id: 4, type: "一問一答", cat: 1, q: "二元一次方程式 $2x+y=10$ について、$x$ が $1, 2, 3$ のとき、それぞれ対応する正の整数 $y$ の値を求めなさい。", a: "x=1のときy=8, x=2のときy=6, x=3のときy=4", e: "それぞれ $y = 10 - 2x$ に代入して求めます。" },
+    { id: 5, type: "一問一答", cat: 1, q: "1本80円の鉛筆 $x$ 本と1冊120円のノート $y$ 冊の合計代金が800円であるときの方程式を立てなさい。", a: "$80x+120y=800$", e: "数量の関係をそのまま式に表します。両辺を40で割った $2x+3y=20$ も正解です。" },
+    { id: 6, type: "一問一答", cat: 1, q: "二元一次方程式 $x+2y=8$ を成り立たせる正の整数（自然数） $(x, y)$ の組をすべて求めなさい。", a: "(6, 1), (4, 2), (2, 3)", e: "$y=1$ のとき $x=6$、$y=2$ のとき $x=4$、$y=3$ のとき $x=2$。$y=4$ 以上のときは $x$ が正の整数になりません。" },
+    { id: 7, type: "記号選択", cat: 1, q: "連立方程式の解の意味として正しいものを選びなさい。", options: ["どちらか一方の方程式を満たす値の組", "2つの方程式を同時に満たす共通の値の組", "どちらの方程式も満たさない値の組", "グラフの傾きを表す値"], a: "イ", ans_literal: "2つの方程式を同時に満たす共通の値の組", e: "2つの二元一次方程式を組み合わせた連立方程式の解とは、両方を同時に成り立たせる値の組のことです。" },
+    { id: 8, type: "一問一答", cat: 1, q: "$x, y$ の値の組 $(x, y) = (1, -2)$ が、二元一次方程式 $ax + 3y = -5$ の解であるとき、 $a$ の値を求めなさい。", a: "a=1", e: "式に $x=1, y=-2$ を代入すると、$a\\times1 + 3\\times(-2) = -5$ より $a - 6 = -5$ となり、$a = 1$ となります。" },
+    { id: 9, type: "一問一答", cat: 1, q: "あるクラスの男子 $x$ 人、女子 $y$ 人の合計人数は35人です。この関係を表す方程式を書きなさい。", a: "$x+y=35$", e: "男子の人数と女子の人数を足すとクラス全体の人数になります。" },
+    { id: 10, type: "一問一答", cat: 1, q: "1枚52円の切手 $x$ 枚と1枚82円の切手 $y$ 枚を買って1000円札を出したら、おつりが140円でした。この数量の関係を表す方程式を書きなさい。", a: "$52x+82y=860$", e: "使った代金は $1000 - 140 = 860$（円）となります。よって $52x + 82y = 860$ です。" },
+
+    // 第2ブロック：連立方程式の解き方―加減法 (11-25)
+    { id: 11, type: "一問一答", cat: 2, q: "加減法で解きなさい： $\\begin{cases}x+y=7\\\\ x-y=1\\end{cases}$", a: "x=4, y=3", e: "2つの式をたすと $2x=8$ より $x=4$。これを上の式に代入して $y=3$ となります。" },
+    { id: 12, type: "一問一答", cat: 2, q: "加減法で解きなさい： $\\begin{cases}2x+y=8\\\\ x+y=5\\end{cases}$", a: "x=3, y=2", e: "上の式から下の式をひくと $x=3$。下の式に代入して $3+y=5$ より $y=2$ となります。" },
+    { id: 13, type: "一問一答", cat: 2, q: "加減法で解きなさい： $\\begin{cases}3x+2y=12\\\\ 3x-y=3\\end{cases}$", a: "x=2, y=3", e: "上の式から下の式をひくと $3y=9$ より $y=3$。下の式に代入して $3x-3=3$ より $x=2$ です。" },
+    { id: 14, type: "一問一答", cat: 2, q: "加減法で解きなさい： $\\begin{cases}x-2y=-4\\\\ 3x+2y=12\\end{cases}$", a: "x=2, y=3", e: "2つの式をたすと $4x=8$ より $x=2$。これを上の式に代入すると $2-2y=-4$ より $y=3$ となります。" },
+    { id: 15, type: "一問一答", cat: 2, q: "加減法で解きなさい： $\\begin{cases}4x+3y=15\\\\ 2x+3y=9\\end{cases}$", a: "x=3, y=1", e: "上の式から下の式をひくと $2x=6$ より $x=3$。下の式に代入して $6+3y=9$ より $3y=3$ となり $y=1$ となります。$(x, y) = (3, 1)$" },
+    { id: 16, type: "一問一答", cat: 2, q: "加減法で解きなさい： $\\begin{cases}5x-2y=11\\\\ 3x+2y=13\\end{cases}$", a: "x=3, y=2", e: "2つの式をたすと $8x=24$ より $x=3$。下の式に代入すると $9+2y=13$ より $y=2$ となります。" },
+    { id: 17, type: "一問一答", cat: 2, q: "加減法で解きなさい： $\\begin{cases}2x+3y=13\\\\ x-2y=-4\\end{cases}$", a: "x=2, y=3", e: "下の式を2倍して $2x-4y=-8$。上の式からこの式をひくと $7y=21$ より $y=3$。下の式に代入して $x-6=-4$ より $x=2$ となります。" },
+    { id: 18, type: "一問一答", cat: 2, q: "加減法で解きなさい： $\\begin{cases}3x-y=7\\\\ 2x+3y=12\\end{cases}$", a: "x=3, y=2", e: "上の式を3倍して $9x-3y=21$。これと下の式をたすと $11x=33$ より $x=3$。上の式に代入して $9-y=7$ より $y=2$ となります。" },
+    { id: 19, type: "一問一答", cat: 2, q: "加減法で解きなさい： $\\begin{cases}4x+3y=10\\\\ 3x+2y=7\\end{cases}$", a: "x=1, y=2", e: "上の式を2倍、下の式を3倍して $y$ の係数をそろえます。$\\begin{cases}8x+6y=20\\\\ 9x+6y=21\\end{cases}$ 下の式から上の式をひくと $x=1$。これを代入して $y=2$ となります。" },
+    { id: 20, type: "一問一答", cat: 2, q: "加減法で解きなさい： $\\begin{cases}2x+5y=-1\\\\ 3x-2y=8\\end{cases}$", a: "x=2, y=-1", e: "上の式を2倍、下の式を5倍してたすと $19x=38$ より $x=2$。上の式に代入して $4+5y=-1$ より $y=-1$ となります。" },
+    { id: 21, type: "一問一答", cat: 2, q: "加減法で解きなさい： $\\begin{cases}3x-4y=10\\\\ 2x+3y=1\\end{cases}$", a: "x=2, y=-1", e: "上の式を3倍、下の式を4倍してたすと $17x=34$ より $x=2$。下の式に代入して $4+3y=1$ より $y=-1$ です。" },
+    { id: 22, type: "一問一答", cat: 2, q: "加減法で解きなさい： $\\begin{cases}x+3y=3\\\\ 2x+3y=3\\end{cases}$", a: "x=0, y=1", e: "下の式から上の式をひくと $x=0$。上の式に代入すると $3y=3$ より $y=1$ となります。" },
+    { id: 23, type: "一問一答", cat: 2, q: "加減法で解きなさい： $\\begin{cases}-x+2y=8\\\\ 3x-2y=-4\\end{cases}$", a: "x=2, y=5", e: "2つの式をそのまたすと $2x=4$ より $x=2$。上の式に代入して $-2+2y=8$ より $y=5$ となります。" },
+    { id: 24, type: "一問一答", cat: 2, q: "加減法で解きなさい： $\\begin{cases}7x-3y=9\\\\ 2x+3y=9\\end{cases}$", a: "x=2, y=5/3", e: "2つの式をたすと $9x=18$ より $x=2$。下の式に代入すると $4+3y=9$ より $3y=5$ となり $y=\\frac{5}{3}$ となります。" },
+    { id: 25, type: "一問一答", cat: 2, q: "加減法で解きなさい： $\\begin{cases}6x+5y=-2\\\\ 6x-y=22\\end{cases}$", a: "x=3, y=-4", e: "上の式から下の式をひくと $6y=-24$ より $y=-4$。下の式に代入すると $6x-(-4)=22 \\rightarrow 6x=18$ より $x=3$ となります。" },
+
+    // 第3ブロック：連立方程式の解き方―代入法 (26-35)
+    { id: 26, type: "一問一答", cat: 3, q: "代入法で解きなさい： $\\begin{cases}y=2x\\\\ x+y=9\\end{cases}$", a: "x=3, y=6", e: "下の式の $y$ に $2x$ を代入すると $x+2x=9 \\rightarrow 3x=9$ より $x=3$。よって $y=6$ です。" },
+    { id: 27, type: "一問一答", cat: 3, q: "代入法で解きなさい： $\\begin{cases}x=y+3\\\\ 2x+3y=11\\end{cases}$", a: "x=4, y=1", e: "下の式の $x$ に $y+3$ を代入すると $2(y+3)+3y=11 \\rightarrow 5y+6=11 \\rightarrow 5y=5$ より $y=1$。よって $x=4$ です。" },
+    { id: 28, type: "一問一答", cat: 3, q: "代入法で解きなさい： $\\begin{cases}3x-2y=12\\\\ y=3x\\end{cases}$", a: "x=-4, y=-12", e: "上の式の $y$ に $3x$ を代入すると $3x-2(3x)=12 \\rightarrow -3x=12$ より $x=-4$。よって $y=-12$ となります。" },
+    { id: 29, type: "一問一答", cat: 3, q: "代入法で解きなさい： $\\begin{cases}x=-5y+4\\\\ 2x+y=-1\\end{cases}$", a: "x=-1, y=1", e: "下の式に上の式を代入して $2(-5y+4)+y=-1 \\rightarrow -9y+8=-1 \\rightarrow -9y=-9$ より $y=1$。よって $x=-1$ です。" },
+    { id: 30, type: "一問一答", cat: 3, q: "代入法で解きなさい： $\\begin{cases}y=x-2\\\\ 3x-2y=9\\end{cases}$", a: "x=5, y=3", e: "上の式を下の式に代入して $3x-2(x-2)=9 \\rightarrow x+4=9$ より $x=5$。よって $y=3$ となります。" },
+    { id: 31, type: "一問一答", cat: 3, q: "代入法で解きなさい： $\\begin{cases}2x+y=7\\\\ y=3x-3\\end{cases}$", a: "x=2, y=3", e: "上の式の $y$ に $3x-3$ を代入すると $2x+(3x-3)=7 \\rightarrow 5x=10$ より $x=2$。よって $y=3$ です。" },
+    { id: 32, type: "一問一答", cat: 3, q: "代入法で解きなさい： $\\begin{cases}x=2y+1\\\\ 3x-5y=4\\end{cases}$", a: "x=3, y=1", e: "下の式に $x=2y+1$ を代入すると $3(2y+1)-5y=4 \\rightarrow 6y+3-5y=4 \\rightarrow y=1$。これを上の式に代入して $x=3$ となります。" },
+    { id: 33, type: "一問一答", cat: 3, q: "代入法で解きなさい： $\\begin{cases}y=-2x+5\\\\ 4x+3y=11\\end{cases}$", a: "x=2, y=1", e: "下の式に代入すると $4x+3(-2x+5)=11 \\rightarrow -2x+15=11 \\rightarrow -2x=-4$ より $x=2$。よって $y=1$ です。" },
+    { id: 34, type: "一問一答", cat: 3, q: "代入法で解きなさい： $\\begin{cases}3x+y=10\\\\ 2x-3y=3\\end{cases}$", a: "x=3, y=1", e: "上の式を $y=10-3x$ と変形して下の式に代入します。$2x-3(10-3x)=3 \\rightarrow 11x-30=3 \\rightarrow 11x=33$ より $x=3$。よって $y=1$ です。" },
+    { id: 35, type: "一問一答", cat: 3, q: "代入法で解きなさい： $\\begin{cases}y=x\\\\ 5x+2y=14\\end{cases}$", a: "x=2, y=2", e: "下の式の $y$ に $x$ を代入すると $7x=14$ より $x=2$。よって $y=2$ となります。" },
+
+    // 第4ブロック：いろいろな連立方程式―かっこ・小数・分数 (36-50)
+    { id: 36, type: "一問一答", cat: 4, q: "かっこを含む式を解きなさい： $\\begin{cases}4x+7y=39\\\\ 2(x-y)=3x+3y\\end{cases}$", a: "x=15, y=-3", e: "下の式を展開して整理すると $x=-5y$。これを上の式に代入すると $-20y+7y=39 \\rightarrow -13y=39$ より $y=-3$。よって $x=15$ となります。" },
+    { id: 37, type: "一問一答", cat: 4, q: "かっこを含む式を解きなさい： $\\begin{cases}3(x+2y)=5(x-4)\\\\ x+3y=-2\\end{cases}$", a: "x=4, y=-2", e: "上の式を整理すると $x-3y=10$。これと下の式 $x+3y=-2$ をたすと $2x=8 \\rightarrow x=4$。よって $y=-2$ となります。" },
+    { id: 38, type: "一問一答", cat: 4, q: "かっこを含む式を解きなさい： $\\begin{cases}2x-(x+7y)=13\\\\ 2(x+3y)-5y=-4\\end{cases}$", a: "x=-1, y=-2", e: "整理すると $\\begin{cases}x-7y=13\\\\ 2x+y=-4\\end{cases}$ となり、これを解くと $x=-1, y=-2$ となります。" },
+    { id: 39, type: "一問一答", cat: 4, q: "小数を含む式を解きなさい： $\\begin{cases}0.2x+0.3y=1.1\\\\ x-2y=-5\\end{cases}$", a: "x=1, y=3", e: "上の式を10倍して $2x+3y=11$ とします。下の式を2倍して引くなどして解くと $x=1, y=3$ となります。" },
+    { id: 40, type: "一問一答", cat: 4, q: "小数を含む式を解きなさい： $\\begin{cases}0.05x+0.04y=0.3\\\\ x+y=7\\end{cases}$", a: "x=2, y=5", e: "上の式を100倍して $5x+4y=30$。下の式を4倍して引くと $x=2$。よって $y=5$ です。" },
+    { id: 41, type: "一問一答", cat: 4, q: "分数を含む式を解きなさい： $\\begin{cases}\\frac{1}{2}x+\\frac{1}{3}y=5\\\\ x-y=0\\end{cases}$", a: "x=6, y=6", e: "上の式を6倍して $3x+2y=30$。下の式より $x=y$ なので代入して $5x=30 \\rightarrow x=6, y=6$ となります。" },
+    { id: 42, type: "一問一答", cat: 4, q: "分数を含む式を解きなさい： $\\begin{cases}x+2y=8\\\\ \\frac{x}{3}-\\frac{y}{2}=-\\frac{5}{6}\\end{cases}$", a: "x=2, y=3", e: "下の式を6倍して $2x-3y=-5$。上の式を2倍した $2x+4y=16$ から引くと $7y=21 \\rightarrow y=3$。上の式に代入して $x=2$ となります。" },
+    { id: 43, type: "一問一答", cat: 4, q: "かっこを含む式を解きなさい： $\\begin{cases}3(x+y)=2x-1\\\\ x+y=-5\\end{cases}$", a: "x=-7, y=2", e: "下の式を上の式に代入すると $3\\times(-5)=2x-1 \\rightarrow -15=2x-1 \\rightarrow 2x=-14$ より $x=-7$。よって $y=2$ となります。" },
+    { id: 44, type: "一問一答", cat: 4, q: "小数を含む式を解きなさい： $\\begin{cases}0.3x-0.1y=0.9\\\\ 0.2x+0.5y=2.3\\end{cases}$", a: "x=4, y=3", e: "両方の式を10倍して $\\begin{cases}3x-y=9\\\\ 2x+5y=23\\end{cases}$ とし、加減法などで解くと $x=4, y=3$ となります。" },
+    { id: 45, type: "一問一答", cat: 4, q: "分数を含む式を解きなさい： $\\begin{cases}\\frac{x+y}{2}=3\\\\ x-y=4\\end{cases}$", a: "x=5, y=1", e: "上の式の両辺を2倍して $x+y=6$。下の式 $x-y=4$ と足し合わせると $2x=10 \\rightarrow x=5, y=1$ となります。" },
+    { id: 46, type: "一問一答", cat: 4, q: "$A=B=C$ の形の方程式を解きなさい： $2x+y = x-y = 3$", a: "x=2, y=-1", e: "$\\begin{cases}2x+y=3\\\\ x-y=3\\end{cases}$ という連立方程式を作って解きます。足すと $3x=6 \\rightarrow x=2$。下の式より $2-y=3 \\rightarrow y=-1$ となるため、$(x, y) = (2, -1)$ です。" },
+    { id: 47, type: "一問一答", cat: 4, q: "分数を含む式を解きなさい： $\\begin{cases}\\frac{3}{4}x+\\frac{1}{2}y=2\\\\ x+2y=4\\end{cases}$", a: "x=2, y=1", e: "上の式を4倍すると $3x+2y=8$。下の式 $x+2y=4$ を引くと $2x=4 \\rightarrow x=2$。よって $y=1$ となります。" },
+    { id: 48, type: "一問一答", cat: 4, q: "比例式を含む式を解きなさい： $\\begin{cases}x : y = 2 : 3\\\\ 2x+y=14\\end{cases}$", a: "x=4, y=6", e: "上の比例式より、内項の積と外項の積は等しいので $3x=2y \\rightarrow 3x-2y=0$。これと下の式を連立させて解くと $x=4, y=6$ となります。" },
+    { id: 49, type: "一問一答", cat: 4, q: "小数の式を解きなさい： $\\begin{cases}0.12x+0.05y=0.46\\\\ x+y=5\\end{cases}$", a: "x=3, y=2", e: "上の式を100倍して $12x+5y=46$。下の式を5倍した $5x+5y=25$ を引くと $7x=21 \\rightarrow x=3$。よって $y=2$ となります。" },
+    { id: 50, type: "一問一答", cat: 4, q: "総合問題（かっこ・分数）を解きなさい： $\\begin{cases}2(x-1)+3y=13\\\\ \\frac{x}{2}-\\frac{y}{3}=1\\end{cases}$", a: "x=4, y=3", e: "上の式を整理すると $2x+3y=15$。下の式を6倍すると $3x-2y=6$。これらを連立方程式として解くと $x=4, y=3$ となります。" }
+];
+
+let timeLeft = 50 * 60; // 試験時間を50分に変更
+const timerDisplay = document.getElementById('timer');
+const userScores = new Array(selectedQuestions.length).fill(null);
+
+function generateQuestions() {
+    selectedQuestions.forEach(q => {
+        const container = document.getElementById(`questions-container-${q.cat}`);
+        if (!container) return;
+        
+        const div = document.createElement('div');
+        div.className = 'question-item';
+        let content = `<span class="q-num">問${q.id}</span> <span class="q-type">${q.type}</span><br>${q.q}`;
+        
+        if (q.type === "記号選択" && q.options) {
+            content += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                content += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            content += `</div>`;
+        }
+        
+        div.innerHTML = content;
+        container.appendChild(div);
+    });
+
+    if (window.MathJax) {
+        MathJax.typesetPromise();
+    }
+}
+
+function showAnswers() {
+    clearInterval(countdown);
+    document.getElementById('test-page').classList.remove('active');
+    document.getElementById('answer-page').classList.add('active');
+    document.getElementById('score-bar').style.display = 'block';
+    
+    const container = document.getElementById('answers-container');
+    container.innerHTML = "";
+    
+    selectedQuestions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'ans-item';
+        
+        let qContent = `<div class="ans-q-text"><span class="q-num">問${q.id}</span> [${q.type}] ${q.q}`;
+        if (q.type === "記号選択" && q.options) {
+            qContent += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                qContent += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            qContent += `</div>`;
+        }
+        qContent += `</div>`;
+
+        let targetAnswer = q.a;
+        if (q.type === "記号選択" && q.ans_literal) {
+            targetAnswer = `${q.a} （${q.ans_literal}）`;
+        }
+
+        div.innerHTML = `
+            ${qContent}
+            <div><span class="ans-correct">正解：${targetAnswer}</span></div>
+            <div class="ans-explanation"><strong>解説:</strong> ${q.e}</div>
+            <div class="scoring-btns">
+                <button class="score-btn btn-correct" id="btn-c-${idx}" onclick="setScore(${idx}, true)">○ 正解</button>
+                <button class="score-btn btn-wrong" id="btn-w-${idx}" onclick="setScore(${idx}, false)">× 不正解</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+
+    if (window.MathJax) {
+        MathJax.typesetPromise();
+    }
+
+    window.scrollTo(0, 0);
+}
+
+const countdown = setInterval(() => {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+    if (timerDisplay) {
+        timerDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+    if (timeLeft <= 0) {
+        clearInterval(countdown);
+        alert('時間終了です！採点ページへ移ります。');
+        showAnswers();
+    }
+    timeLeft--;
+}, 1000);
+
+function setScore(idx, isCorrect) {
+    userScores[idx] = isCorrect;
+    
+    const btnCorrect = document.getElementById(`btn-c-${idx}`);
+    const btnWrong = document.getElementById(`btn-w-${idx}`);
+    
+    if (isCorrect) {
+        btnCorrect.classList.add('selected');
+        btnWrong.classList.remove('selected');
+    } else {
+        btnCorrect.classList.remove('selected');
+        btnWrong.classList.add('selected');
+    }
+    updateScore();
+}
+
+function updateScore() {
+    const correctCount = userScores.filter(s => s === true).length;
+    document.getElementById('correct-count').innerText = correctCount;
+    document.getElementById('score-val').innerText = Math.round((correctCount / selectedQuestions.length) * 100);
+}
+
+generateQuestions();
+</script>
+
+</body>
+</html>

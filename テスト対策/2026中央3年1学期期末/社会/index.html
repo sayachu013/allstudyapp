@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3年歴史 1学期期末対策テスト</title>
+    <style>
+        /* --- 画面表示用（通常スタイル） --- */
+        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f0f2f5; color: #333; }
+        .page { display: none; }
+        .active { display: block; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        h1 { color: #1a365d; text-align: center; border-bottom: 3px solid #1a365d; padding-bottom: 10px; margin-top: 10px; }
+        #timer-bar, #score-bar { position: sticky; top: 0; background: #c53030; color: white; padding: 10px; text-align: center; font-weight: bold; border-radius: 5px; z-index: 1000; font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        #score-bar { background: #2f855a; top: 50px; display: none; }
+        .question-item { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #cbd5e0; position: relative; }
+        .q-num { font-weight: bold; color: #2b6cb0; margin-right: 10px; }
+        .q-type { font-size: 0.8em; background: #edf2f7; padding: 2px 8px; border-radius: 4px; margin-left: 10px; color: #4a5568; }
+        .options-container { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .option-item { background: #fff; border: 1px solid #2b6cb0; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; color: #2b6cb0; }
+        .btn { display: block; width: 100%; padding: 15px; background: #2b6cb0; color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; text-align: center; margin-top: 20px; text-decoration: none; }
+        .btn:hover { background: #2c5282; }
+        .scoring-btns { margin-top: 10px; display: flex; gap: 10px; }
+        .score-btn { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-correct { background: #e6fffa; color: #234e52; border: 1px solid #38b2ac; }
+        .btn-correct.selected { background: #38b2ac; color: white; }
+        .btn-wrong { background: #fff5f5; color: #742a2a; border: 1px solid #f56565; }
+        .btn-wrong.selected { background: #f56565; color: white; }
+        .ans-item { margin-bottom: 20px; padding: 15px; background: #f7fafc; border-left: 4px solid #2f855a; }
+        .ans-q-text { font-size: 0.95em; color: #4a5568; margin: 10px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+        .ans-correct { font-weight: bold; color: #2f855a; font-size: 1.1em; }
+        .ans-explanation { font-size: 0.9em; color: #4a5568; margin-top: 5px; background: #fff; padding: 10px; border-radius: 4px; }
+        .category-header { background: #4a5568; color: white; padding: 8px 15px; margin: 30px 0 15px 0; border-radius: 5px; font-size: 1em; }
+        
+        .print-ans-space, .print-score-table, .print-header-meta { display: none; }
+
+        /* --- 印刷用スタイル（Ctrl+Pで自動適用） --- */
+        @media print {
+            @page {
+                size: A4;
+                margin: 12mm 12mm 12mm 12mm;
+            }
+            body { background-color: #fff; color: #000; padding: 0; font-size: 10pt; max-width: 100%; }
+            .card { box-shadow: none; padding: 0; margin: 0; }
+            h1 { font-size: 16pt; color: #000; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 5px; }
+            
+            #timer-bar, #score-bar, .btn, .scoring-btns, .q-type, .card > p { display: none !important; }
+            
+            .print-header-meta { display: flex; justify-content: flex-end; gap: 20px; font-size: 10.5pt; margin-bottom: 15px; border-bottom: 1px solid #000; padding-bottom: 5px; }
+            .print-score-table { display: table; border-collapse: collapse; float: left; margin-right: 20px; }
+            .print-score-table td { border: 1px solid #000; padding: 4px 12px; text-align: center; font-size: 9.5pt; }
+            
+            .category-header { background: none !important; color: #000 !important; font-weight: bold; font-size: 11pt; border: 1px solid #000; padding: 3px 8px; margin: 15px 0 10px 0; border-radius: 0; page-break-after: avoid; }
+            
+            #questions-container-1, #questions-container-2 {
+                column-count: 2;
+                column-gap: 25px;
+                column-fill: auto;
+            }
+            
+            .question-item { page-break-inside: avoid; break-inside: avoid; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dotted #ccc; }
+            .q-num { color: #000; }
+            
+            .options-container { display: block; margin-top: 3px; }
+            .option-item { border: none; padding: 0; margin-right: 12px; display: inline-block; color: #000; font-size: 9.5pt; }
+            
+            .print-ans-space { display: block; margin-top: 5px; font-size: 9.5pt; color: #000; }
+            .ans-line { inline-block; width: 75%; border-bottom: 1px solid #000; margin-left: 5px; height: 16px; vertical-align: bottom; }
+            .ans-box { border: 1px solid #000; min-height: 40px; margin-top: 4px; width: 95%; }
+            
+            #questions-container-3, #questions-container-4 { column-count: 1 !important; }
+            
+            .ans-item { background: #fff; border: none; border-bottom: 1px dashed #000; padding: 8px 0; page-break-inside: avoid; }
+            .ans-q-text { color: #000; border-bottom: none; padding-bottom: 0; }
+            .ans-correct { color: #000; font-weight: bold; }
+            .ans-explanation { background: none; padding: 0; margin-top: 4px; font-size: 9pt; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="test-page" class="page active">
+    <div id="timer-bar">残り時間: <span id="timer">40:00</span></div>
+    
+    <div class="print-header-meta">
+        <table class="print-score-table">
+            <tr><td>得点</td><td style="width:60px; height:20px;">/100</td></tr>
+        </table>
+        <div>3年 &nbsp; &nbsp; 組 &nbsp; &nbsp; 番 &nbsp; 氏名：____________________</div>
+    </div>
+
+    <h1>3年歴史 1学期期末対策テスト（第一次世界大戦〜世界恐慌と満州事変）</h1>
+    <div class="card">
+        <p>※ノートを用意して解答を記入してください。最後に「採点ページへ」を押すと正解が表示されます。</p>
+        <div id="test-container">
+            <div class="category-header">第1ブロック：記号選択（20問）</div>
+            <div id="questions-container-1"></div>
+            <div class="category-header">第2ブロック：一問一答（20問）</div>
+            <div id="questions-container-2"></div>
+            <div class="category-header">第3ブロック：記述問題（10問）</div>
+            <div id="questions-container-3"></div>
+            <div class="category-header">第4ブロック：発展・応用・考察（10問）</div>
+            <div id="questions-container-4"></div>
+        </div>
+        <button class="btn" onclick="showAnswers()">テストを終了して採点ページへ</button>
+    </div>
+</div>
+
+<div id="answer-page" class="page">
+    <div id="score-bar">正答率: <span id="score-val">0</span>% (<span id="correct-count">0</span>/60問)</div>
+    <h1>解答・解説一覧</h1>
+    <div class="card" id="answers-container"></div>
+    <button class="btn" onclick="location.reload()">トップに戻る</button>
+</div>
+
+<script>
+const questions = [
+    // 第1ブロック：記号選択 (1-20)
+    { id: 1, type: "記号選択", cat: 1, q: "19世紀末、ドイツの強国化に対抗するためにフランスと同盟を結んだ東ヨーロッパの大国はどこか[cite: 7]。", options: ["イギリス", "ロシア", "イタリア", "オーストリア"], a: "イ", ans_literal: "ロシア", e: "19世紀末にドイツが強国になると、フランスとロシアは同盟（露仏同盟）を結んでドイツに対抗しました[cite: 7]。" },
+    { id: 2, type: "記号選択", cat: 1, q: "次のうち、日米修好通商条約において、日本側に認められず不平等とされた権利は何か[cite: 6]。", options: ["領事裁判権", "関税自主権", "駐兵権", "宣戦布告権"], a: "イ", ans_literal: "関税自主権", e: "日本は外国に対して領事裁判権を認める一方、自国で関税を決める権利である関税自主権を持たされず、不平等な内容でした[cite: 6]。" },
+    { id: 3, type: "記号選択", cat: 1, q: "第一次世界大戦の直接の引き金となった、オーストリアの皇位継承者夫妻が暗殺されたバルカン半島の都市はどこか[cite: 7]。", options: ["ロンドン", "サラエボ", "北京", "ジュネーブ"], a: "イ", ans_literal: "サラエボ", e: "1914年、サラエボでオーストリアの皇位継承者夫妻がスラブ系のセルビア人に暗殺され、第一次世界大戦が始まりました[cite: 7]。" },
+    { id: 4, type: "記号選択", cat: 1, q: "第一次世界大戦において、ドイツ・オーストリア・オスマン帝国などが構成した陣営を何というか[cite: 7]。", options: ["連合国", "同盟国", "三国協商", "枢軸国"], a: "イ", ans_literal: "同盟国", e: "ドイツ・オーストリア・オスマン帝国を中心とする陣営を「同盟国」、イギリス・フランス・ロシアを中心とする陣営を「連合国」といいます[cite: 7]。" },
+    { id: 5, type: "記号選択", cat: 1, q: "第一次世界大戦の最前線で、大量の大砲や機関銃から身を守るために掘られた、長い溝のことを何というか[cite: 7]。", options: ["文化住宅", "租借地", "ざんごう", "満鉄"], a: "ウ", ans_literal: "ざんごう", e: "最前線には長いざんごう（塹壕）が掘られ、兵士が待機する長期戦（ざんごう戦）となりました[cite: 7]。" },
+    { id: 6, type: "記号選択", cat: 1, q: "第一次世界大戦において、初めて本格的に実戦投入された「新兵器」の組み合わせとして正しいものを選びなさい[cite: 7]。", options: ["大砲 と 弓矢", "鉄砲 と 火薬", "戦車 と 毒ガス", "原子爆弾 と ミサイル"], a: "ウ", ans_literal: "戦車 と 毒ガス", e: "第一次世界大戦では、毒ガス、戦車、飛行機、潜水艦などの新兵器が登場し、死傷者がばく大な数に上りました[cite: 7]。" },
+    { id: 7, type: "記号選択", cat: 1, q: "第一次世界大戦において、前線へ兵士や物資を送るために、国民、経済、資源、科学技術など国家の全力を挙げた戦争の形態を何というか[cite: 7]。", options: ["総力戦", "局地戦", "短期戦", "治安維持"], a: "ア", ans_literal: "総力戦", e: "各国が国民や資源をすべて戦争に動員したため、第一次世界大戦は「総力戦」と呼ばれます[cite: 7]。" },
+    { id: 8, type: "記号選択", cat: 1, q: "1917年、ロシアにおいて「パンと平和」を求める民衆の不満から発展し、史上初の社会主義政府を誕生させた出来事は何か[cite: 7]。", options: ["辛亥革命", "ロシア革命", "五・四運動", "米騒動"], a: "イ", ans_literal: "ロシア革命", e: "労働者のストライキや兵士の反乱から、社会主義者レーニンの指導の下、ソビエトに権力の基盤を置く新政府（ロシア革命）が成立しました[cite: 7]。" },
+    { id: 9, type: "記号選択", cat: 1, q: "1919年、第一次世界大戦の戦勝国が集まり、ドイツに対する厳しい講和条件などを定めた会議を何というか[cite: 7]。", options: ["ワシントン会議", "パリ講和会議", "ロンドン会議", "ジュネーブ総会"], a: "イ", ans_literal: "パリ講和会議", e: "1919年にパリ講和会議が開かれ、ドイツの弱体化を目指すベルサイユ条約が調印されました[cite: 7]。" },
+    { id: 10, type: "記号選択", cat: 1, q: "大戦後の1920年、世界平和と国際協調を目的として発足した、史上初の政府間国際機関は何か[cite: 7]。", options: ["国際連合", "国際連盟", "南満州鉄道", "全国水平社"], a: "イ", ans_literal: "国際連盟", e: "アメリカのウィルソン大統領の提案に基づき、世界平和と国際協調を目的とする国際連盟が発足しました[cite: 7]。" },
+    { id: 11, type: "記号選択", cat: 1, q: "国際連盟の発足時、常任理事国となった4か国の正しい組み合わせを選びなさい[cite: 7]。", options: ["アメリカ・イギリス・ドイツ・日本", "イギリス・フランス・イタリア・日本", "ロシア・アメリカ・中国・イギリス", "フランス・ドイツ・ソ連・日本"], a: "イ", ans_literal: "イギリス・フランス・イタリア・日本", e: "国際連盟の常任理事国はイギリス・フランス・イタリア・日本の4か国でした[cite: 7]。提案国のアメリカは国内の反対で不参加でした[cite: 7]。" },
+    { id: 12, type: "記号選択", cat: 1, q: "1915年、日本が欧米列強のアジアへの影響力低下に乗じて、中国（中華民国）の袁世凱政府に突きつけた要求は何か[cite: 7]。", options: ["山東省返還要求", "二十一か条の要求", "独立万歳の宣言", "満州国建国の要求"], a: "イ", ans_literal: "二十一か条の要求", e: "1915年、日本は中国に対して山東省のドイツ権益引きつぎなどを含む二十一か条の要求を示し、大部分を認めさせました[cite: 7]。" },
+    { id: 13, type: "記号選択", cat: 1, q: "大正時代に日本の経済が空前の好景気となり、工業国としての基礎を築くきっかけとなった出来事は何か[cite: 7]。", options: ["関東大震災", "世界恐慌", "大戦景気", "昭和恐慌"], a: "ウ", ans_literal: "大戦景気", e: "第一次世界大戦により、欧米からの輸入が止まったことで日本の重化学工業が急成長しました（大戦景気）[cite: 7]。" },
+    { id: 14, type: "記号選択", cat: 1, q: "1918年、シベリア出兵を見越した業者の買い占めなどにより、米の価格が急騰したことで起きた暴動を何というか[cite: 7]。", options: ["不平士族の反乱", "米騒動", "五・四運動", "小作争議"], a: "イ", ans_literal: "米騒動", e: "富山県の魚津町から始まった米の安売りを求める運動（米騒動）は、新聞報道を通じて全国へ広がりました[cite: 7]。" },
+    { id: 15, type: "記号選択", cat: 1, q: "米騒動の責任をとって藩閥の寺内正毅内閣が退陣したあと、首相となった「平民宰相」と呼ばれる人物は誰か[cite: 7]。", options: ["犬養毅", "浜口雄幸", "原敬", "加藤高明"], a: "ウ", ans_literal: "原敬", e: "衆議院第一党の立憲政友会を率いる原敬が内閣を組織し、本格的な政党内閣が誕生しました[cite: 7]。" },
+    { id: 16, type: "記号選択", cat: 1, q: "吉野作造が唱え、大正デモクラシー期の男子普通選挙や政党内閣制の運動を理論的に支えた思想を何というか[cite: 7]。", options: ["天皇機関説", "民本主義", "全体主義", "ファシズム"], a: "イ", ans_literal: "民本主義", e: "吉野作造は主権の所在を問わず「一般民衆の幸福や意向を重んじて政策を決定するべきだ」とする民本主義を提唱しました[cite: 7]。" },
+    { id: 17, type: "記号選択", cat: 1, q: "1922年、被差別部落の人々が自らの力で人間としての平等を勝ち取るために結成した全国組織は何か[cite: 7]。", options: ["新婦人協会", "全国水平社", "日本農民組合", "日本共産党"], a: "イ", ans_literal: "全国水平社", e: "1922年に全国水平社が結成され、「人の世に熱あれ、人間（じんかん）に光あれ」という水平社宣言が出されました[cite: 7]。" },
+    { id: 18, type: "記号選択", cat: 1, q: "1901年に操業を開始し、日清戦争の賠償金などを投じて建設され、日本の重化学工業化を支えた官営の製鉄所はどこか[cite: 6, 7]。", options: ["釜石製鉄所", "室蘭製鉄所", "八幡製鉄所", "倉敷製鉄所"], a: "ウ", ans_literal: "八幡製鉄所", e: "日清戦争の賠償金などを投じて、官営の八幡製鉄所が福岡県に建設されました[cite: 6]。" },
+    { id: 19, type: "記号選択", cat: 1, q: "足尾銅山から流れ出た有害物質による日本初の公害被害を訴え、明治政府に対して鉱山の操業停止を求めた人物は誰か[cite: 6]。", options: ["田中正造", "幸徳秋水", "内村鑑三", "与謝野晶子"], a: "ア", ans_literal: "田中正造", e: "田中正造は、渡良瀬川周辺の被害住民とともに、足尾銅山の公害問題を厳しく追及しました[cite: 6]。" },
+    { id: 20, type: "記号選択", cat: 1, q: "黄熱病の研究に生涯を捧げ、西アフリカの地で世界的に大活躍した明治・大正期の科学者は誰か[cite: 6]。", options: ["北里柴三郎", "志賀潔", "野口英世", "長岡半太郎"], a: "ウ", ans_literal: "野口英世", e: "野口英世は黄熱病などの医学研究を行い、世界的に活躍した科学者です[cite: 6]。" },
+
+    // 第2ブロック：一問一答 (21-40)
+    { id: 21, type: "一問一答", cat: 2, q: "19世紀末、バルカン半島においてオスマン帝国の衰退にともない民族対立が激化したことから、この地域は何と呼ばれていたか[cite: 7]。", a: "ヨーロッパの火薬庫", e: "いつ大規模な戦争が起きてもおかしくない緊張状態から「ヨーロッパの火薬庫」と呼ばれました[cite: 7]。" },
+    { id: 22, type: "一問一答", cat: 2, q: "第一次世界大戦において、イギリス・フランス・ロシア・日本・アメリカなどが構成した陣営を何というか[cite: 7]。", a: "連合国", e: "日英同盟に基づいて参戦した日本や、1917年に参戦したアメリカなどは「連合国」側でした[cite: 7]。" },
+    { id: 23, type: "一問一答", cat: 2, q: "第一次世界大戦の最中である1916年、坂本龍馬らの仲介によって薩摩藩と長州藩が結んだ、倒幕運動を決定づけた軍事同盟は何か[cite: 6]。", a: "薩長同盟", e: "土佐藩出身の坂本龍馬らが仲介し、長州と薩摩の間に秘密の軍事同盟が結ばれました[cite: 6]。" },
+    { id: 24, type: "一問一答", cat: 2, q: "1922年、史上初の社会主義国家としてロシアを中心に成立した国の正式名称（略称ではない）を答えなさい[cite: 7]。", a: "ソビエト社会主義共和国連邦", e: "干渉戦争や国内の反革命派を鎮圧した革命政府により、1922年にソ連（ソビエト社会主義共和国連邦）が成立しました[cite: 7]。" },
+    { id: 25, type: "一問一答", cat: 2, q: "レーニンの死後、ソ連の指導者となり、「五か年計画」による計画経済を進めて独裁体制を強化した人物は誰か[cite: 7]。", a: "スターリン", e: "スターリンは重工業の増強と農業の集団化を強行し、反対派を弾圧して絶対的な権力を握りました[cite: 7]。" },
+    { id: 26, type: "一問一答", cat: 2, q: "第一次世界大戦の講和条約（ベルサイユ条約）で、敗戦国となったドイツに対して課された極めて厳しい条件を、賠償金以外で1つ答えなさい[cite: 7]。", a: "領土の縮小（または、植民地の喪失、軍備縮小）", e: "ドイツは領土の縮小、すべての植民地の没収、厳しい軍備制限、そして巨額の賠償金を課されました[cite: 7]。" },
+    { id: 27, type: "一問一答", cat: 2, q: "1919年、ドイツで制定された、男女普通選挙や世界で初めて「人間の尊厳に値する生存（社会権）」を保障した近代的な憲法は何か[cite: 7]。", a: "ワイマール憲法", e: "当時の世界で最も民主的な憲法とされ、労働者の基本的権利や社会福祉の原則を定めました[cite: 7]。" },
+    { id: 28, type: "一問一答", cat: 2, q: "1919年、中国の北京での学生集会をきっかけに発生した、日本の山東省権益返還などを求める全国的な反帝国主義・反日運動は何か[cite: 7]。", a: "五・四運動", e: "パリ講和会議で二十一か条の要求の廃棄が中国側に拒絶されたことに憤慨した民衆が起こした運動です[cite: 7]。" },
+    { id: 29, type: "一問一答", cat: 2, q: "1919年3月1日、日本の植民地支配下にあった朝鮮で、知識人や学生が独立宣言を発表し、「独立万歳」を叫んで広がった運動は何か[cite: 7]。", a: "三・一独立運動", e: "民族自決の考えに影響を受けた朝鮮の人々が半島全体でデモを起こし、朝鮮総督府に武力鎮圧されました[cite: 7]。" },
+    { id: 30, type: "一問一答", cat: 2, q: "インドの民族独立運動の最高指導者であり、イギリスの支配に対して「非暴力・不服従」の抵抗運動を展開した人物は誰か[cite: 7]。", a: "ガンディー", e: "ガンディーはイギリス製の綿製品を使わず、伝統的な糸車で自ら糸をつむぐなどして不服従を貫きました[cite: 7]。" },
+    { id: 31, type: "一問一答", cat: 2, q: "大戦景気によって急激に富を築き、「成金」と呼ばれた人々が現れた当時の風刺画で、暗い玄関を明るくするために火をつけたものは何か[cite: 7]。", a: "百円札（または、紙幣、お札）", e: "「どうだ明るくなったろう」という台詞とともに百円札に火をつける成金の風刺画は、大戦景気を象徴しています[cite: 7]。" },
+    { id: 32, type: "一問一答", cat: 2, q: "大正時代に憲法学者の美濃部達吉が主張し、主権は国家にあり天皇は国家の最高機関であるとして政党内閣制を支持した学説は何か[cite: 7]。", a: "天皇機関説", e: "天皇機関説は、のちに国家主義者から激しく批判されることになりますが、当時は政党政治の憲法論的支えでした[cite: 7]。" },
+    { id: 33, type: "一問一答", cat: 2, q: "1920年、平塚らいてうが市川房枝らとともに設立し、女性の政治活動の自由や地位向上を目指して活動した組織の名称を答えなさい[cite: 7]。", a: "新婦人協会", e: "新婦人協会は署名運動などを展開し、女性が政治集会に参加・加入することを禁止していた法律の改正を達成しました[cite: 7]。" },
+    { id: 34, type: "一問一答", cat: 2, q: "大正時代、洋風の応接室をもつ住宅が流行しました。このような新時代の大衆向け住宅を何というか[cite: 7]。", a: "文化住宅", e: "都市のサラリーマン層（新中間層）を中心に、伝統的日本家屋に洋風の要素を取り入れた文化住宅が普及しました[cite: 7]。" },
+    { id: 35, type: "一問一答", cat: 2, q: "1923年9月1日、東京や横浜を中心に壊滅的な被害をもたらし、混乱の中で多くの朝鮮人らが殺害される悲劇も生んだ大災害は何か[cite: 7]。", a: "関東大震災", e: "関東大震災の直後、「井戸に毒を入れた」といった根拠のない流言飛語が広まり、多くの朝鮮人や社会主義者が殺害されました[cite: 7]。" },
+    { id: 36, type: "一問一答", cat: 2, q: "世界恐慌に対してアメリカのローズベルト大統領が実施した、公共事業による失業者救済や経済調整を目的とした一連の政策を何というか[cite: 7]。", a: "ニューディール政策（または、ニューディール）", e: "政府が積極的に市場経済に介入し、ダム建設などの公共事業をおこして失業者を雇用する画期的な政策でした[cite: 7]。" },
+    { id: 37, type: "一問一答", cat: 2, q: "イギリスやフランスが世界恐慌対策として行った、本国と植民地間の貿易を優遇し、他国に高い関税を課して市場を囲い込んだ経済体制を何というか[cite: 7]。", a: "ブロック経済", e: "身内の経済圏だけでサプライチェーンを完結させるブロック経済は、植民地を持たない国々を追いつめる原因となりました[cite: 7]。" },
+    { id: 38, type: "一問一答", cat: 2, q: "世界恐慌による不況が日本に波及して起きた深刻な危機で、特に農村での「身売り」や子供の「欠食児童」が問題となった恐慌は何か[cite: 7]。", a: "昭和恐慌", e: "1930年から始まった昭和恐慌では、農産物価格の暴落や東北地方の冷害が重なり、農村は極限の窮乏に陥りました[cite: 7]。" },
+    { id: 39, type: "一問一答", cat: 2, q: "満州事変のあと、関東軍が清の最後の皇帝を元首として、1932年に建国を宣言した事実上の傀儡国家の名称を答えなさい[cite: 7]。", a: "満州国", e: "関東軍は清朝最後の皇帝であった溥儀を元首に据え、日本が実質的に支配する「満州国」を誕生させました[cite: 7]。" },
+    { id: 40, type: "一問一答", cat: 2, q: "1936年2月26日、陸軍の青年将校らが大臣らを暗殺して東京の中心部を占拠し、結果として軍部の政治的発言力を決定づけた事件は何か[cite: 7]。", a: "二・二六事件", e: "二・二六事件の反乱自体は鎮圧されたものの、これ以降、軍部は政府に対して強硬な態度をとり、政治を主導していきました[cite: 7]。" },
+
+    // 第3ブロック：記述問題 (41-50)
+    { id: 41, type: "記述", cat: 3, q: "開港後、国内で生糸や茶などが一時的に品不足となり、日本国内の物価が上昇したのはなぜか、理由を説明しなさい[cite: 6]。", a: "貿易の開始により、海外からの強い需要に応じて、日本国内の大量の商品が輸出に回されたため。", e: "国内の供給量を上回る勢いで海外へ輸出されたため、一時的に品不足や物価上昇が起きました[cite: 6]。" },
+    { id: 42, type: "記述", cat: 3, q: "第一次世界大戦が、それまでの近代戦争と異なり「総力戦」と呼ばれるようになった理由を、前線以外の社会の様子に触れて説明しなさい[cite: 7]。", a: "前線の兵士だけでなく、後方の国民、経済、資源、科学技術など、国家のすべての力を戦争に総動員したから。", e: "男性が戦場へ動員されたため、女性が兵器工場で働くなど、銃後の国民生活全体が戦争継続のために組み込まれました[cite: 7]。" },
+    { id: 43, type: "記述", cat: 3, q: "第一次世界大戦後、欧米諸国において女性の国政での選挙権が相次いで認められるようになった背景には、戦争中のどのような事情があったか説明しなさい[cite: 7]。", a: "総力戦となった大戦中に、女性が工場労働などで銃後を守り、戦争の継続に大きく貢献したことが評価されたため。", e: "女性の労働と国家への貢献が不可欠であったという実績が、戦後の政治的地位の向上（参政権獲得）に直結しました[cite: 7]。" },
+    { id: 44, type: "記述", cat: 3, q: "第一次世界大戦中、日本がロシア革命への干渉を目的として行った「シベリア出兵」において、国内の米の価格が急騰し「米騒動」が起きたメカニズムを説明しなさい[cite: 7]。", a: "シベリアへの大規模な出兵を見越して、米を扱う商人たちが米を買い占め、売り惜しみをしたため価格が跳ね上がった。", e: "軍隊用の米の需要増を狙った商人の思惑が市場価格を不当に吊り上げ、民衆の生活を直撃して暴動を誘発しました[cite: 7]。" },
+    { id: 45, type: "記述", cat: 3, q: "大正デモクラシー期に結成された「全国水平社」が発表した水平社宣言において、彼らが目指した差別からの解放の姿勢について、政府との関係に触れて説明しなさい[cite: 7]。", a: "政府や他人の同情に頼るのではなく、被差別部落の人々自身が団結し、自力で人間としての平点を勝ち取ろうとする姿勢。", e: "「部外者の同情」による解放を否定し、自分たちの尊厳を自らの手で取り戻すという自主独立の精神が宣言の核となっています[cite: 7]。" },
+    { id: 46, type: "記述", cat: 3, q: "大正時代、新聞の発行部数が100万部を超え、1冊1円の円本が普及したことなどに象徴される、文化の広がり方の変化を何というか、言葉を明記して説明しなさい[cite: 7]。", a: "特権階級だけでなく、サラリーマンなどの一般の大衆にまで文化や娯楽が普及していく「文化の大衆化」が起こった。", e: "教育の普及とマスメディアの発達により、知識や娯楽が特権的なものから大衆のものへと変化した時代でした[cite: 7]。" },
+    { id: 47, type: "記述", cat: 3, q: "世界恐慌に対して、植民地を多く持つ国（イギリスやフランスなど）が「ブロック経済」という対策をとれた理由を説明しなさい[cite: 7]。", a: "本国と世界中に広がる広大な植民地との間で排他的な経済圏を囲い込み、その中だけで貿易を完結させることができたから。", e: "本国と植民地間の関税を下げ、他国の関税を高くすることで、自国の市場と産業を守る盾として植民地を利用できました[cite: 7]。" },
+    { id: 48, type: "記述", cat: 3, q: "世界恐慌の際、独自の経済体制を採っていた「ソ連」だけが、恐慌の影響を全く受けることなく経済成長を続けられた理由を説明しなさい[cite: 7]。", a: "資本家同士の自由競争を行う資本主義ではなく、国家が計画的に生産と分配を管理する「五か年計画（計画経済）」を採っていたため。", e: "世界市場（世界的な資本主義のネットワーク）から孤立した独自の計画経済を行っていたため、世界的な株価暴落の連鎖に巻き込まれませんでした[cite: 7]。" },
+    { id: 49, type: "記述", cat: 3, q: "世界恐慌の際、日本の農村が極めて深刻な飢饉や不況に陥った直接の理由を、農産物の売れ行きに着目して説明しなさい[cite: 7]。", a: "アメリカへの輸出主力品であった生糸（まゆ）の需要が激減し、さらに米などの農産物の価格が暴落したため。", e: "アメリカ市場の崩壊により日本の養蚕業が壊滅し、農村の主要な現金収入源が絶たれたことで、極度の貧困がもたらされました[cite: 7]。" },
+    { id: 50, type: "記述", cat: 3, q: "1920年代半ばから日本で交互に政権を担当した二大政党は、次第に国民からの信頼を失っていきました。その背景にある、政党と経済界との癒着について説明しなさい[cite: 7]。", a: "政党が巨大な「財閥」と結びつき、特定の利益のために汚職や政争をくり返したため、国民の不信感が高まった。", e: "三井・三菱などの財閥と結託して私利私欲に走る政党の姿が、昭和恐慌にあえぐ民衆の目には既得権益の象徴と映りました[cite: 7]。" },
+
+    // 第4ブロック：発展・応用・考察 (51-60)
+    { id: 51, type: "発展", cat: 4, q: "第一次世界大戦前の国際関係において、イギリスが元々は警戒していたロシアと急接近し、「三国協商」を形成するに至った外交的な背景を説明しなさい[cite: 7]。", a: "19世紀末にドイツが急速に強国化・近代化し、世界進出を進めたため、ドイツの脅威に対抗する必要性が生じたから。", e: "東アジアでの利害対立からロシアを警戒して日英同盟を結んだイギリスでしたが、覇権を拡大するドイツの脅威に対抗するためロシアと協商を結びました[cite: 7]。" },
+    { id: 52, type: "発展", cat: 4, q: "第一次世界大戦の講和条約（ベルサイユ条約）において、戦勝国であるイギリスやフランスが敗戦国ドイツに対して過酷な条件を突きつけた「戦略的な狙い」を説明しなさい[cite: 7]。", a: "巨額の経済的負担と軍備縮小を課すことで、ドイツの国力を徹底的に削ぎ、再び大国としてヨーロッパの脅威にならないようにするため。", e: "大戦で甚大な被害を受けた英仏は、復興資金の獲得とともに、ドイツの軍事的・経済的な再起を完全に封じ込めることを意図していました[cite: 7]。" },
+    { id: 53, type: "発展", cat: 4, q: "1921〜22年のワシントン会議において、アメリカが主催となり「ワシントン海軍軍縮条約」や太平洋の現状維持を定めた背景にある、アメリカの国際的な思惑について説明しなさい[cite: 7]。", a: "大戦で力を弱めたヨーロッパ諸国に代わり、アジア・太平洋地域における自国の発言力を強め、日本の台頭を抑えるため。", e: "アメリカは、大戦中に中国や太平洋へと権益を拡大した日本を警戒し、日英同盟を解消させるとともに海軍力に枠をはめました[cite: 7]。" },
+    { id: 54, type: "発展", cat: 4, q: "ロシア革命後の「シベリア出兵」において、日本は他の列強諸国（イギリス・フランス・アメリカ）が撤兵したあとも軍をシベリアに残留させ続けました。この独自の行動がとられた理由を、日本の隠された目的から説明しなさい[cite: 7]。", a: "純粋な干渉戦争の継続だけでなく、シベリア地域に日本の新たな領土（独自の権益）を獲得しようという野心があったため。", e: "日本は他国の数倍の軍勢を送り、列強撤退後も駐留を維持したため、国際社会から不信感を買い、激しい批判を浴びることとなりました[cite: 7]。" },
+    { id: 55, type: "発展", cat: 4, q: "大正時代に原敬首相が選挙法を改正し、選挙権の納税条件を「10円以上」から「3円以上」に引き下げました。しかし、彼は男子全員に選挙権を与える「普通選挙」には反対（消極的）でした。原敬が普通選挙の導入を拒んだ政治的理由を説明しなさい[cite: 7]。", a: "納税額による制限をなくして一気に有権者を広げると、議会における自党（立憲政友会）の主導権や従来の政治秩序が揺らぐと考え、時期尚早としたため。", e: "原敬は政党政治の確立を目指したものの、エリートや地主層を基盤とする政友会の安定を最優先したため、急進的な大衆政治への移行を警戒しました[cite: 7]。" },
+    { id: 56, type: "発展", cat: 4, q: "1870年代の「不平士族の反乱（西南戦争など）」の時代から、1920年代の「自由民権運動・社会運動」の時代へと、民衆の政府に対する批判の手段が変わった歴史的背景を説明しなさい[cite: 7]。", a: "近代的な装備と徴兵制をもつ新政府の軍隊に対し、武力で抵抗して勝つことは不可能であると西南戦争の敗北で悟ったため、言論によるアプローチへ転換した。", e: "不平士族による最後の最大規模の武力反乱である西南戦争が政府軍に鎮圧されたことで、抵抗の戦術は武力から、国会開設や選挙権獲得を求める言論へと切り替わりました[cite: 7]。" },
+    { id: 57, type: "発展", cat: 4, q: "世界恐慌が発生した際、植民地が非常に少ない国（日本・ドイツ・イタリアなど）が、英仏のように国内だけで不況を解決できず、結果としてとらざるを得なくなった共通の軍事的な方針について説明しなさい[cite: 7]。", a: "自国を中心とする閉鎖的な経済圏（ブロック経済）を強制的に作り出すため、武力による新たな領土の獲得や他国への侵略を始めた。", e: "持たざる国は、世界的な経済ブロック化による締め出しに対抗するため、武力で販路と原料供給地（満州やエチオピアなど）を奪いにいく軍国主義の道を歩み始めました[cite: 7]。" },
+    { id: 58, type: "発展", cat: 4, q: "イタリアのムッソリーニやドイツのヒトラーが率いた「ファシズム（全体主義）」という政治思想の本質的な特徴について、個人の権利や自由との関係から説明しなさい[cite: 7]。", a: "人間の平等を否定して強い指導者に絶対従属することを求め、個人の自由や民主主義の仕組みを完全に否定・弾圧する特徴。", e: "国家や民族という全体の利益を個人の人権よりも上位に置き、一党独裁によって言論・集会の自由を奪い、反対派を暴力的に排除する全体主義の体制です[cite: 7]。" },
+    { id: 59, type: "発展", cat: 4, q: "1920年代後半の日本において、中国の蔣介石率いる国民政府が「満州の権益（旅順・大連など）の回収」を唱えて民族運動を強めた際、現地の日本軍（関東軍）が抱いた危機感と、彼らが起こした過激な行動（1928年の事件）について説明しなさい[cite: 7]。", a: "中国統一が進み満州の日本の利権が奪われることに危機感を抱き、満州の支配権を確実にするため、現地の軍閥であった張作霖を列車ごと爆殺した。", e: "関東軍は独断で張作霖爆殺事件を引き起こしましたが、その思惑とは裏腹に、息子の張学良が蔣介石の国民政府に合流したため、満州全体に中国国民政府の支配が及ぶ結果となりました[cite: 7]。" },
+    { id: 60, type: "発展", cat: 4, q: "1930年代前半、世界恐慌をきっかけに日本国内の重化学工業の生産額が急激にのび、軽工業を上回る発展を遂げました[cite: 7]。この急激な工業化を後押しした、当時の経済・社会的な要因（需要）について説明しなさい[cite: 7]。", a: "満州事変以降の軍事行動にともない、軍隊で使用する兵器や物資を大量に生産するための「軍需品の生産（軍備増強）」の需要が急増したため。", e: "昭和恐慌からの脱却の過程で、軍需産業（金属・機械・化学など）が爆発的に成長しました[cite: 7]。" }
+];
+
+let timeLeft = 40 * 60;
+const timerDisplay = document.getElementById('timer');
+const userScores = new Array(questions.length).fill(null);
+
+function generateQuestions() {
+    questions.forEach(q => {
+        const container = document.getElementById(`questions-container-${q.cat}`);
+        const div = document.createElement('div');
+        div.className = 'question-item';
+        let content = `<span class="q-num">問${q.id}</span> <span class="q-type">${q.type}</span><br>${q.q}`;
+        
+        if (q.type === "記号選択" && q.options) {
+            content += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                content += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            content += `</div>`;
+            content += `<div class="print-ans-space">答：[ &nbsp; &nbsp; ]</div>`;
+        } else {
+            if (q.type === "記述" || q.id === 57 || q.id === 59) {
+                content += `<div class="print-ans-space">答：<div class="ans-box"></div></div>`;
+            } else {
+                content += `<div class="print-ans-space">答：<span class="ans-line"></span></div>`;
+            }
+        }
+        
+        div.innerHTML = content;
+        container.appendChild(div);
+    });
+}
+
+function showAnswers() {
+    clearInterval(countdown);
+    document.getElementById('test-page').classList.remove('active');
+    document.getElementById('answer-page').classList.add('active');
+    document.getElementById('score-bar').style.display = 'block';
+    
+    const container = document.getElementById('answers-container');
+    questions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'ans-item';
+        div.id = `ans-item-${idx}`;
+        
+        let qContent = `<div class="ans-q-text"><span class="q-num">問${q.id}</span> [${q.type}] ${q.q}`;
+        if (q.type === "記号選択" && q.options) {
+            qContent += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                qContent += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            qContent += `</div>`;
+        }
+        qContent += `</div>`;
+
+        let targetAnswer = q.a;
+        if (q.type === "記号選択" && q.ans_literal) {
+            targetAnswer = `${q.a} （${q.ans_literal}）`;
+        }
+
+        div.innerHTML = `
+            ${qContent}
+            <div><span class="ans-correct">正解：${targetAnswer}</span></div>
+            <div class="ans-explanation"><strong>解説:</strong> ${q.e}</div>
+            <div class="scoring-btns">
+                <button class="score-btn btn-correct" id="btn-c-${idx}" onclick="setScore(${idx}, true)">○ 正解</button>
+                <button class="score-btn btn-wrong" id="btn-w-${idx}" onclick="setScore(${idx}, false)">× 不正解</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+    window.scrollTo(0, 0);
+}
+
+function setScore(idx, isCorrect) {
+    userScores[idx] = isCorrect;
+    document.getElementById(`btn-c-${idx}`).classList.toggle('selected', isCorrect);
+    document.getElementById(`btn-w-${idx}`).classList.toggle('selected', !isCorrect);
+    updateScore();
+}
+
+function updateScore() {
+    const correctCount = userScores.filter(s => s === true).length;
+    document.getElementById('correct-count').innerText = correctCount;
+    document.getElementById('score-val').innerText = Math.round((correctCount / questions.length) * 100);
+}
+
+const countdown = setInterval(() => {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+    timerDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    if (timeLeft <= 0) {
+        clearInterval(countdown);
+        alert('時間終了です！採点ページへ移ります。');
+        showAnswers();
+    }
+    timeLeft--;
+}, 1000);
+
+generateQuestions();
+</script>
+
+</body>
+</html>

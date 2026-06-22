@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中3数学 定期・実力テスト対策（展開・因数分解・確率・箱ひげ図）</title>
+    <style>
+        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f0f2f5; color: #333; }
+        .page { display: none; }
+        .active { display: block; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        h1 { color: #2c5282; text-align: center; border-bottom: 3px solid #2c5282; padding-bottom: 10px; }
+        #timer-bar, #score-bar { position: sticky; top: 0; background: #c53030; color: white; padding: 10px; text-align: center; font-weight: bold; border-radius: 5px; z-index: 1000; font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        #score-bar { background: #2f855a; top: 50px; display: none; }
+        .question-item { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #cbd5e0; }
+        .q-num { font-weight: bold; color: #2b6cb0; margin-right: 10px; }
+        .q-type { font-size: 0.8em; background: #edf2f7; padding: 2px 8px; border-radius: 4px; margin-left: 10px; color: #4a5568; }
+        .options-container { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .option-item { background: #fff; border: 1px solid #2b6cb0; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; color: #2b6cb0; }
+        .btn { display: block; width: 100%; padding: 15px; background: #2b6cb0; color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; text-align: center; margin-top: 20px; text-decoration: none; }
+        .btn:hover { background: #2c5282; }
+        .scoring-btns { margin-top: 10px; display: flex; gap: 10px; }
+        .score-btn { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-correct { background: #e6fffa; color: #234e52; border: 1px solid #38b2ac; }
+        .btn-correct.selected { background: #38b2ac; color: white; }
+        .btn-wrong { background: #fff5f5; color: #742a2a; border: 1px solid #f56565; }
+        .btn-wrong.selected { background: #f56565; color: white; }
+        .ans-item { margin-bottom: 20px; padding: 15px; background: #f7fafc; border-left: 4px solid #2f855a; }
+        .ans-q-text { font-size: 0.95em; color: #4a5568; margin: 10px 0; border-bottom: 1px solid #e2e880; padding-bottom: 10px; }
+        .ans-correct { font-weight: bold; color: #2f855a; font-size: 1.1em; }
+        .ans-explanation { font-size: 0.9em; color: #4a5568; margin-top: 5px; background: #fff; padding: 10px; border-radius: 4px; }
+        .category-header { background: #4a5568; color: white; padding: 8px 15px; margin: 30px 0 15px 0; border-radius: 5px; font-size: 1em; }
+    </style>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            chtml: {
+                matchFontHeight: false
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+
+<div id="test-page" class="page active">
+    <div id="timer-bar">残り時間: <span id="timer">40:00</span></div>
+    <h1>数学 定期・実力テスト対策（展開・因数分解・確率・箱ひげ図）</h1>
+    <div class="card">
+        <p>※ノートに解答を記入し、最後に「採点ページへ」を押して確認してください。</p>
+        <div id="test-container">
+            <div class="category-header">第1ブロック：記号選択（10問）</div>
+            <div id="questions-container-1"></div>
+            <div class="category-header">第2ブロック：基本公式・空欄補充（10問）</div>
+            <div id="questions-container-2"></div>
+            <div class="category-header">第3ブロック：式の展開・因数分解 計算（20問）</div>
+            <div id="questions-container-3"></div>
+            <div class="category-header">第4ブロック：確率の基本・応用（10問）</div>
+            <div id="questions-container-4"></div>
+            <div class="category-header">第5ブロック：データの活用・箱ひげ図と応用展開（10問）</div>
+            <div id="questions-container-5"></div>
+        </div>
+        <button class="btn" onclick="showAnswers()">テストを終了して採点ページへ</button>
+    </div>
+</div>
+
+<div id="answer-page" class="page">
+    <div id="score-bar">正答率: <span id="score-val">0</span>% (<span id="correct-count">0</span>/60問)</div>
+    <h1>解答・解説一覧</h1>
+    <div class="card" id="answers-container"></div>
+    <button class="btn" onclick="location.reload()">テストTOPに戻る</button>
+</div>
+
+<script>
+const questions = [
+    // 第1ブロック：記号選択 (1-10) [展開因数分解: 7問, 確率: 1問, 箱ひげ: 2問]
+    { id: 1, type: "記号選択", cat: 1, q: "1つのさいころを投げるとき、1の目が出る確率は $\\frac{1}{6}$ です。この確率の意味を正しく説明しているものを次から選びなさい。", options: ["6回投げるとき、そのうち1回はかならず1の目が出る。", "6回投げるとき、そのうち1回しか1の目は出ない。", "3000回投げるとき、500回ぐらい1の目が出る。"], a: "3000回投げるとき、500回ぐらい1の目が出る。", e: "確率は、数多く実験や観察を繰り返したときに、そのことがらが起こると期待される割合（割合の偏りのなさ）を表します [cite: 975]。よって断定的な表現をしている選択肢は誤りです [cite: 975, 976]。" },
+    { id: 2, type: "記号選択", cat: 1, q: "ヒストグラムが左右対称ではなく、左に長くすそをひく形になっているとき、対応する箱ひげ図の中央値はどのような位置にある傾向がありますか。", options: ["箱ひげ図の箱のちょうど真ん中あたりにある", "箱ひげ図の箱の左寄りの方にある", "箱ひげ図の箱の右寄りの方にある"], a: "箱ひげ図の箱の右寄りの方にある", e: "左に長くすそをひくヒストグラムでは、データが全体的に右側（値の大きい方）に多く集まっているため、中央値（第2四分位数）は右寄りに位置します [cite: 1277]。" },
+    { id: 3, type: "記号選択", cat: 1, q: "ある学校のふたつのグループのハンドボール投げの記録を表した箱ひげ図があります。この図のみから『Aグループの記録の平均値は11mである』と結論づけることはできますか。", options: ["正しいと言える", "正しくないと言える", "このデータ（箱ひげ図）だけからはわからない"], a: "このデータ（箱ひげ図）だけからはわからない", e: "箱ひげ図から読み取れるのは「最大値・最小値・四分位数（第1・第2・第3）」であり、個々の具体的なデータの値までは分かりません [cite: 1257]。そのため平均値を算出することは不可能です [cite: 1257]。" },
+    { id: 4, type: "記号選択", cat: 1, q: "単項式や多項式の積の形で表された式を計算して、単項式の和の形で表すことを、もとの式をどうするといいますか。", options: ["展開する", "因数分解する", "通分する", "約分する"], a: "展開する", e: "かっこを外して単項式の和の形に直す計算を、式を「展開する」といいます [cite: 11, 165, 166]。" },
+    { id: 5, type: "記号選択", cat: 1, q: "1つの多項式を、いくつかの因数の積の形に表すことを、その多項式をどうするといいますか。", options: ["展開する", "因数分解する", "平方する", "有理化する"], a: "因数分解する", e: "多項式をいくつかの因数（積の形）に分解して表すことを、その多項式を「因数分解する」といいます [cite: 516]。" },
+    { id: 6, type: "記号選択", cat: 1, q: "多項式を因数分解するとき、各項に共通して含まれている因数（共通因数）がある場合、最初に行うべき正しい操作はどれですか。", options: ["共通因数をかっこ（ ）の外にくくり出す", "公式 $x^2+(a+b)x+ab$ を無理やり適用する", "すべての項を共通因数で割って消去する"], a: "共通因数をかっこ（ ）の外にくくり出す", e: "因数分解の鉄則は、まず各項に共通する因数（共通因数）を見つけてかっこの外にくくり出すことです [cite: 579, 778, 804]。" },
+    { id: 7, type: "記号選択", cat: 1, q: "展開した式に同類項（文字の部分がまったく同じ項）があるとき、最後に行うべき正しい処理はどれですか。", options: ["同類項はそのまま並べて残しておく", "同類項をまとめて計算してすっきりさせる", "同類項どうしを掛け合わせる"], a: "同類項をまとめて計算してすっきりさせる", e: "展開した式の中に同類項があるときは、必ずそれらをまとめて整理しなければなりません [cite: 24, 184, 251]。" },
+    { id: 8, type: "記号選択", cat: 1, q: "式 $(x+a)(x+b)$ を展開したとき、$x$ の係数にあたる部分はどのように決まりますか。", options: ["$a$ と $b$ の和（$a+b$）になる", "$a$ と $b$ の積（$ab$）になる", "$a$ と $b$ の差（$a-b$）になる"], a: "$a$ と $b$ の和（$a+b$）になる", e: "公式 $(x+a)(x+b) = x^2 + (a+b)x + ab$ の通り、$x$ の係数は $a$ と $b$ の和になります [cite: 242, 289]。" },
+    { id: 9, type: "記号選択", cat: 1, q: "式 $(x+a)(x+b)$ を展開したとき、文字のつかない数だけの項（定数項）はどのように決まりますか。", options: ["$a$ と $b$ の和（$a+b$）になる", "$a$ と $b$ の積（$ab$）になる", "$a$ と $b$ の差（$a-b$）になる"], a: "$a$ と $b$ の積（$ab$）になる", e: "公式 $(x+a)(x+b) = x^2 + (a+b)x + ab$ より、定数項（数の項）は $a$ と $b$ の積になります [cite: 242, 289]。" },
+    { id: 10, type: "記号選択", cat: 1, q: "因数分解 $x^2 + (a+b)x + ab = (x+a)(x+b)$ を行う際、2つの数 $a, b$ を見つけるための正しいアプローチはどれですか。", options: ["まず「和」になる組み合わせを考え、その中から「積」に合うものを探す", "まず「積」になる組み合わせを考え、その中から「補」に合うものを探す", "まず「積」になる組み合わせを考え、その中から「和」に合うものを探す"], a: "まず「積」になる組み合わせを考え、その中から「和」に合うものを探す", e: "積 $ab$ になる数の組み合わせ（候補）は有限で絞り込みやすいため、先に「積」から候補を挙げ、その中から和が $a+b$ になる組を選ぶのが正しい手順です [cite: 686, 687]。" },
+
+    // 第2ブロック：基本公式・空欄補充 (11-20) [展開因数分解: 9問, 箱ひげ: 1問]
+    { id: 11, type: "空欄補充", cat: 2, q: "分配法則の空欄を埋めなさい。$(a+b)c = \\Box$", a: "$ac+bc$", e: "かっこを外すとき、かっこの中の各項に外側の文字をそれぞれ掛けます [cite: 7, 81]。$(a+b)c = ac+bc$ となります [cite: 7, 81]。" },
+    { id: 12, type: "空欄補充", cat: 2, q: "乗法の公式の空欄を埋めなさい。$(x+a)(x+b) = x^2 + (\\Box)x + ab$", a: "$a+b$", e: "公式 $(x+a)(x+b) = x^2 + (a+b)x + ab$ です [cite: 242, 686]。$x$ の係数は2数の和（$a+b$）が入ります [cite: 242, 289]。" },
+    { id: 13, type: "空欄補充", cat: 2, q: "平方の公式の空欄を埋めなさい。$(a+b)^2 = a^2 + \\Box + b^2$", a: "$2ab$", e: "展開すると $(a+b)^2 = a^2 + 2ab + b^2$ となります [cite: 244, 645]。中央の項は $2 \\times a \\times b$ になる点に注意しましょう [cite: 247, 346]。" },
+    { id: 14, type: "空欄補充", cat: 2, q: "平方の公式の空欄を埋めなさい。$(a-b)^2 = a^2 - 2ab + \\Box$", a: "$b^2$", e: "展開すると $(a-b)^2 = a^2 - 2ab + b^2$ になります [cite: 245, 646]。最後の項は負の数 $-b$ の2乗なので、必ず $+b^2$ になります [cite: 245, 646]。" },
+    { id: 15, type: "空欄補充", cat: 2, q: "和と差の積の公式の空欄を埋めなさい。$(a+b)(a-b) = \\Box$", a: "$a^2-b^2$", e: "同じ項の和と差の積は、$(a+b)(a-b) = a^2 - b^2$ のように「2乗の差」の形に展開されます [cite: 246, 357]。" },
+    { id: 16, type: "空欄補充", cat: 2, q: "因数分解の公式にあてはめて空欄に正の数を入れなさい。$x^2 - 6x + 9 = (x - \\Box)^2$", a: "$3$", e: "定数項が $9 = 3^2$ であり、中央の項が $-2 \\times 3 \\times x = -6x$ なので、平方の公式から $(x-3)^2$ に因数分解できます [cite: 640, 663]。" },
+    { id: 17, type: "空欄補充", cat: 2, q: "因数分解の公式にあてはめて空欄に正の数を入れなさい。$x^2 - \\Box x + 9 = (x - 3)^2$", a: "$6$", e: "右辺を展開すると $(x-3)^2 = x^2 - 6x + 9$ となるため、$\\Box$ にあてはまる数は $6$ です [cite: 640]。" },
+    { id: 18, type: "空欄補充", cat: 2, q: "因数分解の公式にあてはめて空欄に正の数を入れなさい。$4x^2 + \\Box x + 1 = (\\Box x + 1)^2$ （共通の数が入ります）", a: "$2$", e: "$(2x+1)^2 = 4x^2 + 4x + 1$ となるため、$\\Box$ に入る正の数は $2$ です [cite: 643]。" },
+    { id: 19, type: "空欄補充", cat: 2, q: "因数分解の公式にあてはめて空欄に正の数を入れなさい。$x^2 - 16x + \\Box = (x - 8)^2$", a: "$64$", e: "右辺を展開すると $(x-8)^2 = x^2 - 16x + 64$ となるため、定数項の $\\Box$ に入る数は $8^2 = 64$ です [cite: 641]。" },
+    { id: 20, type: "空欄補充", cat: 2, q: "箱ひげ図の散らばりの指標で、「第3四分位数から第1四分位数を引いた差」の名称を漢字5文字で答えなさい。", a: "四分位範囲", e: "データの散らばりの度合いを表す指標で、第3四分位数と第1四分位数の差を「四分位範囲」といいます [cite: 1182, 1185]。" },
+
+    // 第3ブロック：式の展開・因数分解 計算 (21-40) [展開因数分解: 20問]
+    { id: 21, type: "一問一答", cat: 3, q: "次の計算をしなさい。$(2x+y)\\times7x$", a: "$14x^2+7xy$", e: "分配法則により、各項に $7x$ を掛けます：$2x \\times 7x + y \\times 7x = 14x^2 + 7xy$ [cite: 84]。" },
+    { id: 22, type: "一問一答", cat: 3, q: "次の計算をしなさい。$(3a-b)\\times4a$", a: "$12a^2-4ab$", e: "分配法則により計算します：$3a \\times 4a + (-b) \\times 4a = 12a^2 - 4ab$ [cite: 88]。" },
+    { id: 23, type: "一問一答", cat: 3, q: "次の計算をしなさい。$(5a-6b)\\times(-2b)$", a: "$-10ab+12b^2$", e: "負の数を掛ける際のデザイン（符号）に注意します：$5a \\times (-2b) + (-6b) \\times (-2b) = -10ab + 12b^2$ [cite: 90]。" },
+    { id: 24, type: "一問一答", cat: 3, q: "次の計算をしなさい。$-3a(8a+7b)$", a: "$-24a^2-21ab$", e: "かっこの前の $-3a$ を分配します：$-3a \\times 8a + (-3a) \\times 7b = -24a^2 - 21ab$ [cite: 93]。" },
+    { id: 25, type: "一問一答", cat: 3, q: "次の計算をしなさい。$-2x(-3x+2y)$", a: "$6x^2-4xy$", e: "符号の変化に注意して分配します：$-2x \\times (-3x) + (-2x) \\times 2y = 6x^2 - 4xy$ [cite: 96]。" },
+    { id: 26, type: "一問一答", cat: 3, q: "次の計算をしなさい。$(5x^2-10x)\\div5x$", a: "$x-2$", e: "多項式の各項を $5x$ で割ります：$\\frac{5x^2}{5x} - \\frac{10x}{5x} = x - 2$ [cite: 144, 146]。" },
+    { id: 27, type: "一問一答", cat: 3, q: "次の計算をしなさい。$(8a^2-2a)\\div2a$", a: "$4a-1$", e: "各項を $2a$ で割ります：$\\frac{8a^2}{2a} - \\frac{2a}{2a} = 4a - 1$ 。後ろの項の $-1$ を消してしまわないよう注意してください 。" },
+    { id: 28, type: "一問一答", cat: 3, q: "次の計算をしなさい。$(6ax+3ay)\\div(-3a)$", a: "$-2x-y$", e: "負の単項式 $-3a$ で各項を割るため、両方の項の符号が変わります：$\\frac{6ax}{-3a} + \\frac{3ay}{-3a} = -2x - y$ [cite: 148]。" },
+    { id: 29, type: "一問一答", cat: 3, q: "次の計算をしなさい。$(6xy-4xy^2)\\div\\frac{2}{5}y$", a: "$15x-10xy$", e: "わる式が分数の場合は、分子と分母を入れかえた逆数を掛けます：$(6xy-4xy^2) \\times \\frac{5}{2y} = 15x - 10xy$ [cite: 145, 150]。" },
+    { id: 30, type: "一問一答", cat: 3, q: "次の計算をしなさい。$(-10x^2+x)\\div\\frac{x}{2}$", a: "$-20x+2$", e: "逆数である $\\frac{2}{x}$ を各項に掛けます：$-10x^2 \\times \\frac{2}{x} + x \\times \\frac{2}{x} = -20x + 2$ [cite: 151]。" },
+    { id: 31, type: "一問一答", cat: 3, q: "次の式を展開しなさい。$(x+2)(y+3)$", a: "$xy+3x+2y+6$", e: "分配法則を数回用いて順に展開します：$x(y+3) + 2(y+3) = xy + 3x + 2y + 6$ [cite: 167, 172]。" },
+    { id: 32, type: "一問一答", cat: 3, q: "次の式を展開しなさい。$(x-4)(x+5)$", a: "$x^2+x-20$", e: "公式を使います。$x$ の係数は $-4+5=1$、定数項は $-4 \\times 5 = -20$ なので、$x^2 + x - 20$ です [cite: 182, 198, 199]。" },
+    { id: 33, type: "一問一答", cat: 3, q: "次の式を展開しなさい。$(3x+2y)(3x-2y)$", a: "$9x^2-4y^2$", e: "和と差の積の公式 $(A+B)(A-B) = A^2 - B^2$ を利用します：$(3x)^2 - (2y)^2 = 9x^2 - 4y^2$ [cite: 357, 368]。" },
+    { id: 34, type: "一問一答", cat: 3, q: "次の計算をしなさい。$(x-3)^2+(x-1)(x+7)$", a: "$2x^2+2$", e: "それぞれの公式で展開したあと同類項をまとめます：$(x^2 - 6x + 9) + (x^2 + 6x - 7) = 2x^2 + 2$ [cite: 403, 411, 412]。" },
+    { id: 35, type: "一問一答", cat: 3, q: "次の式を因数分解しなさい。$4ax-2a$", a: "$2a(2x-1)$", e: "共通因数である $2a$ をかっこの外にくくり出します：$2a \\times 2x - 2a \\times 1 = 2a(2x-1)$ [cite: 603, 604]。" },
+    { id: 36, type: "一問一答", cat: 3, q: "次の式を因数分解しなさい。$a^2b-ab^2$", a: "$ab(a-b)$", e: "共通因数である $ab$ をくくり出します：$ab \\times a - ab \\times b = ab(a-b)$ [cite: 600, 601]。" },
+    { id: 37, type: "一問一答", cat: 3, q: "次の式を因数分解しなさい。$9x^2-1$", a: "$(3x+1)(3x-1)$", e: "2乗の差の形（和と差の積の公式の逆）を利用します：$(3x)^2 - 1^2 = (3x+1)(3x-1)$ [cite: 620, 637]。" },
+    { id: 38, type: "一問一答", cat: 3, q: "次の式を因数分解しなさい。$x^2+11x+24$", a: "$(x+3)(x+8)$", e: "積が $+24$、和が $+11$ となる2つの正の数は $3$ と $8$ なので、$(x+3)(x+8)$ です [cite: 685]。" },
+    { id: 39, type: "一問一答", cat: 3, q: "次の式を因数分解しなさい。$x^2-10x+16$", a: "$(x-2)(x-8)$", e: "積が正（$+16$）で和が負（$-10$）なので、2数とも負になります。該当するのは $-2$ と $-8$ です [cite: 707, 726]。" },
+    { id: 40, type: "一問一答", cat: 3, q: "次の式を因数分解しなさい。$5x^2-45$", a: "$5(x+3)(x-3)$", e: "まず共通因数 $5$ をくくり出し、さらにかっこ内の $x^2-9$ を公式で因数分解します：$5(x^2-9) = 5(x+3)(x-3)$ [cite: 778, 780, 781]。" },
+
+    // 第4ブロック：確率の基本・応用 (41-50) [展開因数分解: 5問, 確率: 5問]
+    { id: 41, type: "一問一答", cat: 4, q: "1つのさいころを投げるとき、奇数の目が出る確率を求めなさい。", a: "$\\frac{1}{2}$", e: "すべての目の出方は6通り。奇数の目は1, 3, 5の3通り。よって確率は $\\frac{3}{6} = \\frac{1}{2}$ です [cite: 1002, 1004]。" },
+    { id: 42, type: "一問一答", cat: 4, q: "1から20までの数が1つずつ書かれた20枚のカードから1枚を取り出すとき、それが3の倍数である確率を求めなさい。", a: "$\\frac{3}{10}$", e: "カードは全部で20枚。3の倍数は3, 6, 9, 12, 15, 18の6通り。よって確率は $\\frac{6}{20} = \\frac{3}{10}$ です [cite: 982, 983, 985]。" },
+    { id: 43, type: "一問一答", cat: 4, q: "3枚の硬貨を同時に投げるとき、3枚とも表となる確率を求めなさい。", a: "$\\frac{1}{8}$", e: "裏表の出方は全部で $2^3 = 8$ 通り。3枚とも表になるのは (表, 表, 表) の1通りなので、確率は $\\frac{1}{8}$ です [cite: 1005, 1015]。" },
+    { id: 44, type: "一問一答", cat: 4, q: "5本のうち、あたりが2本はいっているくじがあります。同時に2本ひくとき、少なくとも1本があたりである確率を求めなさい。", a: "$\\frac{7}{10}$", e: "5本から2本を選ぶひき方は全部で10通り [cite: 1022]。少なくとも1本あたり（1本あたり、または2本ともあたり）は7通りなので $\\frac{7}{10}$ です [cite: 1021, 1023]。" },
+    { id: 45, type: "一問一答", cat: 4, q: "2つのさいころを同時に投げるとき、1の目がまったく出ない確率を求めなさい。", a: "$\\frac{25}{36}$", e: "すべての目の出方は36通り [cite: 1031]。2つとも1以外の目（2〜6の5通り）が出るのは $5 \\times 5 = 25$ 通りなので、確率は $\\frac{25}{36}$ です [cite: 1033]。" },
+    { id: 46, type: "一問一答", cat: 4, q: "次の式を因数分解しなさい。$ab-ac$", a: "$a(b-c)$", e: "各項に共通する文字 $a$ をかっこの外にくくり出します：$a \\times b - a \\times c = a(b-c)$ [cite: 596, 597]。" },
+    { id: 47, type: "一問一答", cat: 4, q: "次の式を因数分解しなさい。$2ax+3ay$", a: "$a(2x+3y)$", e: "共通因数である文字 $a$ をくくり出します：$a(2x+3y)$ [cite: 598, 599]。" },
+    { id: 48, type: "一問一答", cat: 4, q: "次の式を因数分解しなさい。$8a^2b-4b^2$", a: "$4b(2a^2-b)$", e: "数と文字の共通因数 $4b$ を見つけてくくり出します：$4b \\times 2a^2 - 4b \\times b = 4b(2a^2-b)$ [cite: 605, 606]。" },
+    { id: 49, type: "一問一答", cat: 4, q: "次の式を因数分解しなさい。$ax+bx+cx$", a: "$x(a+b+c)$", e: "項が3つになっても同様に共通因数 $x$ をくくり出します：$x(a+b+c)$ [cite: 607, 608]。" },
+    { id: 50, type: "一問一答", cat: 4, q: "次の式を因数分解しなさい。$mx-my$", a: "$m(x-y)$", e: "共通因数 $m$ をかっこの外にくくり出します：$m(x-y)$ [cite: 805]。" },
+
+    // 第5ブロック：データの活用・箱ひげ図と応用展開 (51-60) [展開因数分解: 7問, 確率: 1問, 箱ひげ: 2問]
+    { id: 51, type: "発展応用", cat: 5, q: "2つのさいころを同時に投げるとき、出る目の数の差が3になる確率を求めなさい。", a: "$\\frac{1}{6}$", e: "全体の36通りのうち [cite: 1031]、差が3になる組は (1,4), (2,5), (3,6), (4,1), (5,2), (6,3) の6通りです [cite: 1037]。よって $\\frac{6}{36} = \\frac{1}{6}$ となります [cite: 1037]。" },
+    { id: 52, type: "発展応用", cat: 5, q: "ある生徒15人が先月読んだ本の冊数のデータが以下の通りです。このデータの「四分位範囲」を求めなさい。<br>[2, 3, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 15] （※すでに小さい順に並んでいます）", a: "8", e: "中央値は7番目の「7」です [cite: 1192]。前半の中央値（第1四分位数）は3 [cite: 1191]、後半の中央値（第3四分位数）は11です [cite: 1196]。四分位範囲は $11 - 3 = 8$ となります [cite: 1193]。" },
+    { id: 53, type: "発展応用", cat: 5, q: "1年生10人の読書時間（時間）のデータが小さい順に並んでいます。このデータの中央値を求めなさい。<br>[3, 6, 7, 8, 8, 10, 10, 12, 15, 16]", a: "9", e: "データ数が10個（偶数）なので、中央値は中央に並ぶ5番目（8時間）と6番目（10時間）の平均値になります：$\\frac{8+10}{2} = 9$（時間） [cite: 1202]。" },
+    { id: 54, type: "発展応用", cat: 5, q: "次の式を展開しなさい。$(a+b-1)(a+b+3)$", a: "$a^2+2ab+b^2+2a+2b-3$", e: "$a+b=M$ と置き換えると、$(M-1)(M+3) = M^2+2M-3$ となります [cite: 424, 426, 427]。$M$ を元に戻して展開すると、$a^2+2ab+b^2+2a+2b-3$ となります [cite: 428, 429]。" },
+    { id: 55, type: "発展応用", cat: 5, q: "次の式を展開しなさい。$(x+y-2)^2$", a: "$x^2+2xy+y^2-4x-4y+4$", e: "$x+y=M$ と置くと $(M-2)^2 = M^2-4M+4$ [cite: 430, 432, 433]。これを元に戻して展開すると、$(x+y)^2-4(x+y)+4 = x^2+2xy+y^2-4x-4y+4$ となります [cite: 434, 435]。" },
+    { id: 56, type: "発展応用", cat: 5, q: "次の式を因数分解しなさい。$(a+b)x+(a+b)y$", a: "$(a+b)(x+y)$", e: "共通部分 $a+b=M$ と置くと $Mx+My = M(x+y)$ [cite: 821, 823]。$M$ を戻して $(a+b)(x+y)$ となります [cite: 824]。" },
+    { id: 57, type: "発展応用", cat: 5, q: "次の式を因数分解しなさい。$(a+b)^2+5(a+b)+6$", a: "$(a+b+2)(a+b+3)$", e: "$a+b=M$ と置くと $M^2+5M+6 = (M+2)(M+3)$ [cite: 834, 835]。$M$ を元に戻して $(a+b+2)(a+b+3)$ とします [cite: 836]。" },
+    { id: 58, type: "発展応用", cat: 5, q: "次の式を因数分解しなさい。$3ax^2+12ax+12a$", a: "$3a(x+2)^2$", e: "まず共通因数 $3a$ をくくり出すと $3a(x^2+4x+4)$ となります [cite: 786]。かっこ内を平方公式で因数分解して $3a(x+2)^2$ にします [cite: 787]。" },
+    { id: 59, type: "発展応用", cat: 5, q: "次の式を因数分解しなさい。$2bx^2-4bx-16b$", a: "$2b(x+2)(x-4)$", e: "共通因数 $2b$ をくくり出して $2b(x^2-2x-8)$ とします [cite: 782, 783]。かっこ内をさらに因数分解して $2b(x+2)(x-4)$ とします [cite: 784]。" },
+    { id: 60, type: "発展応用", cat: 5, q: "次の式を因数分解しなさい。$4a^2b-bx^2$", a: "$b(2a+x)(2a-x)$", e: "共通因数 $b$ をくくり出すと $b(4a^2-x^2)$ となります [cite: 788, 789]。かっこ内は2乗の差なので和と差の積にして $b(2a+x)(2a-x)$ とします [cite: 790]。" }
+];
+
+let timeLeft = 40 * 60;
+const timerDisplay = document.getElementById('timer');
+const userScores = new Array(questions.length).fill(null);
+
+function generateQuestions() {
+    questions.forEach(q => {
+        const container = document.getElementById(`questions-container-${q.cat}`);
+        const div = document.createElement('div');
+        div.className = 'question-item';
+        let content = `<span class="q-num">問${q.id}</span> <span class="q-type">${q.type}</span><br>${q.q}`;
+        
+        if (q.type === "記号選択" && q.options) {
+            content += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                content += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            content += `</div>`;
+        }
+        
+        div.innerHTML = content;
+        container.appendChild(div);
+    });
+
+    // 動的生成後に MathJax で再レンダリング
+    if (window.MathJax) {
+        MathJax.typesetPromise();
+    }
+}
+
+function showAnswers() {
+    clearInterval(countdown);
+    document.getElementById('test-page').classList.remove('active');
+    document.getElementById('answer-page').classList.add('active');
+    document.getElementById('score-bar').style.display = 'block';
+    
+    const container = document.getElementById('answers-container');
+    questions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'ans-item';
+        div.id = `ans-item-${idx}`;
+        
+        let qContent = `<div class="ans-q-text"><span class="q-num">問${q.id}</span> [${q.type}] ${q.q}`;
+        if (q.type === "記号選択" && q.options) {
+            qContent += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                qContent += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            qContent += `</div>`;
+        }
+        qContent += `</div>`;
+
+        div.innerHTML = `
+            ${qContent}
+            <div><span class="ans-correct">正解：${q.a}</span></div>
+            <div class="ans-explanation"><strong>解説:</strong> ${q.e}</div>
+            <div class="scoring-btns">
+                <button class="score-btn btn-correct" id="btn-c-${idx}" onclick="setScore(${idx}, true)">○ 正解</button>
+                <button class="score-btn btn-wrong" id="btn-w-${idx}" onclick="setScore(${idx}, false)">× 不正解</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+
+    // 解答画面生成後に MathJax で再レンダリング
+    if (window.MathJax) {
+        MathJax.typesetPromise();
+    }
+
+    window.scrollTo(0, 0);
+}
+
+const countdown = setInterval(() => {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+    timerDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    if (timeLeft <= 0) {
+        clearInterval(countdown);
+        alert('時間終了です！採点ページへ移ります。');
+        showAnswers();
+    }
+    timeLeft--;
+}, 1000);
+
+function setScore(idx, isCorrect) {
+    userScores[idx] = isCorrect;
+    document.getElementById(`btn-c-${idx}`).classList.toggle('selected', isCorrect);
+    document.getElementById(`btn-w-${idx}`).classList.toggle('selected', !isCorrect);
+    updateScore();
+}
+
+function updateScore() {
+    const correctCount = userScores.filter(s => s === true).length;
+    document.getElementById('correct-count').innerText = correctCount;
+    document.getElementById('score-val').innerText = Math.round((correctCount / questions.length) * 100);
+}
+
+generateQuestions();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>定期テスト完璧対策システム（理科・社会）</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+  <style>
+    :root {
+      --primary-color: #3498db;
+      --secondary-color: #2ecc71;
+      --accent-color: #e74c3c;
+      --gold-color: #f1c40f;
+      --bg-color: #f4f6f9;
+      --text-color: #1e293b;
+      --border-color: #e2e8f0;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      margin: 0;
+      padding: 15px;
+    }
+    .container { max-width: 600px; margin: 15px auto; background: white; padding: 25px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); }
+    h1 { font-size: 20px; border-bottom: 3px solid var(--primary-color); padding-bottom: 12px; text-align: center; margin-top: 0; font-weight: 700; color: #0f172a; }
+    h2 { font-size: 16px; margin-top: 0; font-weight: 600; color: #334155; }
+    .hidden { display: none !important; }
+    select, button { width: 100%; padding: 14px; margin-top: 15px; border-radius: 10px; border: 1px solid var(--border-color); font-size: 16px; box-sizing: border-box; font-weight: 600; }
+    button { background-color: var(--primary-color); color: white; border: none; cursor: pointer; }
+    button:hover { opacity: 0.9; }
+    .btn-secondary { background-color: #64748b; }
+    .btn-outline { background-color: transparent; color: var(--primary-color); border: 2px solid var(--primary-color); margin-top: 10px; padding: 10px; font-size: 14px; }
+    #loading { text-align: center; padding: 40px 20px; font-size: 16px; color: #64748b; font-weight: bold; }
+    .spinner { width: 40px; height: 40px; border: 4px solid rgba(0,0,0,0.1); border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 20px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .menu-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 15px; }
+    .menu-btn { background-color: #ffffff; color: var(--text-color); border: 2px solid var(--border-color); text-align: left; padding: 16px; border-radius: 12px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 15px; font-weight: 600; box-sizing: border-box; width: 100%; margin-top: 0; }
+    .menu-btn:hover { border-color: var(--primary-color); background-color: #f8fafc; }
+    .menu-btn.cleared { border-color: var(--gold-color); background-color: #fffdf5; color: #854d0e; }
+    .crown { color: var(--gold-color); font-size: 16px; font-weight: bold; }
+    .progress-text { font-size: 12px; color: #64748b; font-weight: normal; margin-top: 2px; }
+    .choices-container { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 20px; }
+    .choice-btn { background-color: #ffffff; color: var(--text-color); border: 2px solid var(--border-color); text-align: left; padding: 16px; font-size: 18px; font-weight: 600; cursor: pointer; border-radius: 10px; margin-top: 0; width: 100%; box-sizing: border-box; }
+    .choice-btn:hover { background-color: #f8fafc; border-color: var(--primary-color); }
+    .choice-btn.selected-correct { background-color: #dcfce7 !important; border-color: #2ecc71 !important; color: #15803d !important; }
+    .choice-btn.selected-incorrect { background-color: #fee2e2 !important; border-color: #e74c3c !important; color: #b91c1c !important; }
+    .card { background: #f8fafc; border: 1px solid var(--border-color); padding: 22px; border-radius: 12px; margin-top: 15px; }
+    .badge { background-color: #e0f2fe; color: #0369a1; padding: 6px 12px; font-size: 12px; border-radius: 6px; font-weight: 700; display: inline-block; }
+    .difficulty-badge { float: right; font-size: 12px; background-color: #f1f5f9; color: #475569; padding: 6px 12px; border-radius: 6px; font-weight: 700; }
+    .result { margin-top: 20px; padding: 15px; border-radius: 10px; font-weight: bold; text-align: center; font-size: 18px; }
+    .correct { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
+    .incorrect { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+    .hint-box { background-color: #fef9c3; color: #713f12; padding: 15px; border-radius: 10px; margin-top: 15px; font-size: 15px; border-left: 5px solid #eab308; display: block; word-break: break-all; }
+    #header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    #user-display { font-size: 13px; color: #64748b; font-weight: 700; }
+    .admin-student-card { background: #ffffff; border: 2px solid var(--border-color); border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+    .admin-student-name { font-size: 16px; font-weight: bold; color: #0f172a; margin: 0 0 12px 0; border-left: 4px solid var(--primary-color); padding-left: 8px; }
+    .admin-progress-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed var(--border-color); font-size: 13px; }
+    .admin-progress-row:last-child { border-bottom: none; }
+    .admin-progress-label { color: #475569; font-weight: 600; width: 60%; }
+    .admin-progress-bar-container { width: 30%; background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden; position: relative; }
+    .admin-progress-bar-fill { height: 100%; background: var(--primary-color); border-radius: 4px; transition: width 0.3s ease; }
+    .admin-progress-bar-fill.complete { background: var(--secondary-color); }
+    .admin-student-card .admin-progress-row .admin-score-badge { width: 10%; text-align: right; font-weight: bold; font-size: 12px; color: #0f172a; }
+    .admin-student-card .admin-progress-row .admin-score-badge.gold { color: #b45309; }
+    .clear-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); display: flex; justify-content: center; align-items: center; z-index: 9999; }
+    .clear-content { background: white; padding: 40px 30px; border-radius: 24px; text-align: center; max-width: 450px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.2); animation: popUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+    @keyframes popUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+    .clear-title { font-size: 28px; font-weight: 800; color: #b45309; margin-bottom: 10px; }
+    .clear-subtitle { font-size: 16px; color: #475569; margin-bottom: 25px; line-height: 1.6; }
+    .clear-icon { font-size: 64px; margin-bottom: 15px; display: inline-block; animation: bouncin 1s infinite alternate; }
+    @keyframes bouncin { from { transform: translateY(0); } to { transform: translateY(-10px); } }
+    .timer-container { width: 100%; background-color: #e2e8f0; height: 6px; border-radius: 3px; margin-top: 10px; overflow: hidden; }
+    .timer-bar { width: 100%; height: 100%; background-color: var(--accent-color); transition: width 0.1s linear; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="header-bar">
+      <button class="btn-outline" style="width:auto; margin:0;" onclick="openAdmin()">講師用管理</button>
+      <div id="user-display"></div>
+    </div>
+    <h1 id="main-title">中3 理科・社会 定期テスト完全対策</h1>
+    <div id="loading"><div class="spinner"></div><p>Googleスプレッドシートからデータを同期中...</p></div>
+
+    <div id="login-screen" class="hidden">
+      <p style="font-weight: bold; margin-bottom: 5px;">名簿から自分の名前を選んでください：</p>
+      <select id="student-select"><option value="">-- 生徒名を選択 --</option></select>
+      <button onclick="login()">メニューに進む</button>
+    </div>
+    <div id="menu-screen" class="hidden">
+      <h2>挑戦する単元と難易度を選択してください</h2>
+      <div class="menu-grid" id="menu-list"></div>
+      <button class="btn-secondary" style="margin-top: 20px;" onclick="backToLogin()">生徒選択に戻る</button>
+      <button class="btn-outline" style="color:var(--accent-color); border-color:var(--accent-color); margin-top:10px;" onclick="resetStudentData()">学習データをリセットする</button>
+    </div>
+    <div id="quiz-screen" class="hidden">
+      <button class="btn-secondary" style="width:auto; padding: 8px 16px; margin: 0 0 10px 0; font-size:14px;" onclick="backToMenu()">◀ 単元メニューに戻る</button>
+      <div class="card">
+        <div><span class="badge" id="q-category"></span><span class="difficulty-badge" id="q-difficulty"></span></div>
+        <div class="timer-container"><div id="timer-bar" class="timer-bar"></div></div>
+        <div id="q-instruction" style="font-size: 15px; color: #475569; margin-top: 15px; font-weight: bold;"></div>
+        <div id="q-text" style="font-size: 18px; margin: 25px 0; text-align: left; line-height: 1.7; font-weight: 500; min-height: 40px; background:#fff; padding:15px; border-radius:8px; border:1px solid var(--border-color); white-space: normal; word-break: break-all;"></div>
+        <div class="choices-container" id="choices-area"></div>
+        <div id="result-area" class="result hidden"></div>
+        <div id="hint-area" class="hint-box hidden"></div>
+        <button id="next-btn" style="background-color: var(--secondary-color);" class="hidden" onclick="generateNextQuestion()">次の問題に進む</button>
+      </div>
+    </div>
+    <div id="admin-screen" class="hidden">
+      <h2>講師用 進捗管理メニュー (リアルタイム)</h2>
+      <button class="btn-secondary" style="width:auto; padding: 8px 16px; margin-bottom:15px;" onclick="closeAdmin()">◀ アプリに戻る</button>
+      <div id="admin-content" style="max-height: 70vh; overflow-y: auto; padding-right: 5px;"></div>
+    </div>
+  </div>
+  <div id="clear-modal-screen" class="clear-modal hidden">
+    <div class="clear-content">
+      <div class="clear-icon"> 🎉 </div>
+      <div class="clear-title"> 👑 単元クリア！</div>
+      <div id="clear-message" class="clear-subtitle"></div>
+      <button style="background-color: var(--secondary-color); margin-top: 10px;" onclick="closeClearModal()">単元メニューに戻る</button>
+    </div>
+  </div>
+<script>
+// 指定されたデプロイURLを使用
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzlcIJ8oMUhv35yut28aC3qpX2LX6aOZQU0UPqJJFc506AHIk5kLOJ2T73FzkfbFNsKnA/exec";
+
+let students = [];
+let questions = [];
+let liveProgress = {}; 
+let currentModePool = [];
+let currentStudentId = null;
+let currentMenuKey = null;
+let currentQuestion = null;
+let isAnswered = false;
+let selectedCategory = "";
+let selectedDifficulty = "";
+
+let currentContinuousCorrect = 0;
+let timerInterval = null;
+const LIMIT_TIME = 7.0; 
+let remainingTime = LIMIT_TIME;
+
+const modeConfigs = [
+  { category: "【元素記号】名称から記号", difficulty: "基本", label: "理科：元素記号（名称 → 記号）" },
+  { category: "【元素記号】記号から名称", difficulty: "基本", label: "理科：元素記号（記号 → 名称）" },
+  { category: "【化学式】名称から化学式", difficulty: "標準", label: "理科：化学式（物質名 → 化学式）" },
+  { category: "【化学式】化学式から名称", difficulty: "標準", label: "理科：化学式（化学式 → 物質名）" },
+  { category: "【イオン式】名称からイオン式", difficulty: "標準", label: "理科：イオン式（イオン名 → イオン式）" },
+  { category: "【イオン式】イオン式から名称", difficulty: "標準", label: "理科：イオン式（イオン式 → イオン名）" },
+  { category: "【電離・分解・生成】化学反応式", difficulty: "発展", label: "理科：電離・電気分解・中和（反応式）" },
+  { category: "歴史年表（明治・大正）", difficulty: "出来事クイズ", label: "社会：明治・大正（出来事・用語当て）" },
+  { category: "歴史年表（昭和・戦前戦中）", difficulty: "出来事クイズ", label: "社会：昭和戦前・戦中（出来事・用語当て）" },
+  { category: "歴史年表（昭和・戦後～現代）", difficulty: "出来事クイズ", label: "社会：昭和戦後～現代（出来事・用語当て）" },
+  { category: "歴史年表（明治・大正）", difficulty: "年号クイズ", label: "社会：明治・大正（年号・西暦当て）" },
+  { category: "歴史年表（昭和・戦前戦中）", difficulty: "年号クイズ", label: "社会：昭和戦前・戦中（年号・西暦当て）" },
+  { category: "歴史年表（昭和・戦後～現代）", difficulty: "年号クイズ", label: "社会：昭和戦後～現代（年号・西暦当て）" }
+];
+
+function loadLocalProgress() {
+  const localData = localStorage.getItem("test_system_progress_v4");
+  if (localData) {
+    try {
+      const parsed = JSON.parse(localData);
+      for (let k in parsed) {
+        liveProgress[k] = parsed[k];
+      }
+    } catch(e) { console.error("ローカルデータ読み込みエラー", e); }
+  }
+}
+
+function saveLocalProgress(key, value) {
+  liveProgress[key] = value;
+  localStorage.setItem("test_system_progress_v4", JSON.stringify(liveProgress));
+  
+  // ★重要：ローカル保存と同時に、即座にサーバー（スプレッドシート）側にも最新の数値を上書き強制同期送信する★
+  syncProgressToServer(key, value);
+}
+
+function formatMathText(text) {
+if (!text) return "";
+let str = String(text).trim();
+str = str.replace(/->/g, " \\rightarrow ").replace(/→/g, " \\rightarrow ");
+str = str.replace(/^(\$\$|\\\(|\\\[|\$)/, "").replace(/(\$\$|\\\)|\\\]|\$)$/, "").trim();
+str = str.replace(/\\\\div/g, " \\div ").replace(/\\div/g, " \\div ");
+str = str.replace(/\\\\times/g, " \\times ").replace(/\\times/g, " \\times ");
+str = str.replace(/\*/g, " \\times ").replace(/×/g, " \\times ");
+str = str.replace(/\(([a-zA-Z0-9\-+^]+)\/([a-zA-Z0-9\-+^]+)\)/g, "\\frac{$1}{$2}");
+const advancedFractionRegex = /([a-zA-Z0-9\-+^]+)\/([a-zA-Z0-9\-+^]+)/g;
+while (advancedFractionRegex.test(str)) {
+str = str.replace(advancedFractionRegex, "\\frac{$1}{$2}");
+}
+str = str.split(/([\u30a0-\u30ff\u3040-\u309f\u4e00-\u9fafのとき値、となり元の倍になります。]+)/).map(part => {
+if (!part) return "";
+if (!/[\u30a0-\u30ff\u3040-\u309f\u4e00-\u9fafのとき値、となり元の倍になります。]/.test(part) && part.trim().length > 0) {
+let cleanedPart = part.trim().replace(/^(\$)/, "").replace(/(\$)$/, "").trim();
+return `$${cleanedPart}$`;
+}
+return part;
+}).join("");
+return str;
+}
+
+function cleanCompareText(str) {
+if (!str) return "";
+return String(str)
+.replace(/->/g, "→")
+.replace(/^(\$\$|\\\(|\\\[|\\\]|\\\)|$)/g, "")
+.replace(/(\$\$|\\\)|\\\]|\\\(|$)/g, "")
+.replace(/math|xmlns|display|block|<|>|\//g, "")
+.replace(/\\frac|\\div|\\times|\\rightarrow|\{|\}/g, "")
+.replace(/\s+/g, "")
+.trim();
+}
+
+function secureShuffle(array) {
+let arr = [...array];
+for (let i = arr.length - 1; i > 0; i--) {
+const j = Math.floor(Math.random() * (i + 1));
+[arr[i], arr[j]] = [arr[j], arr[i]];
+}
+return arr;
+}
+
+window.onload = async function() {
+try {
+const response = await fetch(`${GAS_URL}?action=getInitialData`);
+const data = await response.json();
+students = data.students || [];
+questions = data.questions || [];
+liveProgress = data.liveProgress || {};
+
+loadLocalProgress();
+
+const select = document.getElementById("student-select");
+select.innerHTML = '<option value="">-- 生徒名を選択 --</option>';
+students.forEach(s => {
+if(s && s.id) {
+const opt = document.createElement("option");
+opt.value = s.id;
+opt.textContent = `${s.className || ''} ： ${s.name || ''}`;
+select.appendChild(opt);
+}
+});
+document.getElementById("loading").classList.add("hidden");
+document.getElementById("login-screen").classList.remove("hidden");
+} catch (e) {
+document.getElementById("loading").innerHTML = "<p style='color:red; font-weight:bold;'>データの同期に失敗しました。</p>";
+}
+};
+
+function login() {
+const select = document.getElementById("student-select");
+if(!select.value) return alert("名前を選択してください。");
+currentStudentId = select.value;
+showMenuScreen();
+}
+
+function showMenuScreen() {
+clearInterval(timerInterval);
+const student = students.find(s => s && s.id == currentStudentId);
+document.getElementById("user-display").textContent = `学習者: ${student ? student.name : '未知の生徒'}`;
+document.getElementById("login-screen").classList.add("hidden");
+document.getElementById("quiz-screen").classList.add("hidden");
+document.getElementById("admin-screen").classList.add("hidden");
+document.getElementById("menu-screen").classList.remove("hidden");
+renderMenu();
+}
+
+function renderMenu() {
+const menuList = document.getElementById("menu-list");
+menuList.innerHTML = "";
+modeConfigs.forEach(mode => {
+const totalInMode = questions.filter(q => q.category.trim() === mode.category.trim() && q.difficulty.trim() === mode.difficulty.trim()).length;
+const key = `${currentStudentId}__${mode.category}__${mode.difficulty}`;
+
+let currentScore = liveProgress[key] || 0;
+if (currentScore === "CLEARED") currentScore = totalInMode;
+currentScore = parseInt(currentScore) || 0;
+if (currentScore > totalInMode) currentScore = totalInMode;
+
+const isCleared = currentScore >= totalInMode && totalInMode > 0;
+
+const btn = document.createElement("button");
+btn.className = `menu-btn ${isCleared ? 'cleared' : ''}`;
+btn.innerHTML = `<div><div>${mode.label}</div><div class="progress-text">連続正解数: ${currentScore} / ${totalInMode} 問</div></div><div>${isCleared ? '<span class="crown"> 👑 クリア!</span>' : '<span>▶</span>'}</div>`;
+btn.onclick = () => startMode(mode.category, mode.difficulty);
+menuList.appendChild(btn);
+});
+}
+
+function startMode(category, difficulty) {
+currentMenuKey = `${currentStudentId}__${category}__${difficulty}`;
+selectedCategory = category;
+selectedDifficulty = difficulty;
+
+const totalInMode = questions.filter(q => q.category.trim() === selectedCategory.trim() && q.difficulty.trim() === selectedDifficulty.trim()).length;
+let savedScore = liveProgress[currentMenuKey] || 0;
+if (savedScore === "CLEARED") savedScore = totalInMode;
+savedScore = parseInt(savedScore) || 0;
+
+currentContinuousCorrect = (savedScore >= totalInMode) ? totalInMode : 0;
+
+buildQuestionPool();
+document.getElementById("menu-screen").classList.add("hidden");
+document.getElementById("quiz-screen").classList.remove("hidden");
+generateNextQuestion();
+}
+
+function buildQuestionPool() {
+currentModePool = questions.filter(q => {
+  return q.category.trim() === selectedCategory.trim() && q.difficulty.trim() === selectedDifficulty.trim();
+});
+currentModePool = secureShuffle(currentModePool);
+}
+
+function generateNextQuestion() {
+isAnswered = false;
+clearInterval(timerInterval);
+
+let allQuestionsInMode = questions.filter(q => q.category.trim() === selectedCategory.trim() && q.difficulty.trim() === selectedDifficulty.trim());
+const totalInMode = allQuestionsInMode.length;
+
+if (!currentModePool || currentModePool.length === 0) {
+  buildQuestionPool();
+}
+
+currentQuestion = currentModePool.pop();
+document.getElementById("q-category").textContent = currentQuestion.category || "";
+document.getElementById("q-difficulty").textContent = `連続正解に挑戦中 [ 現在 ${currentContinuousCorrect} / ${totalInMode} 連勝 ]`;
+const qTextDiv = document.getElementById("q-text");
+
+let formattedQ = formatMathText(currentQuestion.question || "");
+
+const hasLargeJapanese = /[\u30a0-\u30ff\u3040-\u309f\u4e00-\u9faf]{3,}/.test(formattedQ);
+if (hasLargeJapanese || formattedQ.includes("のとき")) {
+qTextDiv.innerHTML = formattedQ;
+qTextDiv.style.textAlign = "left";
+qTextDiv.style.fontSize = "16px";
+} else {
+qTextDiv.innerHTML = `\\[ ${formattedQ.replace(/\$/g, "")} \\]`;
+qTextDiv.style.textAlign = "center";
+qTextDiv.style.fontSize = "24px";
+}
+const instructionArea = document.getElementById("q-instruction");
+
+if (String(currentQuestion.difficulty).includes("年号クイズ")) {
+instructionArea.textContent = "次の歴史的な出来事が発生した、正しい西暦（年号）を選びなさい。";
+} else if (String(currentQuestion.category).includes("歴史年表")) {
+instructionArea.textContent = "次の歴史的な出来事について、正しい歴史用語や人物名を選びなさい。";
+} else if (String(currentQuestion.category).includes("元素記号")) {
+instructionArea.textContent = "対応する正しい元素記号、または元素の名称を選びなさい。";
+} else if (String(currentQuestion.category).includes("化学式") || String(currentQuestion.category).includes("イオン式")) {
+instructionArea.textContent = "物質またはイオンを表す正しい化学式・名称を選びなさい。";
+} else {
+instructionArea.textContent = "物質の電離や化学変化を表す、正しい化学反応式・イオン反応式を選びなさい。";
+}
+document.getElementById("result-area").classList.add("hidden");
+document.getElementById("hint-area").classList.add("hidden");
+document.getElementById("next-btn").classList.add("hidden");
+
+renderSheetChoices(currentQuestion.choices || [], currentQuestion.answer || "");
+triggerMathRender();
+
+remainingTime = LIMIT_TIME;
+const timerBar = document.getElementById("timer-bar");
+timerBar.style.width = "100%";
+timerBar.style.backgroundColor = "var(--accent-color)";
+
+timerInterval = setInterval(() => {
+  remainingTime -= 0.1;
+  const percentage = (remainingTime / LIMIT_TIME) * 100;
+  timerBar.style.width = `${percentage}%`;
+
+  if (remainingTime <= 0) {
+    clearInterval(timerInterval);
+    handleTimeOut(); 
+  }
+}, 100);
+}
+
+function handleTimeOut() {
+  if (isAnswered) return;
+  isAnswered = true;
+  
+  const choices = document.querySelectorAll(".choice-btn");
+  choices.forEach(btn => {
+    btn.disabled = true;
+    let rawAttr = btn.getAttribute("data-raw-choice");
+    if (cleanCompareText(rawAttr) === cleanCompareText(currentQuestion.answer)) {
+      btn.classList.add("selected-correct"); 
+    }
+  });
+
+  currentContinuousCorrect = 0;
+  saveLocalProgress(currentMenuKey, 0); 
+  currentModePool.unshift(currentQuestion);
+
+  let formattedHint = formatMathText(currentQuestion.hint || "解説データは登録されていません。");
+  const hintArea = document.getElementById("hint-area");
+  hintArea.classList.remove("hidden");
+  hintArea.innerHTML = ` ⏰ <strong>時間切れです！(制限時間7秒)</strong><br><br>💡 解説:<br>${formattedHint}`;
+
+  const resArea = document.getElementById("result-area");
+  resArea.className = "result incorrect";
+  resArea.textContent = "× 時間切れ... 【連勝ストップ！最初からやり直し】";
+  resArea.classList.remove("hidden");
+
+  document.getElementById("next-btn").classList.remove("hidden");
+  triggerMathRender();
+
+  logToSpreadsheet(false, "【時間切れ】");
+}
+
+function renderSheetChoices(choicesArray, correctAnswer) {
+let shuffled = secureShuffle([...choicesArray]);
+const choicesArea = document.getElementById("choices-area");
+choicesArea.innerHTML = "";
+shuffled.forEach(choice => {
+let formattedChoice = formatMathText(choice);
+const btn = document.createElement("button");
+btn.className = "choice-btn";
+btn.setAttribute("data-raw-choice", String(choice).trim());
+if (!/[\u30a0-\u30ff\u3040-\u309f\u4e00-\u9faf]/.test(formattedChoice)) {
+btn.innerHTML = formattedChoice.includes("$") ? formattedChoice : `$${formattedChoice}$`;
+} else {
+btn.innerHTML = formattedChoice;
+}
+btn.onclick = () => selectChoice(btn, choice, correctAnswer);
+choicesArea.appendChild(btn);
+});
+}
+
+function selectChoice(selectedBtn, chosenAnswer, correctAnswer) {
+if (isAnswered) return;
+isAnswered = true;
+clearInterval(timerInterval); 
+
+const isCorrect = (cleanCompareText(chosenAnswer) === cleanCompareText(correctAnswer));
+const choices = document.querySelectorAll(".choice-btn");
+choices.forEach(btn => btn.disabled = true);
+
+let allQuestionsInMode = questions.filter(q => q.category.trim() === selectedCategory.trim() && q.difficulty.trim() === selectedDifficulty.trim());
+const totalInMode = allQuestionsInMode.length;
+
+if (isCorrect) {
+  selectedBtn.classList.add("selected-correct");
+  currentContinuousCorrect++;
+  
+  if (currentContinuousCorrect >= totalInMode) {
+    saveLocalProgress(currentMenuKey, "CLEARED"); 
+  } else if (!liveProgress[currentMenuKey] || liveProgress[currentMenuKey] < currentContinuousCorrect) {
+    saveLocalProgress(currentMenuKey, currentContinuousCorrect);
+  }
+} else {
+  selectedBtn.classList.add("selected-incorrect");
+  choices.forEach(btn => {
+    let rawAttr = btn.getAttribute("data-raw-choice");
+    if (cleanCompareText(rawAttr) === cleanCompareText(correctAnswer)) {
+      btn.classList.add("selected-correct");
+    }
+  });
+  
+  currentContinuousCorrect = 0;
+  saveLocalProgress(currentMenuKey, 0); 
+  currentModePool.unshift(currentQuestion);
+  
+  let formattedHint = formatMathText(currentQuestion.hint || "解説データは登録されていません。");
+  const hintArea = document.getElementById("hint-area");
+  hintArea.classList.remove("hidden");
+  hintArea.innerHTML = ` 💡 解説:<br>${formattedHint}`;
+}
+
+const resArea = document.getElementById("result-area");
+resArea.className = "result " + (isCorrect ? "correct" : "incorrect");
+if (isCorrect) {
+  resArea.textContent = `〇 正解！ 【これで ${currentContinuousCorrect} 連勝！】`;
+} else {
+  resArea.textContent = "× 不正解... 【連勝ストップ！最初からやり直し】";
+}
+resArea.classList.remove("hidden");
+
+if (currentContinuousCorrect >= totalInMode) {
+  setTimeout(() => {
+    const config = modeConfigs.find(m => m.category === selectedCategory && m.difficulty === selectedDifficulty);
+    document.getElementById("clear-message").innerHTML = `<strong>${config ? config.label : selectedCategory}</strong><br>全 ${totalInMode} 問連続正解を完璧に達成しました！<br>素晴らしい集中力と実力です。`;
+    document.getElementById("clear-modal-screen").classList.remove("hidden");
+  }, 1200);
+} else {
+  document.getElementById("next-btn").classList.remove("hidden");
+}
+triggerMathRender();
+
+logToSpreadsheet(isCorrect, chosenAnswer);
+}
+
+function logToSpreadsheet(isCorrect, userAnswer) {
+  fetch(GAS_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "logAnswer",
+      studentId: currentStudentId,
+      questionId: currentQuestion.id,
+      isCorrect: isCorrect,
+      userAnswer: userAnswer
+    })
+  });
+}
+
+// 別端末間で強制上書き同期させるためのフロント用ロジック
+function syncProgressToServer(menuKey, progressValue) {
+  fetch(GAS_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      action: "syncProgress",
+      studentId: menuKey, 
+      progressValue: progressValue
+    })
+  });
+}
+
+function closeClearModal() {
+document.getElementById("clear-modal-screen").classList.add("hidden");
+showMenuScreen();
+}
+
+function triggerMathRender() {
+try {
+renderMathInElement(document.body, {
+  delimiters: [
+    {left: "$$", right: "$$", display: true},
+    {left: "\\(", right: "\\)", display: false},
+    {left: "\\[", right: "\\]", display: true},
+    {left: "$", right: "$", display: false}
+  ],
+  throwOnError: false
+});
+} catch(e) { console.error("数式描画エラー:", e); }
+}
+
+function backToMenu() { clearInterval(timerInterval); showMenuScreen(); }
+function backToLogin() {
+clearInterval(timerInterval);
+document.getElementById("menu-screen").classList.add("hidden");
+document.getElementById("login-screen").classList.remove("hidden");
+document.getElementById("user-display").textContent = "";
+}
+
+function resetStudentData() {
+if(confirm("この生徒の学習データをリセットして最初からやり直しますか？\n(※クリア状態や現在の進行データがすべてリセットされます)")) {
+modeConfigs.forEach(mode => {
+  saveLocalProgress(`${currentStudentId}__${mode.category}__${mode.difficulty}`, 0);
+});
+renderMenu();
+}
+}
+
+function openAdmin() {
+const password = prompt("講師用パスワードを入力してください：");
+if (password === "admin1234") {
+clearInterval(timerInterval);
+document.getElementById("login-screen").classList.add("hidden");
+document.getElementById("menu-screen").classList.add("hidden");
+document.getElementById("quiz-screen").classList.add("hidden");
+document.getElementById("admin-screen").classList.remove("hidden");
+renderAdminDashboard();
+} else if (password !== null) { alert("パスワードが違います。"); }
+}
+
+function closeAdmin() { if(currentStudentId) { showMenuScreen(); } else { backToLogin(); } }
+
+function renderAdminDashboard() {
+const container = document.getElementById("admin-content");
+container.innerHTML = "<p style='font-size:12px; color:#64748b; margin-bottom:15px;'>※ スプレッドシートのログシートからリアルタイムに全生徒の正確なクリア状況を集計しています。</p>";
+students.forEach(s => {
+if(s) {
+const card = document.createElement("div");
+card.className = "admin-student-card";
+let cardHtml = `<div class="admin-student-name">${s.className || 'クラス不明'} ： ${s.name || '名前不明'}</div>`;
+modeConfigs.forEach(m => {
+const totalInMode = questions.filter(q => q.category.trim() === m.category.trim() && q.difficulty.trim() === m.difficulty.trim()).length;
+const key = `${s.id}__${m.category}__${m.difficulty}`;
+
+let score = liveProgress[key] || 0;
+if (score === "CLEARED") score = totalInMode;
+score = parseInt(score) || 0;
+if (score > totalInMode) score = totalInMode;
+
+const isGold = score >= totalInMode && totalInMode > 0;
+const percent = totalInMode > 0 ? Math.min((score / totalInMode) * 100, 100) : 0;
+
+cardHtml += `
+<div class="admin-progress-row">
+<div class="admin-progress-label">${m.label}</div>
+<div class="admin-progress-bar-container">
+<div class="admin-progress-bar-fill ${isGold ? 'complete' : ''}" style="width: ${percent}%"></div>
+</div>
+<div class="admin-score-badge ${isGold ? 'gold' : ''}">
+${isGold ? ' 👑 クリア' : score + ' / ' + totalInMode}
+</div>
+</div>
+`;
+});
+card.innerHTML = cardHtml;
+container.appendChild(card);
+}
+});
+triggerMathRender();
+}
+</script>
+</body>
+</html>

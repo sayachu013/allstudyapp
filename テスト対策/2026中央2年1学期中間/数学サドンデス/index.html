@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学サドンデス・マスターズ</title>
+    <style>
+        body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #050c14; color: #e0e1dd; text-align: center; margin:0; padding: 20px; user-select: none; }
+        .container { max-width: 650px; margin: 0 auto; background: #0f1f38; padding: 25px; border-radius: 20px; box-shadow: 0 0 30px rgba(0, 180, 216, 0.2); border: 2px solid #253d5b; }
+        h1 { color: #00b4d8; font-size: 1.5rem; letter-spacing: 1px; margin-top: 0; }
+        
+        /* タイムゲージ */
+        .timer-container { width: 100%; height: 14px; background: #1b263b; border-radius: 7px; overflow: hidden; margin-bottom: 20px; border: 1px solid #415a77; }
+        #timer-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #06d6a0, #ffb703, #e63946); transition: width 0.05s linear; }
+        
+        /* 上部ナビゲーションエリア */
+        .nav-bar { display: flex; justify-content: flex-start; margin-bottom: 15px; }
+        .home-back-btn { background-color: #415a77; color: white; border: 1px solid #5d7fa3; padding: 8px 16px; font-size: 0.95rem; font-weight: bold; border-radius: 6px; cursor: pointer; transition: background 0.1s; }
+        .home-back-btn:hover { background-color: #e63946; border-color: #ff4d6d; }
+
+        .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .stat-box { background: #1b263b; padding: 12px; border-radius: 10px; font-size: 1.1rem; border: 1px solid #253d5b; }
+        .num { font-weight: bold; font-size: 1.5rem; color: #00b4d8; }
+
+        /* ステージバッジ */
+        #stage-badge { display: inline-block; padding: 6px 20px; border-radius: 20px; font-size: 0.95rem; font-weight: bold; margin-bottom: 15px; }
+        .st-kiso { background-color: #0077b6; color: white; }
+        .st-hard { background-color: #ffb703; color: #050c14; }
+        .st-hell { background-color: #e63946; color: white; animation: blink 0.8s infinite alternate; }
+
+        /* 問題表示エリア（見切れ防止のため overflow と flex-direction を追加・修正） */
+        #question-box { background: #050c14; padding: 35px 20px; border-radius: 12px; font-size: 1.45rem; font-weight: bold; margin-bottom: 25px; border: 2px solid #253d5b; min-height: 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.4; overflow: hidden; }
+        
+        /* データの活用：アプリ内度数分布表スタイル */
+        .q-table { border-collapse: collapse; margin: 12px auto 0 auto; font-size: 1rem; background: #0f1f38; min-width: 200px; border: 1px solid #415a77; }
+        .q-table th, .q-table td { border: 1px solid #415a77; padding: 5px 10px; text-align: center; font-weight: bold; }
+        .q-table th { background: #1b263b; color: #00b4d8; }
+
+        /* 縦書き分数表記用スタイル (教科書準拠) */
+        .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; font-size: 85%; line-height: 1.1; padding: 0 4px; font-weight: bold; }
+        .num-f { border-bottom: 2px solid #e0e1dd; padding-bottom: 1px; }
+        .den-f { padding-top: 1px; }
+
+        /* 縦書き筆算表現用スタイル */
+        .hissan { display: inline-block; font-family: monospace; text-align: right; line-height: 1.3; font-size: 1.35rem; padding: 6px 12px; background: #111; border-radius: 6px; border: 1px solid #333; margin: 6px 0; }
+        .hissan-line { border-bottom: 2px solid #e0e1dd; padding-bottom: 2px; margin-bottom: 2px; }
+
+        /* 選択肢ボタン */
+        .choices-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .choice-btn { background-color: #223854; color: white; border: 1px solid #415a77; padding: 18px 10px; font-size: 1.25rem; border-radius: 10px; cursor: pointer; transition: all 0.1s; line-height: 1.3; display: flex; align-items: center; justify-content: center; }
+        .choice-btn:active { transform: scale(0.95); }
+        .choice-btn:hover { background-color: #00b4d8; border-color: #90e0ef; }
+
+        #effect-log { height: 35px; font-size: 1.2rem; font-weight: bold; color: #06d6a0; margin-bottom: 10px; }
+
+        /* オーバーレイ画面（メニュー・結果） */
+        #screen-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(5, 12, 20, 0.98); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+        
+        /* 難易度選択メニューのスタイル */
+        .menu-container { display: flex; flex-direction: column; gap: 15px; width: 100%; max-width: 340px; margin-top: 20px; }
+        .start-btn { position: relative; color: white; border: none; padding: 18px 30px; font-size: 1.3rem; font-weight: bold; border-radius: 50px; cursor: pointer; transition: transform 0.1s, box-shadow 0.1s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .start-btn:active { transform: scale(0.98); }
+        .btn-standard { background: #00b4d8; box-shadow: 0 0 15px rgba(0, 180, 216, 0.4); }
+        .btn-standard:hover { background: #0096b7; }
+        .btn-hard { background: #e63946; box-shadow: 0 0 15px rgba(230, 57, 70, 0.4); }
+        .btn-hard:hover { background: #cc323e; }
+        .btn-home { background: #415a77; box-shadow: 0 0 15px rgba(65, 90, 119, 0.4); }
+        .btn-home:hover { background: #33475e; }
+        
+        /* レジェンド状態のボタン演出 */
+        .btn-legend { background: linear-gradient(45deg, #ffd700, #ffa500); color: #050c14; box-shadow: 0 0 25px rgba(255, 215, 0, 0.6); }
+        .btn-legend:hover { background: linear-gradient(45deg, #ffe033, #ffb81a); }
+        
+        /* 金色の王冠演出 */
+        .crown { color: #ffd700; font-size: 1.6rem; filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.6)); display: none; }
+        
+        /* 復習レビューボックス用スタイル */
+        .review-box { background-color: #1b263b; border: 1px solid #415a77; border-radius: 8px; padding: 15px; width: 100%; max-width: 450px; margin: 15px 0; text-align: left; box-sizing: border-box; }
+        .review-title { font-weight: bold; color: #ffb703; margin-bottom: 8px; border-bottom: 1px solid #415a77; padding-bottom: 4px; font-size: 0.95rem; }
+        .review-item { margin: 5px 0; font-size: 1.05rem; line-height: 1.4; }
+
+        @keyframes blink { from { box-shadow: 0 0 5px #e63946; } to { box-shadow: 0 0 20px #e63946; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="nav-bar">
+        <button class="home-back-btn" onclick="backToHomeTrigger()">🏠 ホームに戻る</button>
+    </div>
+
+    <h1>⚔️ 定期テスト対策サドンデス・インフィニティ ⚔️</h1>
+    
+    <div class="timer-container"><div id="timer-bar"></div></div>
+
+    <div class="dashboard">
+        <div class="stat-box">連続正解数: <span id="combo" class="num" style="color:#06d6a0;">0</span> 問</div>
+        <div class="stat-box">最高スコア: <span id="high-score" class="num" style="color:#ffb703;">0</span> pt</div>
+    </div>
+    <div class="dashboard">
+        <div class="stat-box">獲得スコア: <span id="score" class="num">0</span> pt</div>
+        <div class="stat-box">制限時間: <span id="current-limit" class="num" style="color:#f15bb5;">0.0</span> 秒</div>
+    </div>
+
+    <div id="stage-badge" class="st-kiso font-weight:bold;">STAGE 1: 基礎・基本の混合戦</div>
+    <div id="effect-log"></div>
+
+    <div id="question-box">READY...</div>
+
+    <div class="choices-grid">
+        <button class="choice-btn" onclick="selectAnswer(0)">-</button>
+        <button class="choice-btn" onclick="selectAnswer(1)">-</button>
+        <button class="choice-btn" onclick="selectAnswer(2)">-</button>
+        <button class="choice-btn" onclick="selectAnswer(3)">-</button>
+    </div>
+</div>
+
+<div id="screen-overlay">
+    <h2 id="screen-title" style="font-size: 2.2rem; color: #00b4d8; margin-bottom: 5px;">MATH SUDDEN DEATH</h2>
+    <div id="screen-desc" style="font-size: 1.1rem; margin-bottom: 15px; color:#aaa; line-height: 1.5; width: 100%; display: flex; flex-direction: column; align-items: center;">
+        ミス、または時間切れで即終了！<br>
+        問題が進むにつれて制限時間が削られていきます。<br>
+        目標スコア達成でメニューに金色の王冠が輝く！
+    </div>
+    
+    <div class="menu-container" id="menu-buttons">
+        <button id="btn-standard-ui" class="start-btn btn-standard" onclick="startGame('standard')">
+            <span id="crown-standard" class="crown">👑</span> <span id="text-standard">STANDARD</span>
+        </button>
+        <button id="btn-hard-ui" class="start-btn btn-hard" onclick="startGame('hard')">
+            <span id="crown-hard" class="crown">👑</span> <span id="text-hard">HARD</span>
+        </button>
+    </div>
+
+    <div class="menu-container" id="gameover-buttons" style="display: none;">
+        <button id="btn-re-standard" class="start-btn btn-standard" onclick="startGame('standard')">STANDARDで再挑戦</button>
+        <button id="btn-re-hard" class="start-btn btn-hard" onclick="startGame('hard')">HARDで再挑戦</button>
+        <button class="start-btn btn-home" onclick="showMainMenu()">🏠 ホームメニューに戻る</button>
+    </div>
+</div>
+
+<script>
+    // --- 共通テーブル用HTML文字列定義 ---
+    const tblGrip = `<table class="q-table"><tr><th>階級(kg)</th><th>度数(人)</th></tr><tr><td>20以上～24未満</td><td>2</td></tr><tr><td>24～28</td><td>4</td></tr><tr><td>28～32</td><td>6</td></tr><tr><td>32～36</td><td>8</td></tr><tr><td>計</td><td>20</td></tr></table>`;
+    const tblWeight = `<table class="q-table"><tr><th>階級(kg)</th><th>度数(人)</th></tr><tr><td>40以上～44未満</td><td>2</td></tr><tr><td>44～48</td><td>4</td></tr><tr><td>48～52</td><td>3</td></tr><tr><td>52～56</td><td>1</td></tr><tr><td>計</td><td>10</td></tr></table>`;
+    const tblTimeSolve = `<table class="q-table"><tr><th>階級(秒)</th><th>度数(人)</th></tr><tr><td>20以上～30未満</td><td>2</td></tr><tr><td>30～40</td><td>7</td></tr><tr><td>40～50</td><td>14</td></tr><tr><td>50～60</td><td>9</td></tr><tr><td>計</td><td>32</td></tr></table>`;
+    const tblRun50 = `<table class="q-table"><tr><th>階級(秒)</th><th>度数(人)</th></tr><tr><td>7.5以上～8.0未満</td><td>2</td></tr><tr><td>8.0～8.5</td><td>3</td></tr><tr><td>8.5～9.0</td><td>7</td></tr><tr><td>9.0～9.5</td><td>5</td></tr><tr><td>9.5～10.0</td><td>2</td></tr><tr><td>10.0～10.5</td><td>1</td></tr><tr><td>計</td><td>20</td></tr></table>`;
+
+    // --- 新規追加バリエーション用テーブル群 ---
+    const tblGripB = `<table class="q-table"><tr><th>階級(kg)</th><th>度数(人)</th></tr><tr><td>20以上～24未満</td><td>3</td></tr><tr><td>24～28</td><td>5</td></tr><tr><td>28～32</td><td>8</td></tr><tr><td>32～36</td><td>4</td></tr><tr><td>計</td><td>20</td></tr></table>`;
+    const tblWeightB = `<table class="q-table"><tr><th>階級(kg)</th><th>度数(人)</th></tr><tr><td>40以上～44未満</td><td>1</td></tr><tr><td>44～48</td><td>3</td></tr><tr><td>48～52</td><td>4</td></tr><tr><td>52～56</td><td>2</td></tr><tr><td>計</td><td>10</td></tr></table>`;
+    const tblRun50B = `<table class="q-table"><tr><th>階級(秒)</th><th>度数(人)</th></tr><tr><td>7.5以上～8.0未満</td><td>1</td></tr><tr><td>8.0～8.5</td><td>4</td></tr><tr><td>8.5～9.0</td><td>6</td></tr><tr><td>9.0～9.5</td><td>6</td></tr><tr><td>9.5～10.0</td><td>3</td></tr><tr><td>計</td><td>20</td></tr></table>`;
+    const tblGripC = `<table class="q-table"><tr><th>階級(kg)</th><th>度数(人)</th></tr><tr><td>20以上～24未満</td><td>4</td></tr><tr><td>24～28</td><td>6</td></tr><tr><td>28～32</td><td>7</td></tr><tr><td>32～36</td><td>3</td></tr><tr><td>計</td><td>20</td></tr></table>`;
+    // 混入していた不要な「px」の文字列タイポを綺麗に除去
+    const tblWeightC = `<table class="q-table"><tr><th>階級(kg)</th><th>度数(人)</th></tr><tr><td>40以上～44未満</td><td>3</td></tr><tr><td>44～48</td><td>2</td></tr><tr><td>48～52</td><td>4</td></tr><tr><td>52～56</td><td>1</td></tr><tr><td>計</td><td>10</td></tr></table>`;
+
+    // --- 問題バンク（全120問超・構文修正済・超巨大ボリューム版） ---
+    const questionBank = {
+        // 【STANDARDモード用問題群：全単元ミックス】
+        stage1: [
+            { q: "次の式について、単項式であるものを記号で選びなさい。<br>ア：2x + 3y &nbsp;&nbsp; イ：x² &nbsp;&nbsp; ウ：8 - x", a: ["ア", "イ", "ウ", "該当なし"], c: 1, type: "basic" },
+            { q: "次の式について、多項式であるものを記号で選びなさい。<br>ア：x² &nbsp;&nbsp; イ：-3xyz &nbsp;&nbsp; ウ：2x + 3y", a: ["ア", "イ", "ウ", "すべて単項式"], c: 2, type: "basic" },
+            { q: "次の式について、単項式であるものを記号で選びなさい。<br>ア：5a + b &nbsp;&nbsp; イ：-3xyz &nbsp;&nbsp; ウ：a - b + 5", a: ["ア", "イ", "ウ", "なし"], c: 1, type: "basic" },
+            { q: "次の式について、多項式であるものを記号で選びなさい。<br>ア：4x² &nbsp;&nbsp; イ：ab/2 &nbsp;&nbsp; ウ：4a - 3b + 2", a: ["ア", "イ", "ウ", "すべて単項式"], c: 2, type: "basic" },
+            { q: "次の式について、2次式であるものをすべて選びなさい。<br>ア：2x + 3y &nbsp;&nbsp; イ：5x² + 2x + 1 &nbsp;&nbsp; ウ：x² &nbsp;&nbsp; エ：-3xyz", a: ["イ のみ", "ウ のみ", "イ と ウ", "すべて2次式"], c: 2, type: "basic" },
+            { q: "次の式のうち、1次式であるものを記号で選びなさい。<br>ア：2x + 3y &nbsp;&nbsp; イ：x² &nbsp;&nbsp; ウ：5x² + 2x + 1", a: ["ア", "イ", "ウ", "なし"], c: 0, type: "basic" },
+            { q: "次の式のうち、2次式であるものを記号で選びなさい。<br>ア：4a - 3b + 2 &nbsp;&nbsp; イ：2x + 3y &nbsp;&nbsp; ウ：5x² + 2x + 1", a: ["ア", "イ", "ウ", "すべて1次式"], c: 2, type: "basic" },
+            { q: "次の式のうち、1次式であるものを記号で選びなさい。<br>ア：-x + 2y &nbsp;&nbsp; イ：-3a² &nbsp;&nbsp; ウ：x² - 4x + 3", a: ["ア", "イ", "ウ", "なし"], c: 0, type: "basic" },
+            { q: "次の式の同類項をまとめなさい：2x - 5y - x + 3y", a: ["x - 2y", "x + 2y", "3x - 8y", "-x - 2y"], c: 0, type: "basic" },
+            { q: "次の式の同類項をまとめなさい：-x + 2y + 7x - 8y", a: ["6x + 6y", "6x - 6y", "-8x - 6y", "8x + 10y"], c: 1, type: "basic" },
+            { q: "次の式の同類項をまとめなさい：4a - 3b + 2 - 5a - 6", a: ["-a - 3b - 4", "-a - 3b + 8", "a - 3b - 4", "-a + 3b - 4"], c: 0, type: "basic" },
+            { q: "次の式の同類項をまとめなさい：3x + 2y - 5x - 2y", a: ["-2x", "2x + 4y", "-2x + 4y", "0"], c: 0, type: "basic" },
+            { q: "次の式の同類項をまとめなさい：5a - 6b - 2a + 7b", a: ["3a + b", "3a - b", "7a + b", "-3a - b"], c: 0, type: "basic" },
+            { q: "次の式の同類項をまとめなさい：-3x + 4y + 3x - 5y", a: ["-y", "y", "-6x - y", "0"], c: 0, type: "basic" },
+            { q: "次の計算をしなさい：(3a - 2b) + (a + b)", a: ["4a - b", "4a - 3b", "2a - b", "4a + b"], c: 0, type: "basic" },
+            { q: "次の計算をしなさい：(2x + 3y) + (x - y)", a: ["3x + 2y", "3x + 4y", "2x + 2y", "3x - 2y"], c: 0, type: "basic" },
+            { q: "次の計算をしなさい：-2(5a - b)", a: ["-10a - 2b", "-10a + 2b", "-10a - b", "10a + 2b"], c: 1, type: "basic" },
+            { q: "次の計算をしなさい：-3(2x - 4y)", a: ["-6x + 12y", "-6x - 12y", "-6x + 4y", "6x - 12y"], c: 0, type: "basic" },
+            { q: "次の計算をしなさい：-4ab × (-3ab)", a: ["-12a²b²", "12ab", "12a²b²", "7a²b²"], c: 2, type: "basic" },
+            { q: "次の計算をしなさい：5a × (-2b)", a: ["-10ab", "10ab", "-3ab", "-10a²b"], c: 0, type: "basic" },
+            { q: "次の計算をしなさい：(-6a)²", a: ["-36a²", "36a²", "-12a²", "12a"], c: 1, type: "basic" },
+            { q: "次の計算をしなさい：(-2x)²", a: ["4x²", "-4x²", "4x", "-2x²"], c: 0, type: "basic" },
+            { q: "次の計算をしなさい：(-3b)²", a: ["9b²", "-9b²", "6b²", "9b"], c: 0, type: "basic" },
+            { q: "次の計算をしなさい：9a³ ÷ (-3a²)", a: ["-3a", "3a", "-3a⁵", "-3"], c: 0, type: "basic" },
+            { q: "次の計算をしなさい：12x² ÷ (-4x)", a: ["-3x", "3x", "-3", "-3x²"], c: 0, type: "basic" },
+            { q: "下の度数分布表において、階級の幅は何kgか答えなさい。<br>" + tblGrip, a: ["2kg", "4kg", "16kg", "20kg"], c: 1, type: "basic" },
+            { q: "下の度数分布表Bにおいて、階級の幅は何kgか答えなさい。<br>" + tblGripB, a: ["2kg", "4kg", "8kg", "12kg"], c: 1, type: "basic" },
+            { q: "下の度数分布表Cにおいて、階級の幅は何kgか答えなさい。<br>" + tblGripC, a: ["4kg", "2kg", "6kg", "24kg"], c: 0, type: "basic" },
+            { q: "過去100年間で4月1日が晴天だった日は72回あった。晴天になる確率を分数で求めなさい。", a: ["<div class='frac'><div class='num-f'>7</div><div class='den-f'>25</div></div>", "<div class='frac'><div class='num-f'>18</div><div class='den-f'>25</div></div>", "<div class='frac'><div class='num-f'>72</div><div class='den-f'>100</div></div>", "0.72"], c: 1, type: "basic" },
+            { q: "過去50年間で5月1日が雨だった日が10回あった。雨になる確率を分数で求めなさい。", a: ["<div class='frac'><div class='num-f'>1</div><div class='den-f'>5</div></div>", "<div class='frac'><div class='num-f'>4</div><div class='den-f'>5</div></div>", "<div class='frac'><div class='num-f'>1</div><div class='den-f'>10</div></div>", "0.2"], c: 0, type: "basic" }
+        ],
+        // 【STAGE 2: 標準混合戦】
+        stage2: [
+            { q: "次の縦書き計算（筆算）を解きなさい。<br><div class='hissan'> 2x - y<br>+) 3x - 5y<br><div class='hissan-line'></div></div>", a: ["5x - 6y", "5x + 4y", "-x + 4y", "5x - 4y"], c: 0, type: "hard" },
+            { q: "次の縦書き計算（筆算）を解きなさい。<br><div class='hissan'> 3a + 5b<br>+) -4a + 8b<br><div class='hissan-line'></div></div>", a: ["a + 13b", "-a + 13b", "-a - 3b", "7a + 13b"], c: 1, type: "hard" },
+            { q: "次の縦書き計算（筆算）を解きなさい。<br><div class='hissan'> 4x + 2y<br>+) -5x - 3y<br><div class='hissan-line'></div></div>", a: ["-x - y", "-x + y", "9x - y", "x - y"], c: 0, type: "hard" },
+            { q: "次の計算をしなさい：(x² - 4x + 3) + (x² + 3x)", a: ["2x² - x + 3", "2x² - 7x + 3", "x² - x + 3", "2x² + x + 3"], c: 0, type: "hard" },
+            { q: "次の計算をしなさい：(2x² - 3x + 1) + (x² + 4x)", a: ["3x² + x + 1", "3x² - x + 1", "2x² + x + 1", "3x² + 7x + 1"], c: 0, type: "hard" },
+            { q: "次の計算をしなさい：(2x - 3y) - (5x + 2y)", a: ["-3x - y", "-3x - 5y", "3x - 5y", "-3x + 5y"], c: 1, type: "hard" },
+            { q: "次の計算をしなさい：(4a - b) - (2a + 3b)", a: ["2a - 4b", "2a + 2b", "2a - 2b", "-2a - 4b"], c: 0, type: "hard" },
+            { q: "次の計算をしなさい：(a - b + 5) - (3a - 2b + 1)", a: ["-2a - 3b + 4", "-2a + b + 6", "-2a + b + 4", "2a + b + 4"], c: 2, type: "hard" },
+            { q: "次の計算をしなさい：(2a - 3b + 4) - (a - b + 2)", a: ["a - 2b + 2", "a + 2b + 2", "a - 4b + 2", "-a - 2b + 2"], c: 0, type: "hard" },
+            { q: "次の計算をしなさい：(4x - 5y) + (3x + 2y)", a: ["7x - 3y", "7x - 7y", "x - 3y", "7x + 3y"], c: 0, type: "hard" },
+            { q: "次の計算をしなさい：(3a² - 2a) + (2a² - 7a - 5)", a: ["5a² - 9a - 5", "5a² + 5a - 5", "a² - 9a - 5", "5a² - 9a + 5"], c: 0, type: "hard" },
+            { q: "次の計算をしなさい：8x²y ÷ (-<div class='frac'><div class='num-f'>4</div><div class='den-f'>5</div></div>xy)", a: ["-10x", "-10xy", "10x", "-<div class='frac'><div class='num-f'>32</div><div class='den-f'>5</div></div>x"], c: 0, type: "hard" },
+            { q: "次の計算をしなさい：6ab² ÷ (-<div class='frac'><div class='num-f'>2</div><div class='den-f'>3</div></div>b)", a: ["-9ab", "9ab", "-9b", "-4ab"], c: 0, type: "hard" },
+            { q: "次の計算をしなさい：4xy² ÷ (-<div class='frac'><div class='num-f'>1</div><div class='den-f'>2</div></div>y)", a: ["-8xy", "8xy", "-2xy", "-8x"], c: 0, type: "hard" },
+            { q: "次の計算をしなさい：(6x² - 9x) ÷ (-3)", a: ["-2x² - 3x", "-2x² + 3x", "2x² - 3x", "-2x² + 9x"], c: 1, type: "hard" },
+            { q: "次の計算をしなさい：(8a² - 12a) ÷ 4", a: ["2a² - 3a", "2a - 3", "2a² - 12a", "2a² + 3a"], c: 0, type: "hard" },
+            { q: "次の計算をしなさい：(10x² - 15x) ÷ (-5)", a: ["-2x² + 3x", "2x² - 3x", "-2x² - 3x", "-2x + 3"], c: 0, type: "hard" },
+            { q: "次の計算をしなさい：4(x + 2y) - 3(2x + 3y)", a: ["-2x - y", "-2x + 17y", "2x - y", "-2x + y"], c: 0, type: "hard" },
+            { q: "次の計算をしなさい：3(a - 2b) - 2(2a - b)", a: ["-a - 4b", "-a - 8b", "a - 4b", "-a + 4b"], c: 0, type: "hard" },
+            { q: "次の計算をしなさい：5(x - y) - 2(2x - 3y)", a: ["x + y", "x - y", "-x + y", "x - 11y"], c: 0, type: "hard" },
+            { q: "下の体重測定の表から、44kg以上48kg未満の階級の【相対度数】を求めなさい。<br>" + tblWeight, a: ["0.4", "4", "0.2", "0.3"], c: 0, type: "hard" },
+            { q: "下の体重測定の表Bから、44kg以上48kg未満の階級の【相対度数】を求めなさい。<br>" + tblWeightB, a: ["0.3", "0.1", "3", "0.4"], c: 0, type: "hard" },
+            { q: "下の体重測定の表Cから、40kg以上44kg未満の階級の【相対度数】を求めなさい。<br>" + tblWeightC, a: ["0.3", "3", "0.2", "0.4"], c: 0, type: "hard" },
+            { q: "下の体重測定の表から、48kg以上52kg未満の階級の【累積度数】を求めなさい。<br>" + tblWeight, a: ["3人", "6人", "9人", "10人"], c: 2, type: "hard" },
+            { q: "下の体重測定の表Bから、48kg以上52kg未満の階級の【累積度数】を求めなさい。<br>" + tblWeightB, a: ["4人", "8人", "10人", "7人"], c: 1, type: "hard" },
+            { q: "下の体重測定の表Cから、44kg以上48kg未満の階級の【累積度数】を求めなさい。<br>" + tblWeightC, a: ["5人", "2人", "3人", "9人"], c: 0, type: "hard" },
+            { q: "下のかかった時間の度数分布表から、【最頻値（モード）】を求めなさい。<br>" + tblTimeSolve, a: ["14秒", "40秒", "45秒", "50秒"], c: 2, type: "hard" },
+            { q: "下の50m走の記録表から、【度数が最も多い階級の階級値】を求めなさい。<br>" + tblRun50, a: ["7人", "8.75秒", "8.5秒", "9.0秒"], c: 1, type: "hard" }
+        ],
+        // 【FINAL STAGE: 思考の深淵・極限応用】
+        final: [
+            { q: "次の式の同類項をまとめなさい：-<div class='frac'><div class='num-f'>2</div><div class='den-f'>3</div></div>x + y + 2x - <div class='frac'><div class='num-f'>3</div><div class='den-f'>2</div></div>y", a: ["<div class='frac'><div class='num-f'>4</div><div class='den-f'>3</div></div>x - <div class='frac'><div class='num-f'>1</div><div class='den-f'>2</div></div>y", "<div class='frac'><div class='num-f'>4</div><div class='den-f'>3</div></div>x + <div class='frac'><div class='num-f'>1</div><div class='den-f'>2</div></div>y", "-<div class='frac'><div class='num-f'>4</div><div class='den-f'>3</div></div>x - <div class='frac'><div class='num-f'>1</div><div class='den-f'>2</div></div>y", "<div class='frac'><div class='num-f'>8</div><div class='den-f'>3</div></div>x - <div class='frac'><div class='num-f'>5</div><div class='den-f'>2</div></div>y"], c: 0, type: "final" },
+            { q: "次の式の同類項をまとめなさい：-<div class='frac'><div class='num-f'>1</div><div class='den-f'>2</div></div>a + b + 3a - <div class='frac'><div class='num-f'>2</div><div class='den-f'>3</div></div>b", a: ["<div class='frac'><div class='num-f'>5</div><div class='den-f'>2</div></div>a + <div class='frac'><div class='num-f'>1</div><div class='den-f'>3</div></div>b", "<div class='frac'><div class='num-f'>5</div><div class='den-f'>2</div></div>a - <div class='frac'><div class='num-f'>1</div><div class='den-f'>3</div></div>b", "<div class='frac'><div class='num-f'>7</div><div class='den-f'>2</div></div>a + <div class='frac'><div class='num-f'>1</div><div class='den-f'>3</div></div>b", "5a + b"], c: 0, type: "final" },
+            { q: "次の計算をしなさい：2a²b × (-3ab) ÷ ab²", a: ["-6ab", "-6a²", "-6a²b", "6a²"], c: 1, type: "final" },
+            { q: "次の計算をしなさい：4x²y × (-2y) ÷ xy²", a: ["-8x", "8x", "-8xy", "-8"], c: 0, type: "final" },
+            { q: "次の計算をしなさい：3x²y × 4y ÷ 2xy", a: ["6xy", "6x", "6y", "12xy"], c: 0, type: "final" },
+            { q: "次の計算をしなさい：6a²b² × 2a ÷ 3ab", a: ["4a²b", "4ab", "4a²", "4b²"], c: 0, type: "final" },
+            { q: "次の計算をしなさい：<div class='frac'><div class='num-f'>a - b</div><div class='den-f'>2</div></div> + <div class='frac'><div class='num-f'>2a + b</div><div class='den-f'>3</div></div>", a: ["<div class='frac'><div class='num-f'>7a - b</div><div class='den-f'>6</div></div>", "<div class='frac'><div class='num-f'>7a + b</div><div class='den-f'>6</div></div>", "<div class='frac'><div class='num-f'>3a</div><div class='den-f'>5</div></div>", "<div class='frac'><div class='num-f'>7a - b</div><div class='den-f'>5</div></div>"], c: 0, type: "final" },
+            { q: "次の計算をしなさい：<div class='frac'><div class='num-f'>2x - y</div><div class='den-f'>3</div></div> + <div class='frac'><div class='num-f'>x + 2y</div><div class='den-f'>4</div></div>", a: ["<div class='frac'><div class='num-f'>11x + 2y</div><div class='den-f'>12</div></div>", "<div class='frac'><div class='num-f'>11x - y</div><div class='den-f'>12</div></div>", "<div class='frac'><div class='num-f'>3x + y</div><div class='den-f'>7</div></div>", "<div class='frac'><div class='num-f'>11x + y</div><div class='den-f'>12</div></div>"], c: 0, type: "final" },
+            { q: "次の計算をしなさい：(2x² - 3x) - 2(x² - 4x + 1)", a: ["5x - 2", "-7x - 2", "5x + 2", "2x² + 5x - 2"], c: 0, type: "final" },
+            { q: "次の計算をしなさい：(3a² + 5a) - 3(a² - a + 2)", a: ["8a - 6", "2a - 6", "8a + 6", "8a² - 6"], c: 0, type: "final" },
+            { q: "次の計算をしなさい：-3a(a - 2b) + 2a(2a - 3b)", a: ["a²", "a² - 12ab", "-a²", "a² + 6ab"], c: 0, type: "final" },
+            { q: "次の計算をしなさい：-2x(x - 3y) + x(3x - y)", a: ["x² + 5xy", "x² - 5xy", "-x² + 5xy", "x² + y"], c: 0, type: "final" },
+            { q: "次の計算をしなさい：<div class='frac'><div class='num-f'>2x + y</div><div class='den-f'>3</div></div> - <div class='frac'><div class='num-f'>x - y</div><div class='den-f'>2</div></div>", a: ["<div class='frac'><div class='num-f'>x + 5y</div><div class='den-f'>6</div></div>", "<div class='frac'><div class='num-f'>x - y</div><div class='den-f'>6</div></div>", "<div class='frac'><div class='num-f'>x + y</div><div class='den-f'>6</div></div>", "<div class='frac'><div class='num-f'>3x + 5y</div><div class='den-f'>6</div></div>"], c: 0, type: "final" },
+            { q: "次の計算をしなさい：<div class='frac'><div class='num-f'>a + 3b</div><div class='den-f'>2</div></div> - <div class='frac'><div class='num-f'>2a - b</div><div class='den-f'>5</div></div>", a: ["<div class='frac'><div class='num-f'>a + 17b</div><div class='den-f'>10</div></div>", "<div class='frac'><div class='num-f'>a + 13b</div><div class='den-f'>10</div></div>", "<div class='frac'><div class='num-f'>-a + 17b</div><div class='den-f'>10</div></div>", "<div class='frac'><div class='num-f'>a + 17b</div><div class='den-f'>7</div></div>"], c: 0, type: "final" },
+            { q: "次の計算をしなさい：15x³y² ÷ (-3xy) ÷ (-x)", a: ["5x", "5x²y", "-5x²y", "5xy"], c: 1, type: "final" },
+            { q: "次の計算をしなさい：24a²b³ ÷ (-4ab) ÷ (-2b)", a: ["3b", "3ab", "3ab²", "-3ab"], c: 1, type: "final" },
+            { q: "x = -3, y = 4 のとき、次の式の値を求めなさい：2x - 5y", a: ["-14", "26", "-26", "-23"], c: 2, type: "final" },
+            { q: "x = 2, y = -3 のとき、次の式の値を求めなさい：5x + 2y", a: ["4", "16", "1", "-4"], c: 0, type: "final" },
+            { q: "x = 5, y = -2 のとき、次の式の値を求めなさい：x² + 3y", a: ["19", "31", "11", "22"], c: 0, type: "final" },
+            { q: "x = -1, y = -2 のとき、次の式の値を求めなさい：3x² - y", a: ["5", "1", "-1", "4"], c: 0, type: "final" }
+        ],
+        
+        // 【HARDモード用問題群：全単元高難度プール】
+        hardPool: {
+            stage1: [
+                { q: "次の計算をしなさい：<div class='frac'><div class='num-f'>3</div><div class='den-f'>2</div></div>xy × (-4y)", a: ["-6xy²", "-6xy", "-6x²y", "6xy²"], c: 0, type: "basic" },
+                { q: "次の計算をしなさい：<div class='frac'><div class='num-f'>2</div><div class='den-f'>5</div></div>ab × (-10a)", a: ["-4a²b", "4a²b", "-4ab²", "-20a²b"], c: 0, type: "basic" },
+                { q: "次の計算をしなさい：-<div class='frac'><div class='num-f'>1</div><div class='den-f'>3</div></div>a²b × 9b", a: ["-3a²b²", "3a²b²", "-3ab²", "-3a²b"], c: 0, type: "basic" },
+                { q: "次の計算をしなさい：-<div class='frac'><div class='num-f'>3</div><div class='den-f'>4</div></div>x² × (-8xy)", a: ["6x³y", "-6x³y", "6x²y²", "2x³y"], c: 0, type: "basic" },
+                { q: "次の計算をしなさい：(-3x)³", a: ["-9x³", "27x³", "-27x³", "-27x"], c: 2, type: "basic" },
+                { q: "次の計算をしなさい：(-2a)³", a: ["-8a³", "8a³", "-6a³", "-8a"], c: 0, type: "basic" },
+                { q: "次の計算をしなさい：(-4y)³", a: ["-64y³", "64y³", "-12y³", "-16y³"], c: 0, type: "basic" },
+                { q: "次の計算をしなさい：-28x²y ÷ (-7xy)", a: ["4xy", "4x", "-4x", "4y"], c: 1, type: "basic" },
+                { q: "次の計算をしなさい：-36a²b ÷ (-9a)", a: ["4ab", "4b", "4a", "-4ab"], c: 0, type: "basic" },
+                { q: "次の計算をしなさい：-16ab² ÷ (-4b)", a: ["4ab", "4a", "-4ab", "4b"], c: 0, type: "basic" },
+                { q: "次の計算をしなさい：-50x²y² ÷ 5xy", a: ["-10xy", "10xy", "-10x", "-10y"], c: 0, type: "basic" },
+                { q: "記録が9.1秒の生徒は、下の50m走の記録表のどの階級に入るか答えなさい。<br>" + tblRun50, a: ["8.5～9.0", "9.0～9.5", "9.5～10.0", "該当なし"], c: 1, type: "basic" },
+                { q: "記録が8.4秒の生徒は、下の50m走の記録表のどの階級に入るか答えなさい。<br>" + tblRun50, a: ["8.0～8.5", "7.5～8.0", "8.5～9.0", "なし"], c: 0, type: "basic" },
+                { q: "記録が7.9秒の生徒は、下の50m走の記録表Bのどの階級に入るか答えなさい。<br>" + tblRun50B, a: ["7.5～8.0", "8.0～8.5", "該当なし", "7.0～7.5"], c: 0, type: "basic" }
+            ],
+            stage2: [
+                { q: "次の計算をしなさい：(-8x² + 16x - 12) × (-<div class='frac'><div class='num-f'>1</div><div class='den-f'>4</div></div>)", a: ["2x² - 4x + 3", "-2x² + 4x - 3", "2x² + 4x + 3", "2x² - 4x - 3"], c: 0, type: "hard" },
+                { q: "次の計算をしなさい：(12a² - 18a + 6) × (-<div class='frac'><div class='num-f'>1</div><div class='den-f'>3</div></div>)", a: ["-4a² + 6a - 2", "4a² - 6a + 2", "-4a² - 6a - 2", "-4a² + 6a + 2"], c: 0, type: "hard" },
+                { q: "次の計算をしなさい：(-20x² + 25x - 5) × (-<div class='frac'><div class='num-f'>1</div><div class='den-f'>5</div></div>)", a: ["4x² - 5x + 1", "-4x² + 5x - 1", "4x² + 5x + 1", "4x² - 5x - 1"], c: 0, type: "hard" },
+                { q: "次の計算をしなさい：(8x² - 12x) ÷ (-<div class='frac'><div class='num-f'>1</div><div class='den-f'>4</div></div>)", a: ["-2x² + 3x", "-32x² + 48x", "32x² - 48x", "-32x² - 48x"], c: 1, type: "hard" },
+                { q: "次の計算をしなさい：(6a² - 9a) ÷ (-<div class='frac'><div class='num-f'>1</div><div class='den-f'>3</div></div>)", a: ["-18a² + 27a", "18a² - 27a", "-2a² + 3a", "-18a² - 27a"], c: 0, type: "hard" },
+                { q: "次の計算をしなさい：(5a² - 10a) ÷ (-<div class='frac'><div class='num-f'>1</div><div class='den-f'>5</div></div>)", a: ["-25a² + 50a", "-a² + 2a", "25a² - 50a", "-25a² - 50a"], c: 0, type: "hard" },
+                { q: "次の計算をしなさい：(4x² - 8x) ÷ (-<div class='frac'><div class='num-f'>1</div><div class='den-f'>2</div></div>)", a: ["-8x² + 16x", "8x² - 16x", "-2x² + 4x", "-8x² - 16x"], c: 0, type: "hard" },
+                { q: "次の計算をしなさい：3(3x - y) - 2(6x + 5y)", a: ["-3x - 13y", "3x - 13y", "-3x + 7y", "-3x - 8y"], c: 0, type: "hard" },
+                { q: "次の計算をしなさい：4(2a - b) - 3(3a + 2b)", a: ["-a - 10b", "-a - 2b", "a - 10b", "-a + 10b"], c: 0, type: "hard" },
+                { q: "次の計算をしなさい：2(5x - 2y) - 4(3x + y)", a: ["-2x - 8y", "2x - 8y", "-2x + 8y", "-2x - 4y"], c: 0, type: "hard" },
+                { q: "次の計算をしなさい：6(a - 2b + 4) - 4(2a - 3b - 1)", a: ["-2a + 28", "-2a - 24b + 20", "-2a + 20", "-2a + 24b + 28"], c: 0, type: "hard" },
+                { q: "次の計算をしなさい：5(x - 3y + 2) - 2(2x - 7y + 4)", a: ["x - y + 2", "x - 29y + 2", "-x - y + 2", "x - y + 18"], c: 0, type: "hard" },
+                { q: "次の計算をしなさい：2(3x - y + 5) - 3(2x - 2y + 1)", a: ["4y + 7", "-4y + 7", "4y + 13", "12x + 4y + 7"], c: 0, type: "hard" }
+            ],
+            // 【FINAL STAGE: 超複雑数式計算特化仕様】
+            final: [
+                { q: "次の計算をしなさい：9xy² × (-2x) ÷ <div class='frac'><div class='num-f'>3</div><div class='den-f'>4</div></div>y", a: ["-24x²y", "-24xy", "24x²y", "-6x²y"], c: 0, type: "final" },
+                { q: "次の計算をしなさい：8a²b × (-3b) ÷ <div class='frac'><div class='num-f'>4</div><div class='den-f'>5</div></div>a", a: ["-30ab²", "30ab²", "-30a²b", "-24ab²"], c: 0, type: "final" },
+                { q: "次の計算をしなさい：12a²b × (-3a) ÷ <div class='frac'><div class='num-f'>2</div><div class='den-f'>3</div></div>b", a: ["-54a³", "54a³", "-54a²", "-18a³"], c: 0, type: "final" },
+                { q: "次の計算をしなさい：16x²y × (-x) ÷ <div class='frac'><div class='num-f'>4</div><div class='den-f'>7</div></div>y", a: ["-28x³", "28x³", "-28x²", "-64x³"], c: 0, type: "final" },
+                { q: "次の計算をしなさい：-24a⁴ ÷ (-3a) ÷ (-2a)²", a: ["2a", "-2", "2", "-2a"], c: 1, type: "final" },
+                { q: "次の計算をしなさい：-32x⁵ ÷ (-2x²) ÷ (-2x)²", a: ["4", "-4", "4x", "-4x"], c: 0, type: "final" },
+                { q: "次の計算をしなさい：-48b⁶ ÷ (-2b³) ÷ (-2b)³", a: ["3", "-3", "3b", "-3b³"], c: 0, type: "final" },
+                { q: "次の計算をしなさい：<div class='frac'><div class='num-f'>3x + y</div><div class='den-f'>4</div></div> + <div class='frac'><div class='num-f'>2x - 3y</div><div class='den-f'>3</div></div>", a: ["<div class='frac'><div class='num-f'>17x - 9y</div><div class='den-f'>12</div></div>", "<div class='frac'><div class='num-f'>17x - 11y</div><div class='den-f'>12</div></div>", "<div class='frac'><div class='num-f'>5x - 2y</div><div class='den-f'>7</div></div>", "<div class='frac'><div class='num-f'>17x + 9y</div><div class='den-f'>12</div></div>"], c: 0, type: "final" },
+                { q: "次の計算をしなさい：<div class='frac'><div class='num-f'>x + 2y</div><div class='den-f'>3</div></div> + <div class='frac'><div class='num-f'>3x - y</div><div class='den-f'>2</div></div>", a: ["<div class='frac'><div class='num-f'>11x + y</div><div class='den-f'>6</div></div>", "<div class='frac'><div class='num-f'>11x + 4y</div><div class='den-f'>6</div></div>", "<div class='frac'><div class='num-f'>4x + y</div><div class='den-f'>5</div></div>", "<div class='frac'><div class='num-f'>11x - y</div><div class='den-f'>6</div></div>"], c: 0, type: "final" },
+                { q: "次の計算をしなさい：<div class='frac'><div class='num-f'>3x - y</div><div class='den-f'>6</div></div> - <div class='frac'><div class='num-f'>x - 2y</div><div class='den-f'>9</div></div>", a: ["<div class='frac'><div class='num-f'>7x + y</div><div class='den-f'>18</div></div>", "<div class='frac'><div class='num-f'>7x - y</div><div class='den-f'>18</div></div>", "<div class='frac'><div class='num-f'>7x + 2y</div><div class='den-f'>18</div></div>", "<div class='frac'><div class='num-f'>3x + y</div><div class='den-f'>18</div></div>"], c: 0, type: "final" },
+                { q: "次の計算をしなさい：<div class='frac'><div class='num-f'>4x - 2y</div><div class='den-f'>4</div></div> - <div class='frac'><div class='num-f'>x - 3y</div><div class='den-f'>6</div></div>", a: ["<div class='frac'><div class='num-f'>10x - 3y</div><div class='den-f'>12</div></div>", "<div class='frac'><div class='num-f'>10x + y</div><div class='den-f'>12</div></div>", "<div class='frac'><div class='num-f'>2x + y</div><div class='den-f'>4</div></div>", "<div class='frac'><div class='num-f'>8x - y</div><div class='den-f'>12</div></div>"], c: 0, type: "final" },
+                { q: "次の計算をしなさい：<div class='frac'><div class='num-f'>2a - b</div><div class='den-f'>4</div></div> - <div class='frac'><div class='num-f'>a - 3b</div><div class='den-f'>6</div></div>", a: ["<div class='frac'><div class='num-f'>4a + 3b</div><div class='den-f'>12</div></div>", "<div class='frac'><div class='num-f'>4a - b</div><div class='den-f'>12</div></div>", "<div class='frac'><div class='num-f'>2a + 3b</div><div class='den-f'>12</div></div>", "<div class='frac'><div class='num-f'>4a + b</div><div class='den-f'>12</div></div>"], c: 0, type: "final" },
+                { q: "x = 3, y = -<div class='frac'><div class='num-f'>1</div><div class='den-f'>2</div></div> のとき、次の式の値を求めなさい：-6x²y ÷ 2x", a: ["<div class='frac'><div class='num-f'>9</div><div class='den-f'>2</div></div>", "-<div class='frac'><div class='num-f'>9</div><div class='den-f'>2</div></div>", "9", "-9"], c: 0, type: "final" },
+                { q: "x = 4, y = -<div class='frac'><div class='num-f'>1</div><div class='den-f'>2</div></div> のとき、次の式の値を求めなさい：-12x²y ÷ 3xy × (-2y)", a: ["4", "-4", "8", "-8"], c: 1, type: "final" },
+                { q: "x = 2, y = -<div class='frac'><div class='num-f'>1</div><div class='den-f'>2</div></div> のとき、次の式の値を求めなさい：-8x²y ÷ 4x × (-3y)", a: ["-3", "3", "-6", "6"], c: 0, type: "final" },
+                { q: "x = 3, y = -<div class='frac'><div class='num-f'>1</div><div class='den-f'>2</div></div> のとき、次の式の値を求めなさい：3(x - 2y) - 2(3x - 4y)", a: ["-10", "-8", "-11", "-7"], c: 0, type: "final" },
+                { q: "x = 2, y = -<div class='frac'><div class='num-f'>1</div><div class='den-f'>3</div></div> のとき、次の式の値を求めなさい：2(2x - 3y) - 3(x - 2y)", a: ["3", "1", "2", "-1"], c: 0, type: "final" }
+            ]
+        }
+    };
+
+    let score = 0;
+    let combo = 0;
+    let currentQ = null;
+    let currentMode = 'standard'; 
+    let lastQuestionIdx = -1;
+    
+    let baseTimeLimit = 0; 
+    let timeRemaining = 0;
+    let gameTicker = null;
+    const tickRate = 50;
+
+    const targetScores = { standard: 2000, hard: 3500 };
+    const maxScores = { standard: 4500, hard: 7000 };
+
+    window.onload = function() {
+        updateHighScoreDisplay();
+        checkCrowns();
+    };
+
+    function checkCrowns() {
+        let isLegendSystem = false;
+        
+        if (sessionStorage.getItem('math_crown_standard') === 'true') {
+            document.getElementById('crown-standard').style.display = 'inline-block';
+        }
+        if (sessionStorage.getItem('math_legend_standard') === 'true') {
+            document.getElementById('btn-standard-ui').className = "start-btn btn-legend";
+            document.getElementById('text-standard').innerText = "LEGEND (完全制覇)";
+            isLegendSystem = true;
+        }
+
+        if (sessionStorage.getItem('math_crown_hard') === 'true') {
+            document.getElementById('crown-hard').style.display = 'inline-block';
+        }
+        if (sessionStorage.getItem('math_legend_hard') === 'true') {
+            document.getElementById('btn-hard-ui').className = "start-btn btn-legend";
+            document.getElementById('text-hard').innerText = "LEGEND (完全制覇)";
+            isLegendSystem = true;
+        }
+
+        if (isLegendSystem) {
+            document.getElementById('screen-title').innerHTML = "👑 MATH LEGEND ATTACK 👑";
+            document.getElementById('screen-title').style.color = "#ffd700";
+        } else {
+            document.getElementById('screen-title').innerHTML = "MATH SUDDEN DEATH";
+            document.getElementById('screen-title').style.color = "#00b4d8";
+        }
+    }
+
+    function showMainMenu() {
+        document.getElementById('gameover-buttons').style.display = 'none';
+        document.getElementById('menu-buttons').style.display = 'flex';
+        document.getElementById('screen-desc').innerHTML = `
+            ミス、または時間切れで即終了！<br>
+            問題が進むにつれて制限時間が削られていきます。<br>
+            目標スコア達成でメニューに金色の王冠が輝く！
+        `;
+        checkCrowns();
+    }
+
+    function updateHighScoreDisplay() {
+        let key = currentMode === 'hard' ? 'math_pdf_high_hard' : 'math_pdf_high_standard';
+        document.getElementById('high-score').innerText = sessionStorage.getItem(key) || 0;
+    }
+
+    function startGame(mode) {
+        currentMode = mode || 'standard';
+        score = 0; combo = 0; lastQuestionIdx = -1;
+        updateHighScoreDisplay();
+        document.getElementById('screen-overlay').style.display = 'none';
+        document.getElementById('effect-log').innerText = "";
+        nextQuestion();
+    }
+
+    function backToHomeTrigger() {
+        clearInterval(gameTicker);
+        if (confirm("本当にメニュー画面に戻りますか？\n（現在のスコアはリセットされます）")) {
+            showMainMenu();
+            document.getElementById('screen-overlay').style.display = 'flex';
+        } else {
+            startTimer();
+        }
+    }
+
+    function getNextQuestion() {
+        let pool = [];
+        let badge = document.getElementById('stage-badge');
+        let activeBank = currentMode === 'hard' ? questionBank.hardPool : questionBank;
+
+        let initialStageTime = 25; 
+        if (combo < 4) {
+            pool = activeBank.stage1;
+            badge.innerText = "STAGE 1: 基礎・基本の混合戦";
+            badge.className = "st-kiso";
+            initialStageTime = currentMode === 'hard' ? 35 : 25; 
+        } else if (combo < 9) {
+            pool = activeBank.stage2;
+            badge.innerText = "STAGE 2: 標準・展開と統計 of 混合";
+            badge.className = "st-hard";
+            initialStageTime = currentMode === 'hard' ? 45 : 40; 
+        } else {
+            pool = activeBank.final;
+            badge.innerText = "FINAL STAGE: 思考の深淵・極限応用";
+            badge.className = "st-hell";
+            initialStageTime = currentMode === 'hard' ? 55 : 65; 
+        }
+        
+        let penaltyStep = currentMode === 'hard' ? 4.0 : 5.5;
+        let speedPenalty = Math.floor(combo / 3) * penaltyStep;
+        
+        let minTime = 12.0;
+        baseTimeLimit = Math.max(initialStageTime - speedPenalty, minTime);
+
+        let rnd;
+        do {
+            rnd = Math.floor(Math.random() * pool.length);
+        } while (pool.length > 1 && rnd === lastQuestionIdx);
+        
+        lastQuestionIdx = rnd;
+        
+        return JSON.parse(JSON.stringify(pool[rnd]));
+    }
+
+    function nextQuestion() {
+        currentQ = getNextQuestion();
+        
+        // 描画バグを防ぐため、一度要素をクリア
+        let qBox = document.getElementById('question-box');
+        qBox.innerHTML = ""; 
+        qBox.innerHTML = currentQ.q;
+        document.getElementById('current-limit').innerText = baseTimeLimit.toFixed(1);
+        
+        let originalChoices = [...currentQ.a];
+        let correctText = originalChoices[currentQ.c];
+        
+        for (let i = originalChoices.length - 1; i > 0; i--) {
+            let r = Math.floor(Math.random() * (i + 1));
+            let tmp = originalChoices[i];
+            originalChoices[i] = originalChoices[r];
+            originalChoices[r] = tmp;
+        }
+        
+        currentQ.a = originalChoices;
+        currentQ.c = originalChoices.indexOf(correctText);
+        
+        let btns = document.querySelectorAll('.choice-btn');
+        for(let i=0; i<4; i++) {
+            btns[i].innerHTML = currentQ.a[i];
+        }
+
+        timeRemaining = baseTimeLimit;
+        startTimer();
+    }
+
+    function startTimer() {
+        clearInterval(gameTicker);
+        gameTicker = setInterval(() => {
+            timeRemaining -= (tickRate / 1000);
+            let percent = (timeRemaining / baseTimeLimit) * 100;
+            document.getElementById('timer-bar').style.width = percent + "%";
+
+            if (timeRemaining <= 0) {
+                clearInterval(gameTicker);
+                gameOver("⏳ タイムアップ！時間切れです ⏳", -1);
+            }
+        }, tickRate);
+    }
+
+    function selectAnswer(idx) {
+        clearInterval(gameTicker);
+        let log = document.getElementById('effect-log');
+
+        if (idx === currentQ.c) {
+            combo++;
+            
+            let typeWeight = 100;
+            if (currentQ.type === "hard") typeWeight = 200;
+            if (currentQ.type === "final") typeWeight = 500; 
+            
+            if (currentMode === 'hard') typeWeight = Math.floor(typeWeight * 1.5);
+            
+            let earned = typeWeight + (combo * 15);
+            
+            if (timeRemaining <= (baseTimeLimit * 0.12)) {
+                earned *= 3;
+                log.innerHTML = `<span style="color:#ffb703;">⚡ 神回避!! ギリギリ正解でスコア3倍奪取!! ⚡</span>`;
+            } else {
+                log.innerHTML = `<span style="color:#06d6a0;">GREAT! 撃破成功 (+${Math.floor(earned)}pt)</span>`;
+            }
+
+            score += Math.floor(earned);
+            document.getElementById('score').innerText = score;
+            document.getElementById('combo').innerText = combo;
+            
+            nextQuestion();
+        } else {
+            gameOver("❌ 誤答！ 計算ミスにより強制終了 ❌", idx);
+        }
+    }
+
+    function gameOver(reason, selectedIdx) {
+        clearInterval(gameTicker);
+        
+        let scoreKey = currentMode === 'hard' ? 'math_pdf_high_hard' : 'math_pdf_high_standard';
+        let crownKey = currentMode === 'hard' ? 'math_crown_hard' : 'math_crown_standard';
+        let legendKey = currentMode === 'hard' ? 'math_legend_hard' : 'math_legend_standard';
+        
+        let high = parseInt(sessionStorage.getItem(scoreKey) || 0);
+        let isNew = false;
+        if(score > high) {
+            sessionStorage.setItem(scoreKey, score);
+            high = score;
+            isNew = true;
+        }
+        
+        let target = targetScores[currentMode];
+        let maxLimit = maxScores[currentMode];
+        let targetReached = false;
+        let legendReached = false;
+
+        if (score >= target) {
+            sessionStorage.setItem(crownKey, 'true');
+            targetReached = true;
+        }
+        if (score >= maxLimit) {
+            sessionStorage.setItem(legendKey, 'true');
+            legendReached = true;
+        }
+
+        document.getElementById('high-score').innerText = high;
+        document.getElementById('screen-title').innerText = "GAME OVER";
+        
+        let cleanQText = currentQ ? currentQ.q.replace(/<table[^>]*>([\s\S]*?)<\/table>/gi, '[表データ表示]') : '';
+
+        let descHtml = `
+            <span style="color:#ff4d6d; font-weight:bold;">${reason}</span><br><br>
+            難易度: <strong>${currentMode.toUpperCase()}</strong><br>
+            記録: <strong style="font-size:1.5rem; color:#06d6a0;">${combo}</strong> 問連続正解<br>
+            最終スコア: <strong style="font-size:2rem; color:#ffb703;">${score}</strong> pt / 目標: ${target} pt<br>
+        `;
+
+        if (currentQ) {
+            let playerAnswerText = selectedIdx === -1 ? "<span style='color:#ff4d6d;'>時間切れ</span>" : `<span style='color:#ff4d6d;'>${currentQ.a[selectedIdx]}</span>`;
+            let correctAnswerText = `<span style='color:#06d6a0;'>${currentQ.a[currentQ.c]}</span>`;
+            
+            descHtml += `
+                <div class="review-box">
+                    <div class="review-title">🔍 直前の問題レビューと復習</div>
+                    <div class="review-item"><strong>問題:</strong> ${cleanQText}</div>
+                    <div class="review-item"><strong>あなたの回答:</strong> ${playerAnswerText}</div>
+                    <div class="review-item"><strong>正しい正解:</strong> ${correctAnswerText}</div>
+                </div>
+            `;
+        }
+        
+        if (legendReached) {
+            descHtml += `<span style="color:#ffd700; font-weight:bold; font-size:1.4rem; filter:drop-shadow(0 0 8px #ffa500);">🏆 レジェンド降臨！極限の壁を突破しました！ 🏆</span><br>`;
+        } else if (targetReached) {
+            descHtml += `<span style="color:#ffd700; font-weight:bold; font-size:1.2rem;">👑 目標達成！王冠を維持しています！（次の限界: ${maxLimit}pt） 👑</span><br>`;
+        } else {
+            descHtml += `<span style="color:#aaa;">王冠獲得の ${target} pt まであと ${(target - score)} pt！</span><br>`;
+        }
+        
+        if (isNew && !legendReached) {
+            descHtml += `<span style="color:#00b4d8;">✨ 自己ベスト更新！ ✨</span><br>`;
+        }
+
+        document.getElementById('screen-desc').innerHTML = descHtml;
+        
+        checkCrowns();
+        document.getElementById('menu-buttons').style.display = 'none';
+        document.getElementById('gameover-buttons').style.display = 'flex';
+        document.getElementById('screen-overlay').style.display = 'flex';
+    }
+</script>
+</body>
+</html>

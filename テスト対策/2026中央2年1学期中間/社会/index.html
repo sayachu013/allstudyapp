@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歴史 中2社会 中世実力テスト</title>
+    <style>
+        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f0f2f5; color: #333; }
+        .page { display: none; }
+        .active { display: block; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        h1 { color: #1a365d; text-align: center; border-bottom: 3px solid #1a365d; padding-bottom: 10px; }
+        #timer-bar, #score-bar { position: sticky; top: 0; background: #c53030; color: white; padding: 10px; text-align: center; font-weight: bold; border-radius: 5px; z-index: 1000; font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        #score-bar { background: #2f855a; top: 50px; display: none; }
+        .question-item { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #cbd5e0; }
+        .q-num { font-weight: bold; color: #2b6cb0; margin-right: 10px; }
+        .q-type { font-size: 0.8em; background: #edf2f7; padding: 2px 8px; border-radius: 4px; margin-left: 10px; color: #4a5568; }
+        .options-container { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .option-item { background: #fff; border: 1px solid #2b6cb0; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; color: #2b6cb0; }
+        .btn { display: block; width: 100%; padding: 15px; background: #2b6cb0; color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; text-align: center; margin-top: 20px; text-decoration: none; }
+        .btn:hover { background: #2c5282; }
+        .scoring-btns { margin-top: 10px; display: flex; gap: 10px; }
+        .score-btn { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-correct { background: #e6fffa; color: #234e52; border: 1px solid #38b2ac; }
+        .btn-correct.selected { background: #38b2ac; color: white; }
+        .btn-wrong { background: #fff5f5; color: #742a2a; border: 1px solid #f56565; }
+        .btn-wrong.selected { background: #f56565; color: white; }
+        .ans-item { margin-bottom: 20px; padding: 15px; background: #f7fafc; border-left: 4px solid #2f855a; }
+        .ans-q-text { font-size: 0.95em; color: #4a5568; margin: 10px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+        .ans-correct { font-weight: bold; color: #2f855a; font-size: 1.1em; }
+        .ans-explanation { font-size: 0.9em; color: #4a5568; margin-top: 5px; background: #fff; padding: 10px; border-radius: 4px; }
+        .category-header { background: #4a5568; color: white; padding: 8px 15px; margin: 30px 0 15px 0; border-radius: 5px; font-size: 1em; }
+    </style>
+</head>
+<body>
+
+<div id="test-page" class="page active">
+    <div id="timer-bar">残り時間: <span id="timer">30:00</span></div>
+    <h1>歴史 実力判定テスト（中世編）</h1>
+    <div class="card">
+        <p>※ノートを用意して解答を記入してください。最後に「採点ページへ」を押すと正解が表示されます。</p>
+        <div id="test-container">
+            <div class="category-header">第1ブロック：記号選択（20問）</div>
+            <div id="questions-container-1"></div>
+            <div class="category-header">第2ブロック：一問一答（20問）</div>
+            <div id="questions-container-2"></div>
+            <div class="category-header">第3ブロック：記述問題（10問）</div>
+            <div id="questions-container-3"></div>
+            <div class="category-header">第4ブロック：発展・応用・高難易度（10問）</div>
+            <div id="questions-container-4"></div>
+        </div>
+        <button class="btn" onclick="showAnswers()">テストを終了して採点ページへ</button>
+    </div>
+</div>
+
+<div id="answer-page" class="page">
+    <div id="score-bar">正答率: <span id="score-val">0</span>% (<span id="correct-count">0</span>/60問)</div>
+    <h1>解答・解説一覧</h1>
+    <div class="card" id="answers-container"></div>
+    <button class="btn" onclick="location.reload()">トップに戻る</button>
+</div>
+
+<script>
+const questions = [
+    // 記号選択 (1-20)
+    { id: 1, type: "記号選択", cat: 1, q: "鎌倉時代、地頭と荘園領主の間の土地争いを解決するため、土地を半分ずつに折半した解決法を何というか。", options: ["下地中分", "分割相続", "惣領制", "徳政令"], a: "下地中分", e: "地頭は領主と争いながら力を強め、土地の半分を地頭に与えて争いを収める「下地中分」などが行われました。" },
+    { id: 2, type: "記号選択", cat: 1, q: "鎌倉時代の西日本を中心に広まった、秋に米を収穫した後に冬に麦を作る農業手法を何というか。", options: ["二毛作", "三毛作", "輪作", "刈払農法"], a: "二毛作", e: "西日本を中心に、農村では米と麦の二毛作が行われるようになり、農作物の収穫が増加しました。" },
+    { id: 3, type: "記号選択", cat: 1, q: "鎌倉時代、市での売り買いや年貢の納入などで広く使われるようになった中国からの輸入貨幣は何か。", options: ["宋銭", "明銭", "寛永通宝", "皇朝十二銭"], a: "宋銭", e: "中国（宋）から輸入した宋銭が、市での売り買いや年貢の納入などに使われました。" },
+    { id: 4, type: "記号選択", cat: 1, q: "鎌倉文化を代表する東大寺南大門の彫刻で、運慶らが制作した写実的で力強い像は何か。", options: ["金剛力士像", "阿弥陀如来像", "釈迦三尊像", "百済観音像"], a: "金剛力士像", e: "東大寺南大門の金剛力士像は、ダイナミックな動きがあり、筋肉や体つきが写実的で力強い特色を持っています。" },
+    { id: 5, type: "記号選択", cat: 1, q: "鎌倉時代に鴨長明が執筆し、人生のはかなさを記した有名な随筆は何か。", options: ["方丈記", "徒然草", "枕草子", "新古今和歌集"], a: "方丈記", e: "「方丈記」は鴨長明が書いた随筆で、人生のはかなさを記しています。" },
+    { id: 6, type: "記号選択", cat: 1, q: "平氏の興亡をえがき、琵琶法師によって語り広められた鎌倉時代の軍記物語は何か。", options: ["平家物語", "平治物語", "源氏物語", "保元物語"], a: "平家物語", e: "「平家物語」は平氏の興亡をえがいた作品で、琵琶法師が歌い広めました。" },
+    { id: 7, type: "記号選択", cat: 1, q: "1206年、内陸アジアの遊牧民の勢力を統一してモンゴル帝国を建設した初代皇帝は誰か。", options: ["チンギス・ハン", "フビライ・ハン", "マルコ・ポーロ", "バツ"], a: "チンギス・ハン", e: "チンギス・ハンは1206年に遊牧民の勢力を統一し、モンゴル帝国を建設して初代皇帝（ハン）となりました。" },
+    { id: 8, type: "記号選択", cat: 1, q: "モンゴル帝国の第5代皇帝で、国名を「元」と定め、南宋を滅ぼして日本へ使者を送った人物は誰か。", options: ["フビライ・ハン", "チンギス・ハン", "オゴタイ・ハン", "李成桂"], a: "フビライ・ハン", e: "フビライ・ハンは元という中国風の国名をつけ、高麗を従え宋を滅ぼした後、日本に使者を送りました。" },
+    { id: 9, type: "記号選択", cat: 1, q: "1274年、元軍が対馬・壱岐をおそい、博多湾岸に上陸して幕府軍を苦しめた最初の襲来を何というか。", options: ["文永の役", "弘安の役", "応仁の乱", "観応の擾乱"], a: "文永の役", e: "1274年の「文永の役」では、元軍が博多湾岸に上陸し、集団戦法や火薬武器（ててはう）で幕府軍を苦しめました。" },
+    { id: 10, type: "記号選択", cat: 1, q: "二度目の元の襲来（弘安の役）の際、元軍の上陸を阻止するために幕府が博多湾の海岸に造らせた設備は何か。", options: ["石の防壁（防塁）", "山城", "城下町", "関所"], a: "石の防壁（防塁）", e: "幕府は二度目の襲来に備えて、海岸に石の防壁（防塁）を造らせて元軍の上陸を防ぎました。" },
+    { id: 11, type: "記号選択", cat: 1, q: "鎌倉時代後期、生活が困窮した御家人を救うために幕府が出した、借金を取り消させる命令を何というか。", options: ["徳政令", "分国法", "御成敗式目", "武家諸法度"], a: "徳政令", e: "生活が苦しくなり土地を手放した御家人を救うため、幕府は土地を取り返させる徳政令を出しました。" },
+    { id: 12, type: "記号選択", cat: 1, q: "鎌倉幕府を滅ぼした後、天皇中心の政治を取り戻すために後醍醐天皇が始めた新しい政治を何というか。", options: ["建武の新政", "院政", "執権政治", "親政"], a: "建武の新政", e: "後醍醐天皇が始めた天皇中心の新しい政治を「建武の新政」といいます。" },
+    { id: 13, type: "記号選択", cat: 1, q: "1392年、南北朝の合一（統一）を達成し、室町幕府の全盛期を築いた第3代将軍は誰か。", options: ["足利義満", "足利尊氏", "足利義政", "足利義視"], a: "足利義満", e: "足利義満は1392年に南北朝を統一し、室町幕府による全国の支配権を確立しました。" },
+    { id: 14, type: "記号選択", cat: 1, q: "室町幕府において、将軍の補佐役として政治を担当した、細川氏などの有力守護大名が任命された役職は何か。", options: ["管領", "執権", "家老", "探題"], a: "管領", e: "将軍の補佐役である「管領」には、細川氏などの有力な守護大名が任命されました。" },
+    { id: 15, type: "記号選択", cat: 1, q: "1429年、按司（豪族）の争いを勝ち抜いた尚巴志によって沖縄島が統一され、成立した国家は何か。", options: ["琉球王国", "蝦夷地", "高麗", "李氏朝鮮"], a: "琉球王国", e: "1429年、中山の尚巴志が沖縄島を統一し、中継貿易で栄える琉球王国を建てました。" },
+    { id: 16, type: "記号選択", cat: 1, q: "15世紀、蝦夷地南部に進出した本州の人間（和人）と交易をめぐり衝突した、アイヌ民族の戦いを何というか。", options: ["コシャマインの戦い", "山城の国一揆", "加賀の一向一揆", "文永の役"], a: "コシャマインの戦い", e: "交易をめぐりアイヌ民族と和人が衝突した戦いを「コシャマインの戦い」と呼びます。" },
+    { id: 17, type: "記号選択", cat: 1, q: "室町時代、借金の帳消しなどを求めて、土倉や酒屋をおそった農民らの集団行動を何というか。", options: ["土一揆", "国一揆", "打ちこわし", "一向一揆"], a: "土一揆", e: "15世紀に入り、近畿地方を中心に、借金の帳消しを求める「土一揆」が広がりました。" },
+    { id: 18, type: "記号選択", cat: 1, q: "1467年、将軍足利義政のあとつぎ問題や有力守護大名の対立から始まり、京都を主戦場とした11年間の大乱は何か。", options: ["応仁の乱", "承久の乱", "保元の乱", "平治の乱"], a: "応仁の乱", e: "第8代将軍足利義政のあとつぎ問題などから、京都で「応仁の乱（1467〜77年）」が起こりました。" },
+    { id: 19, type: "記号選択", cat: 1, q: "足利義満が京都の北山に建てた、公家文化と武士文化が融合した北山文化を代表する建築物は何か。", options: ["金閣", "銀閣", "東大寺南大門", "龍安寺"], a: "金閣", e: "足利義満が京都北山に建てた「金閣」は、北山文化を代表する絢爛な建築です。" },
+    { id: 20, type: "記号選択", cat: 1, q: "1549年、カトリック側のイエズス会から日本に派遣され、鹿児島に上陸してキリスト教を伝えた宣教師は誰か。", options: ["フランシスコ・ザビエル", "マルコ・ポーロ", "コロンブス", "バスコ・ダ・ガマ"], a: "フランシスコ・ザビエル", e: "1549年、イエズス会の宣教師ザビエルが来日し、日本に初めてキリスト教を伝えました。" },
+
+    // 一問一答 (21-40)
+    { id: 21, type: "一問一答", cat: 2, q: "鎌倉時代、武士の一族を率いる、団結の中心となった長のことを何というか。", a: "惣領", e: "武士は一族の長である惣領を中心にまとまり、武芸の訓練をしていました。" },
+    { id: 22, type: "一問一答", cat: 2, q: "兼好法師が書いた、民衆の姿を伝える鎌倉時代の高名な随筆は何か。", a: "徒然草", e: "「徒然草」は兼好法師が書いた随筆で、当時の人々の姿や無常観を伝えています。" },
+    { id: 23, type: "一問一答", cat: 2, q: "阿弥陀如来の救いを信じ、念仏を唱えれば極楽浄土に生まれ変われると説いた、法然が開いた宗派は？", a: "浄土宗", e: "法然は難しい修行を必要とせず、念仏を唱える分かりやすい浄土宗を開きました。" },
+    { id: 24, type: "一問一答", cat: 2, q: "座禅によって自分でさとりを開くことを重視し、鎌倉幕府（特に臨済宗）にも保護された仏教の系統は何か。", a: "禅宗", e: "座禅によってさとりを開く禅宗（臨済宗・曹洞宗）は、武士の心をとらえ幕府に保護されました。" },
+    { id: 25, type: "一問一答", cat: 2, q: "1333年、後醍醐天皇に味方して鎌倉幕府（北条氏）を滅ぼした有力御家人の一人で、のちに室町幕府を開いた人物は誰か。", a: "足利尊氏", e: "足利尊氏は後醍醐天皇に味方して幕府をたおし、のちに京都に室町幕府を開きました。" },
+    { id: 26, type: "一問一答", cat: 2, q: "室町時代、軍事費の取り立てなど強い権限を与えられ、国内の武士を家来にして領国を支配した大名を何というか。", a: "守護大名", e: "室町幕府から強い権限をあたえられ、国内の武士を自分の家来にして力をつけた守護を守護大名と呼びます。" },
+    { id: 27, type: "一問一答", cat: 2, q: "室町幕府の重要な財政収入源で、京都でおお金の貸し付け（金融業）を行っていた業者を土倉ともう一つ何というか。", a: "酒屋", e: "幕府は土倉や酒屋を保護するかわりに税を取って、大きな収入源としました。" },
+    { id: 28, type: "一問一答", cat: 2, q: "足利義満が、正式な貿易船であることを証明するために明（中国）から発行された札を用いた貿易を何というか。", a: "日明貿易（勘合貿易）", e: "倭寇と区別するため、明が発行した「勘合」を用いたので勘合貿易とも呼ばれます。" },
+    { id: 29, type: "一問一答", cat: 2, q: "西日本の武士・商人・漁民などが集団で船を操り、大陸沿岸をおそって略奪行為を行った海賊集団を何というか。", a: "倭寇", e: "14世紀頃、大陸の沿岸をあらし、明から禁止を求められた海賊集団を倭寇といいます。" },
+    { id: 30, type: "一問一答", cat: 2, q: "1392年に高麗を滅ぼして建てられ、独自のハングルという文字を作るなど豊かな文化を発展させた朝鮮半島の国家は？", a: "朝鮮国（李氏朝鮮）", e: "1392年、李成桂が高麗を滅ぼして朝鮮を建て、ハングルなどの独自文化を発達させました。" },
+    { id: 31, type: "一問一答", cat: 2, q: "室町時代に農村で結成された、有力農民を中心とする村の自治組織を何というか。", a: "惣（惣村）", e: "農民は「惣」と呼ばれる自治組織を作り、村のおきてを定めて団結しました。" },
+    { id: 32, type: "一問一答", cat: 2, q: "室町時代、商人や手工業者が作った同業者団体で、貴族や寺社に税を納めて営業の独占権を認められた組織は何か。", a: "座", e: "「座」と呼ばれる同業者団体は、納税と引き換えに営業を独占する権利を認められていました。" },
+    { id: 33, type: "一問一答", cat: 2, q: "実力を蓄えた下の者が、上の者を武力で打ち倒して権力を奪うという、応仁の乱のあとに広がった社会風潮を何というか。", a: "下剋上", e: "支配の仕組みが揺らいだ結果、実力をたくわえた家来が主人に打ち勝つ下剋上の状況が広がりました。" },
+    { id: 34, type: "一問一答", cat: 2, q: "1488年、浄土真宗の信仰で結び付いた武士や農民が守護大名を倒し、約100年にわたり自治を行った一揆は何か。", a: "加賀の一向一揆", e: "加賀の一向一揆では、門徒（農民や武士）が守護をたおして約100年間も自治を行いました。" },
+    { id: 35, type: "一問一答", cat: 2, q: "戦国大名が領内の武士や民衆の行動を取り締まり、独自に国を治めるために制定した法令を何というか。", a: "分国法", e: "戦国大名が国内の支配体制を強化するため、独自に制定した法令を分国法と呼びます。" },
+    { id: 36, type: "一問一答", cat: 2, q: "戦国大名が新しい商工業者を呼び寄せるため、同業者団体である「座」を廃止して自由な営業を認めた政策を何というか。", a: "座の廃止（楽市）", e: "戦国大名の中には、城下町を盛んにするために座を廃止する政策を進める者がいました。" },
+    { id: 37, type: "一問一答", cat: 2, q: "足利義政が京都の東山に建てた、より質素で落ち着いた東山文化を代表する建築物は何か。", a: "銀閣", e: "足利義政が東山の別荘に建てた「銀閣」は、東山文化のわび・さびの特色をよく表しています。" },
+    { id: 38, type: "一問一答", cat: 2, q: "東山文化の建築様式で、現代の和風建築に受け継がれている「床の間」や「障子」を持つ様式を何というか。", a: "書院造", e: "室町文化を代表する建築様式である「書院造」は、現代の和室の原型となっています。" },
+    { id: 39, type: "一問一答", cat: 2, q: "一色（墨）だけで自然の風景を表現する絵画技法で、明に渡って学び帰国後に大成した「雪舟」で有名なものは何か。", a: "水墨画", e: "雪舟が中国の明で学び、帰国後に大成した一色で自然を表現する技法を水墨画といいます。" },
+    { id: 40, type: "一問一答", cat: 2, q: "1543年、ポルトガル人を乗せた倭寇の船が日本のどこに漂着したことで、鉄砲が伝来したか。", a: "種子島", e: "1543年、ポルトガル人をのせた船が種子島（鹿児島県）に流れ着き、鉄砲を伝えました。" },
+
+    // 記述問題 (41-50)
+    { id: 41, type: "記述", cat: 3, q: "平安時代までの古い仏教と比べて、鎌倉時代に新しい仏教（鎌倉仏教）が武士や民衆に急速に広まったのはなぜか。", a: "教えが分かりやすく、難しい修行を必要としなかったため。", e: "それまでの仏教と比べて「分かりやすく、難しい修行が不要」だったため、多くの人々の心をとらえました。" },
+    { id: 42, type: "記述", cat: 3, q: "文永の役（一度目の元寇）において、日本の御家人たちが元軍の戦い方に非常に苦戦した理由を２つ説明せよ。", a: "元軍が「集団戦法」を用いた点と、火薬武器である「てつはう」を使った点。", e: "一騎打ちを重んじる日本の武士に対し、元軍は集団戦法と火薬兵器（てつはう）で幕府軍を翻弄しました。" },
+    { id: 43, type: "記述", cat: 3, q: "鎌倉時代後期、命がけで戦って元を退けたにもかかわらず、御家人たちの生活が苦しくなったのはなぜか。", a: "防衛戦だったため新たな土地の恩賞が得られず、分割相続の繰り返しで所有地自体が減っていたため。", e: "元の襲来は防衛戦だったため奪った土地（恩賞）がなく、領地の分割相続が繰り返された結果、生活が苦しくなりました。" },
+    { id: 44, type: "記述", cat: 3, q: "室町時代、足利義満が明との貿易（日明貿易）を行う際に「勘合」という特殊な札を使用した目的は何か。", a: "正式な貿易船と、海賊集団である「倭寇」とを明確に区別するため。", e: "当時東シナ海を荒らしていた海賊（倭寇）と、正式な貿易船を識別する目的で勘合が使われました。" },
+    { id: 45, type: "記述", cat: 3, q: "室町時代、惣（惣村）に団結した農民たちが、荘園領主や守護大名に対して行った抵抗や交渉の内容を述べよ。", a: "多くの村々と結び付き、年貢の減免を求めたり、土一揆を起こして借金の帳消しを求めたりした。", e: "惣で団結した農民は領主に抵抗し、年貢を減らす交渉をしたり、土一揆で借金帳消しを求めました。" },
+    { id: 46, type: "記述", cat: 3, q: "戦国大名が、それまで山の上に築いていた城を交通に便利な平地へと移した最大の狙いは何か。", a: "強力な軍隊を配置しやすい城の周辺に家来や商工業者を集め、城下町を造って経済を発展させるため。", e: "戦争への備えだけでなく、家来や商工業者を呼び寄せて城下町を発達させ、国を豊かにする狙いがありました。" },
+    { id: 47, type: "記述", cat: 3, q: "14世紀中頃のヨーロッパで、人口の約3分の1が失われる大流行を起こし、ルネサンスのきっかけともなった伝染病は何か。", a: "ペスト（黒死病）", e: "14世紀にペストが大流行して人口が激減したことで、人間の生き方に関する新しい考え（ルネサンス）が生まれました。" },
+    { id: 48, type: "記述", cat: 3, q: "16世紀にヨーロッパでルターやカルバンがローマ教皇を批判して起こした「宗教改革」において、彼らが信仰の中心に置くべきだと主張したものは何か。", a: "聖書（聖書の言葉）", e: "ルターらは免罪符の販売などを批判し、教会の指導ではなく「聖書」を理解することこそが信仰の中心であると説きました。" },
+    { id: 49, type: "記述", cat: 3, q: "大航海時代、スペイン人によってアステカ王国やインカ帝国が滅ぼされた後、現地の先住民たちはどのように扱われたか。", a: "武力で征服され、銀山（ポトシ銀山など）の開発や農園（プランテーション）での過酷な労働を強制された。", e: "先住民はスペイン人に支配され、過酷な鉱山労働や過酷な環境での農園労働を課せられ人口が激減しました。" },
+    { id: 50, type: "記述", cat: 3, q: "ポルトガル人やスペイン人（南蛮人）との間で行われた「南蛮貿易」において、日本から最も大量に輸出された品物は何か。", a: "銀（当時の世界の産出量の約3分の1）", e: "南蛮貿易において、日本からは当時全世界の約3分の1を占めていたとされる大量の「銀」が持ち出されました。" },
+
+    // 発発展・応用・高難易度 (51-60)
+    { id: 51, type: "発展", cat: 4, q: "鎌倉時代の東大寺南大門「金剛力士像」と、平安時代の「阿弥陀如来像」の芸術的な特色の違いを簡潔に説明せよ。", a: "平安の像は穏やかで左右対称であるのに対し、金剛力士像はダイナミックな動きがあり、筋肉が写実的で力強い点。", e: "穏やかで均整の取れた平安時代の仏像に対し、鎌倉の金剛力士像は写実的でダイナミックな動きの強さを持っています。" },
+    { id: 52, type: "発展", cat: 4, q: "鎌倉幕府が困窮する御家人を救うために出した「徳政令」が、結果として限定的な効果しかなく、逆に経済を混乱させた理由を説明せよ。", a: "一時的に借金は消えたが、信用を失った御家人がその後商人からお金を借りられなくなったため。", e: "借金の取り消しにより商人が損をしたため、御家人への新たな融資がストップし、逆に生活が困窮しました。" },
+    { id: 53, type: "発展", cat: 4, q: "室町幕府が置かれた「京都」の統治の仕組みや財政の集め方は、鎌倉幕府（鎌倉中心）と比べてどのような違いがあるか説明せよ。", a: "地方だけでなく京都に常に滞在し、土倉や酒屋、関所などから税（通行税など）を徴収して収入源とした点。", e: "室町幕府は有力守護を京都に常駐させ、さらに京都の土倉・酒屋への課税や関所の通行税で多くの収入を得ました。" },
+    { id: 54, type: "発展", cat: 4, q: "琉球王国が15世紀にアジアの中で大きく繁栄できた理由を、その地理的特徴を踏まえて「貿易」の観点から説明せよ。", a: "日本、中国、朝鮮半島、東南アジアを結ぶ中心に位置しており、各地の産物をやりとりする「中継貿易」を行ったため。", e: "沖縄島を統一した琉球王国は、アジアの各地域を地理的に結び、産物をやり取りする「中継貿易」の拠点として栄えました。" },
+    { id: 55, type: "発展", cat: 4, q: "応仁の乱の「西軍（山名方）」と「東軍（細川方）」の対立において、将軍家（足利義政）の後継者争いとして誰と誰が対立していたか。", a: "西軍が推す「足利義尚（と日野富子）」に対し、東軍が推す「足利義視」。", e: "義政の弟である義視（東軍）と、義政と妻日野富子の間に生まれた義尚（西軍）の後継をめぐる対立が引き金でした。" },
+    { id: 56, type: "発展", cat: 4, q: "戦国大名が、自分の領国内の武士どうしの勝手な私闘を禁じ、紛争を大名が裁定するために分国法に定めた原則を何というか。", a: "喧嘩両成敗（の原則）", e: "武田氏の法令などに代表されるように、家臣どうしの勝手な争いをなくすために厳しい取り締まりを行いました。" },
+    { id: 57, type: "発展", cat: 4, q: "戦国時代に博多の商人が開発に関わり、産出された銀が中国に輸出されて世界経済を動かす拠点となった島根県の有名な鉱山はどこか。", a: "石見銀山", e: "戦国大名が保護した博多の商人が島根県の「石見銀山」を開発し、そこで採れた銀は海外へと流通していきました。" },
+    { id: 58, type: "発展", cat: 4, q: "室町文化の「能」や「水墨画」、あるいは「枯山水」の庭園の造りなどに共通して影響を与えている、鎌倉時代に伝わった仏教の考え方は何か。", a: "禅宗（禅の思想）", e: "質素で落ち着いた東山文化や、水を使わず一色で表現する水墨画・枯山水は、禅宗の思想が深く背景に関わっています。" },
+    { id: 59, type: "発展", cat: 4, q: "大航海時代にカトリック国であるスペインやポルトガルが世界に進出した際、貿易を行うことと「もう一つの目的」をどのように捉えていたか述べよ。", a: "キリスト教（カトリック）の布教活動を行うことと、貿易による利益獲得を「一体のもの」として捉えていた。", e: "スペインやポルトガルは、貿易とキリスト教の布教を一体と考えており、布教を許した領主の港で交易を行いました。" },
+    { id: 60, type: "発展", cat: 4, q: "種子島に伝来した「鉄砲」は、それまでの刀や弓矢を中心とした日本の戦国時代の「戦い方」や「城の造り」をどのように変化させたか述べよ。", a: "集団戦の重要性が高まり、鉄砲の威力（経済力）を持つ大名が有利になった。また城は山城から平地の堅固な平城へと変わった。", e: "鉄砲の導入は個人の武芸から足軽らの集団戦へと戦術を変え、防御のために城下町を伴う平地への移転を加速させました。" }
+];
+
+function generateQuestions() {
+    questions.forEach(q => {
+        const container = document.getElementById(`questions-container-${q.cat}`);
+        const div = document.createElement('div');
+        div.className = 'question-item';
+        let content = `<span class="q-num">問${q.id}</span> <span class="q-type">${q.type}</span><br>${q.q}`;
+        
+        if (q.type === "記号選択" && q.options) {
+            content += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                content += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            content += `</div>`;
+        }
+        
+        div.innerHTML = content;
+        container.appendChild(div);
+    });
+}
+
+function showAnswers() {
+    clearInterval(countdown);
+    document.getElementById('test-page').classList.remove('active');
+    document.getElementById('answer-page').classList.add('active');
+    document.getElementById('score-bar').style.display = 'block';
+    
+    const container = document.getElementById('answers-container');
+    questions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'ans-item';
+        div.id = `ans-item-${idx}`;
+        
+        let qContent = `<div class="ans-q-text"><span class="q-num">問${q.id}</span> [${q.type}] ${q.q}`;
+        if (q.type === "記号選択" && q.options) {
+            qContent += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                qContent += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            qContent += `</div>`;
+        }
+        qContent += `</div>`;
+
+        div.innerHTML = `
+            ${qContent}
+            <div><span class="ans-correct">正解：${q.a}</span></div>
+            <div class="ans-explanation"><strong>解説:</strong> ${q.e}</div>
+            <div class="scoring-btns">
+                <button class="score-btn btn-correct" id="btn-c-${idx}" onclick="setScore(${idx}, true)">○ 正解</button>
+                <button class="score-btn btn-wrong" id="btn-w-${idx}" onclick="setScore(${idx}, false)">× 不正解</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+    window.scrollTo(0, 0);
+}
+
+function setScore(idx, isCorrect) {
+    userScores[idx] = isCorrect;
+    document.getElementById(`btn-c-${idx}`).classList.toggle('selected', isCorrect);
+    document.getElementById(`btn-w-${idx}`).classList.toggle('selected', !isCorrect);
+    updateScore();
+}
+
+function updateScore() {
+    const correctCount = userScores.filter(s => s === true).length;
+    document.getElementById('correct-count').innerText = correctCount;
+    document.getElementById('score-val').innerText = Math.round((correctCount / 60) * 100);
+}
+
+let timeLeft = 30 * 60;
+const timerDisplay = document.getElementById('timer');
+const userScores = new Array(60).fill(null);
+
+const countdown = setInterval(() => {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+    timerDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    if (timeLeft <= 0) {
+        clearInterval(countdown);
+        alert('時間終了です！採点ページへ移ります。');
+        showAnswers();
+    }
+    timeLeft--;
+}, 1000);
+
+generateQuestions();
+</script>
+
+</body>
+</html>

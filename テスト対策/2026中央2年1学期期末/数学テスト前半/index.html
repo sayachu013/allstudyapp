@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中2数学 確認テスト（式の計算・文字式の利用・等式の変形）</title>
+    <style>
+        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f0f2f5; color: #333; }
+        .page { display: none; }
+        .active { display: block; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        h1 { color: #2c5282; text-align: center; border-bottom: 3px solid #2c5282; padding-bottom: 10px; }
+        #timer-bar, #score-bar { position: sticky; top: 0; background: #c53030; color: white; padding: 10px; text-align: center; font-weight: bold; border-radius: 5px; z-index: 1000; font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        #score-bar { background: #2f855a; top: 50px; display: none; }
+        .question-item { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #cbd5e0; }
+        .q-num { font-weight: bold; color: #2b6cb0; margin-right: 10px; }
+        .q-type { font-size: 0.8em; background: #edf2f7; padding: 2px 8px; border-radius: 4px; margin-left: 10px; color: #4a5568; }
+        .options-container { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .option-item { background: #fff; border: 1px solid #2b6cb0; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; color: #2b6cb0; }
+        .btn { display: block; width: 100%; padding: 15px; background: #2b6cb0; color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; text-align: center; margin-top: 20px; text-decoration: none; }
+        .btn:hover { background: #2c5282; }
+        .scoring-btns { margin-top: 10px; display: flex; gap: 10px; }
+        .score-btn { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-correct { background: #e6fffa; color: #234e52; border: 1px solid #38b2ac; }
+        .btn-correct.selected { background: #38b2ac; color: white; }
+        .btn-wrong { background: #fff5f5; color: #742a2a; border: 1px solid #f56565; }
+        .btn-wrong.selected { background: #f56565; color: white; }
+        .ans-item { margin-bottom: 20px; padding: 15px; background: #f7fafc; border-left: 4px solid #2f855a; }
+        .ans-q-text { font-size: 0.95em; color: #4a5568; margin: 10px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+        .ans-correct { font-weight: bold; color: #2f855a; font-size: 1.1em; }
+        .ans-explanation { font-size: 0.9em; color: #4a5568; margin-top: 5px; background: #fff; padding: 10px; border-radius: 4px; }
+        .category-header { background: #4a5568; color: white; padding: 8px 15px; margin: 30px 0 15px 0; border-radius: 5px; font-size: 1em; }
+        
+        .vertical-calc-box {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 1.2em;
+            line-height: 1.3;
+            background: #f8fafc;
+            padding: 12px 20px;
+            border-radius: 6px;
+            display: inline-block;
+            margin: 10px 0;
+            border: 1px solid #cbd5e0;
+            text-align: right;
+            letter-spacing: 2px;
+        }
+        .vertical-calc-line {
+            border-bottom: 2px solid #333;
+            margin-top: 2px;
+            margin-bottom: 4px;
+        }
+    </style>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            chtml: {
+                matchFontHeight: false
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+
+<div id="test-page" class="page active">
+    <div id="timer-bar">残り時間: <span id="timer">40:00</span></div>
+    <h1>中2数学 確認テスト（式の計算・文字式の利用・等式の変形）</h1>
+    <div class="card">
+        <p>※ノートに解答を記入し、最後に「テストを終了して採点ページへ」を押して確認してください。</p>
+        <div id="test-container">
+            <div class="category-header">第1ブロック：単項式・多項式の分類と次数（10問）</div>
+            <div id="questions-container-1"></div>
+            <div class="category-header">第2ブロック：多項式の加減・同類項・筆算（15問）</div>
+            <div id="questions-container-2"></div>
+            <div class="category-header">第3ブロック：単項式の乗除・分数を含む計算（20問）</div>
+            <div id="questions-container-3"></div>
+            <div class="category-header">第4ブロック：等式の変形・文字について解く（11問）</div>
+            <div id="questions-container-4"></div>
+            <div class="category-header">第5ブロック：文字式の利用・整数の性質と図形への応用（14問）</div>
+            <div id="questions-container-5"></div>
+        </div>
+        <button class="btn" onclick="showAnswers()">テストを終了して採点ページへ</button>
+    </div>
+</div>
+
+<div id="answer-page" class="page">
+    <div id="score-bar">正答率: <span id="score-val">0</span>% (<span id="correct-count">0</span>/70問)</div>
+    <h1>解答・解説一覧</h1>
+    <div class="card" id="answers-container"></div>
+    <button class="btn" onclick="location.reload()">テストTOPに戻る</button>
+</div>
+
+<script>
+const selectedQuestions = [
+    // 第1ブロック：単項式・多項式の分類と次数 (1-10)
+    { id: 1, type: "記号選択", cat: 1, q: "次の多項式のうち、「二次式」であるものを正しく選んだ組み合わせを答えなさい。<br>ア：$ab+c-d$ &nbsp;&nbsp; イ：$x^2y-xy+1$ &nbsp;&nbsp; ウ：$\\frac{2}{5}a^2$ &nbsp;&nbsp; エ：$7x-7y$", options: ["ア と ウ", "イ と エ", "ア と エ", "ウ と エ"], a: "ア", ans_literal: "ア と ウ", e: "アの最高次の項は $ab$ で2文字（2次）、ウは $a^2$ で2次なので、どちらも2次式です。イは3次式、エは1次式です。" },
+    { id: 2, type: "記号選択", cat: 1, q: "多項式 $x^2y-xy+1$ の次数を答えなさい。", options: ["1次", "2次", "3次", "4次"], a: "ウ", ans_literal: "3次", e: "各項の次数のうち、最も高いものが多項式の次数になります。第一項の $x^2y$ は文字が3個掛け合わされているため3次項であり、この多項式は3次式です。" },
+    { id: 3, type: "記号選択", cat: 1, q: "単項式 $-4x$ の次数を答えなさい。", options: ["0次", "1次", "2次", "3次"], a: "イ", ans_literal: "1次", e: "掛け合わされている文字の個数は $x$ の1個だけなので、次数は1（1次式）です。" },
+    { id: 4, type: "記号選択", cat: 1, q: "多項式 $8a-b-7a+2b$ の同類項の正しいペアを選びなさい。", options: ["$8a$ と $-b$", "$8a$ と $-7a$、$-b$ と $2b$", "$8a$ と $2b$", "同類項はない"], a: "イ", ans_literal: "$8a$ と $-7a$、$-b$ と $2b$", e: "文字の部分が全く同じである項を同類項といいます。$a$ の項どうし、$b$ の項どうしがそれぞれ同類項です。" },
+    { id: 5, type: "記号選択", cat: 1, q: "次の単項式のうち、次数が最も高いものを選びなさい。", options: ["$2a$", "$-9b$", "$(-2a)^2$", "$12ab$"], a: "ウ", ans_literal: "$(-2a)^2$", e: "$(-2a)^2 = 4a^2$ となり、文字が2個掛け合わされているため2次です。他はすべて1次です。" },
+    { id: 6, type: "記号選択", cat: 1, q: "次の式のうち、文字式における定数（数だけの項）や定数項の説明として正しいものを選びなさい。", options: ["文字が最も多く掛け合わされた項", "数だけからなる項", "係数が0の項", "符号がマイなすの項"], a: "イ", ans_literal: "数だけからなる項", e: "多項式の中で、文字を含まず数だけで表されている項を定数項といいます。" },
+    { id: 7, type: "記号選択", cat: 1, q: "多項式 $4x-2y-7+2x$ の項をすべて正しく並べたものを選びなさい。", options: ["$4x$, $2y$, $7$, $2x$", "$4x$, $-2y$, $-7$, $2x$", "$6x$, $-2y$, $-7$", "$4x$, $-2y$"], a: "イ", ans_literal: "$4x$, $-2y$, $-7$, $2x$", e: "加法の形に直したときのそれぞれの要素が項です。符号を含めて $4x$, $-2y$, $-7$, $2x$ となります。" },
+    { id: 8, type: "記号選択", cat: 1, q: "数式において、アルファベットの「前のほうの文字（$a, b, c$など）」と「後ろのほうの文字（$x, y, z$など）」は一般にどのように使い使い分けられる習慣がありますか。", options: ["前が変数、後ろが定数", "前が定数、後ろが変数・未知数", "前が自然数、後ろが円周率", "特に使い分けの習慣はない"], a: "イ", ans_literal: "前が定数、後ろが変数・未知数", e: "数学の習慣として $a, b, c$ などは定数に、$x, y, z$ などは変数や未知数に使われます。" },
+    { id: 9, type: "記号選択", cat: 1, q: "面積を表す $S$、体積を表す $V$、半径を表す $r$、時間などを表す $t$ は、何に由来して使われていますか。", options: ["ギリシア文字の順番", "英語の頭文字", "発見した数学者の名前", "明治時代の日本の法律"], a: "イ", ans_literal: "英語の頭文字", e: "半径(radius)、時間(time)、面積(Surface)、体積(Volume)など、いずれも英語の頭文字に由来しています。" },
+    { id: 10, type: "記号選択", cat: 1, q: "円周率を表す $\\pi$ は、どこの国の文字から世界共通で使われていますか。", options: ["ラテン文字", "ギリシア文字", "アラビア文字", "キリル文字"], a: "イ", ans_literal: "ギリシア文字", e: "$\\pi$ はギリシア語のアルファベットで、円周を表すギリシア語の頭文字に由来し世界共通で使用されています。" },
+
+    // 第2ブロック：多項式の加減・同類項・筆算 (11-25)
+    { id: 11, type: "一問一答", cat: 2, q: "次の式の同類項をまとめなさい。<br>$3x-7y+4x$", a: "$7x-7y$", e: "$3x+4x=7x$。$y$ の項を合わせて $7x-7y$ です。" },
+    { id: 12, type: "一問一答", cat: 2, q: "次の式の同類項をまとめなさい。<br>$8a-b-7a+2b$", a: "$a+b$", e: "$8a-7a=a$、$-b+2b=b$ より、 $a+b$ となります。" },
+    { id: 13, type: "一問一答", cat: 2, q: "次の式の同類項をまとめなさい。<br>$-5x+9y+3x-8y$", a: "$-2x+y$", e: "$-5x+3x=-2x$、$9y-8y=y$ より、 $-2x+y$ となります。" },
+    { id: 14, type: "一問一答", cat: 2, q: "次の式の同類項をまとめなさい。<br>$3x^2-5x-2x^2+x$", a: "$x^2-4x$", e: "$3x^2-2x^2=x^2$、$-5x+x=-4x$ より、 $x^2-4x$ となります。" },
+    { id: 15, type: "一問一答", cat: 2, q: "次の式の同類項をまとめなさい。<br>$8a^2-5a-2+7a$", a: "$8a^2+2a-2$", e: "$-5a+7a=2a$。整理して $8a^2+2a-2$ です。" },
+    { id: 16, type: "一問一答", cat: 2, q: "次の式の同類項をまとめなさい。<br>$4x-2y-7+2x$", a: "$6x-2y-7$", e: "$4x+2x=6x$ より、 $6x-2y-7$ となります。" },
+    { id: 17, type: "一問一答", cat: 2, q: "次の2つの多項式をたしなさい。<br>$3a+2b$ と $a-4b$", a: "$4a-2b$", e: "$(3a+2b)+(a-4b) = 3a+a+2b-4b = 4a-2b$ となります。" },
+    { id: 18, type: "一問一答", cat: 2, q: "多項式 $3a+2b$ から多項式 $a-4b$ をひきなさい。", a: "$2a+6b$", e: "$(3a+2b)-(a-4b) = 3a-a+2b+4b = 2a+6b$ となります。" },
+    { id: 19, type: "一問一答", cat: 2, q: "次の2つの多項式をたしなさい。<br>$x-4y$ と $-2x+3y$", a: "$-x-y$", e: "$(x-4y)+(-2x+3y) = x-2x-4y+3y = -x-y$ となります。" },
+    { id: 20, type: "一問一答", cat: 2, q: "多項式 $x-4y$ から多項式 $-2x+3y$ をひきなさい。", a: "$3x-7y$", e: "$(x-4y)-(-2x+3y) = x+2x-4y-3y = 3x-7y$ となります。" },
+    { id: 21, type: "一問一答", cat: 2, q: "次の計算をしなさい。<br>$3x^2+3x+1-(4x+2x^2)$", a: "$x^2-x+1$", e: "$3x^2-2x^2=x^2$、$3x-4x=-x$ より $x^2-x+1$ です。" },
+    { id: 22, type: "一問一答", cat: 2, q: "次の計算をしなさい。<br>$0.7x+y-(-1.4x+y)$", a: "$2.1x$", e: "かっこを外すと $0.7x+y+1.4x-y$ となり、$y$ が相殺されて $2.1x$ です。" },
+    { id: 23, type: "一問一答", cat: 2, q: "次の縦書きの計算をしなさい。<br><div class='vertical-calc-box'>&nbsp;&nbsp;3x + 4y<br>+)&nbsp;2x - 2y<br><div class='vertical-calc-line'></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>", a: "$5x+2y$", e: "縦の同類項どうしを足します。$3x+2x=5x$、$4y+(-2y)=2y$ より $5x+2y$ です。" },
+    { id: 24, type: "一問一答", cat: 2, q: "次の縦書きの計算をしなさい。<br><div class='vertical-calc-box'>&nbsp;&nbsp;a - 2b<br>-)&nbsp;-a - 3b<br><div class='vertical-calc-line'></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>", a: "$2a+b$", e: "引き算なので下の式の符号を反転して足します。$a-(-a)=2a$、$-2b-(-3b)=b$ より $2a+b$ です。" },
+    { id: 25, type: "一問一答", cat: 2, q: "次の縦書きの計算をしなさい。<br><div class='vertical-calc-box'>&nbsp;&nbsp;25x - &nbsp;3y + 6<br>-)&nbsp;&nbsp;5x - 10y + 6<br><div class='vertical-calc-line'></div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>", a: "$20x+7y$", e: "$25x-5x=20x$、$-3y-(-10y)=7y$、$6-6=0$。答えは $20x+7y$ です。" },
+
+    // 第3ブロック：単項式の乗除・分数を含む計算 (26-45)
+    { id: 26, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$5x \\times (-2x)$", a: "$-10x^2$", e: "係数どうし、文字どうしを計算します。$5 \\times (-2) = -10$, $x \\times x = x^2$ より $-10x^2$ です。" },
+    { id: 27, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$12m \\div 2m$", a: "6", e: "$\\frac{12m}{2m} = 6$ となります。文字 $m$ は約分されて消えます。" },
+    { id: 28, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$(-4x)^2$", a: "$16x^2$", e: "$(-4x) \\times (-4x) = 16x^2$ です。マイナスも2乗されるため符号はプラスになります。" },
+    { id: 29, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$\\frac{2}{3}xy \\times \\frac{1}{4}x$", a: "$\\frac{1}{6}x^2y$", e: "係数の計算は $\\frac{2}{3} \\times \\frac{1}{4} = \\frac{1}{6}$。文字を合わせて $\\frac{1}{6}x^2y$ となります。" },
+    { id: 30, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$\\frac{2}{5}x \\times (-10y^2)$", a: "$-4xy^2$", e: "$\\frac{2}{5} \\times (-10) = -4$。文字をあわせて $-4xy^2$ です。" },
+    { id: 31, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$2a \\times (-9b)$", a: "$-18ab$", e: "$2 \\times (-9) = -18$。文字は $ab$ なので $-18ab$ です。" },
+    { id: 32, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$(-6x) \\times (-3y)$", a: "$18xy$", e: "負の数どうしの掛け算なのでプラスになります。答えは $18xy$ です。" },
+    { id: 33, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$(-2a)^2$", a: "$4a^2$", e: "$(-2a) \\times (-2a) = 4a^2$ です。" },
+    { id: 34, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$(-4x)^2 \\times y$", a: "$16x^2y$", e: "先に累乗を計算します。$16x^2 \\times y = 16x^2y$ です。" },
+    { id: 35, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$12ab \\div 3b$", a: "$4a$", e: "$\\frac{12ab}{3b} = 4a$ となります。" },
+    { id: 36, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$3x^2 \\div x$", a: "$3x$", e: "$\\frac{3x^2}{x} = 3x$ となります。" },
+    { id: 37, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$5(4a-5b)$", a: "$20a-25b$", e: "分配法則により、かっこ内の各項に5を掛けます。$20a-25b$ です。" },
+    { id: 38, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$-3(4x-9y)$", a: "$-12x+27y$", e: "$-3$ を分配します。後半の項の符号が $+27y$ に変わる点に注意します。" },
+    { id: 39, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$(-28x+21y) \\div 7$", a: "$-4x+3y$", e: "各項を7で割ります。$\\frac{-28x}{7} + \\frac{21y}{7} = -4x+3y$ です。" },
+    { id: 40, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$(36a-24b) \\div (-4)$", a: "$-9a+6b$", e: "各項を $-4$ で割るため、すべての符号が反転します。$-9a+6b$ です。" },
+    { id: 41, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$5x+2(x-2y)$", a: "$7x-4y$", e: "かっこを外すと $5x+2x-4y$ となり、同類項をまとめて $7x-4y$ です。" },
+    { id: 42, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$2(2x-y)+(5x-y)$", a: "$9x-3y$", e: "展開して $4x-2y+5x-y = 9x-3y$ となります。" },
+    { id: 43, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$3(x+y)-3(x-y)$", a: "$6y$", e: "展開すると $3x+3y-3x+3y$。$3x$ が消えて $6y$ となります。" },
+    { id: 44, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$5(4a+b)-6(5a-b+3)$", a: "$-10a+11b-18$", e: "展開すると $20a+5b-30a+6b-18$。同類項を整理して $-10a+11b-18$ です。" },
+    { id: 45, type: "一問一答", cat: 3, q: "次の計算をしなさい。<br>$\\frac{1}{2}(4x-y)+\\frac{1}{3}(x+2y)$", a: "$\\frac{14x+y}{6}$", e: "展開すると $2x-\\frac{1}{2}y+\\frac{1}{3}x+\\frac{2}{3}y$ となります。通分を行うと、全体の分子は $12x-3y+2x+4y$ となるため、整理して $\\frac{14x+y}{6}$ となります。" },
+
+    // 第4ブロック：等式の変形・文字について解く (46-56)
+    { id: 46, type: "一問一答", cat: 4, q: "等式 $x+2y=3$ を $x$ について解きなさい。", a: "$x=3-2y$", e: "両辺から $2y$ を移項する（ひく）ことで、$x=3-2y$ と変形できます。" },
+    { id: 47, type: "一問一答", cat: 4, q: "等式 $y=ax$ を $a$ について解きなさい。", a: "$a=\\frac{y}{x}$", e: "左辺と右辺を入れ替えて $ax=y$。両辺を $x$ で割って $a=\\frac{y}{x}$ となります。" },
+    { id: 48, type: "一問一答", cat: 4, q: "等式 $l=2\\pi r$ を $r$ について解きなさい。", a: "$r=\\frac{l}{2\\pi}$", e: "左辺と右辺を入れ替えて $2\\pi r=l$。両辺を $2\\pi$ で割って $r=\\frac{l}{2\\pi}$ です。" },
+    { id: 49, type: "一問一答", cat: 4, q: "等式 $x+y=6$ を $x$ について解きなさい。", a: "$x=6-y$", e: "$y$ を移項して $x=6-y$ です。" },
+    { id: 50, type: "一問一答", cat: 4, q: "等式 $2x-y=3$ を $y$ について解きなさい。", a: "$y=2x-3$", e: "$-y = 3-2x$ より、両辺の符号をすべて入れ替えて $y=2x-3$ です。" },
+    { id: 51, type: "一問一答", cat: 4, q: "等式 $l=2(a+b)$ を $a$ について解きなさい。", a: "$a=\\frac{l-2b}{2}$", e: "左右を入れ替えて $2(a+b)=l$。$a+b=\\frac{l}{2}$ より $a=\\frac{l}{2}-b$ です。通分した $\\frac{l-2b}{2}$ も正解です。" },
+    { id: 52, type: "一問一答", cat: 4, q: "等式 $4x+2y=1$ を $y$ について解きなさい。", a: "$y=\\frac{1-4x}{2}$", e: "$2y=1-4x$ より $y=\\frac{1-4x}{2}$ です。分数に分けた $\\frac{1}{2}-2x$ も正解です。" },
+    { id: 53, type: "一問一答", cat: 4, q: "等式 $7x+y=4$ を $y$ について解きなさい。", a: "$y=4-7x$", e: "$7x$ を移項して $y=4-7x$ となります。" },
+    { id: 54, type: "一問一答", cat: 4, q: "等式 $7x+y=4$ を $x$ について解きなさい。", a: "$x=\\frac{4-y}{7}$", e: "$7x=4-y$ より、両辺を7で割って $x=\\frac{4-y}{7}$ です。" },
+    { id: 55, type: "一問一答", cat: 4, q: "等式 $-a+2b=5$ を $a$ について解きなさい。", a: "$a=2b-5$", e: "$-a=5-2b$ より、両辺に $-1$ を掛けて $a=2b-5$ です。" },
+    { id: 56, type: "一問一答", cat: 4, q: "等式 $12x+3y=11$ を $y$ について解きなさい。", a: "$y=\\frac{11-12x}{3}$", e: "$3y=11-12x$ より $y=\\frac{11-12x}{3}$ です。" },
+
+    // 第5ブロック：文字式の利用・整数の性質と図形への応用 (57-70)
+    { id: 57, type: "一問一答", cat: 5, q: "連続する3つの整数のうち、最も小さい整数を $n$ とするとき、これら3つの整数の和を $n$ を使って表しなさい。", a: "$3n+3$", e: "3つの整数は $n$, $n+1$, $n+2$ と表せるので、足すと $n+(n+1)+(n+2) = 3n+3$ となります。" },
+    { id: 58, type: "一問一答", cat: 5, q: "連続する3つの整数のうち、中央の整数を $n$ とするとき、これら3つの整数の和を $n$ を使って表しなさい。", a: "$3n$", e: "3つの整数は $n-1$, $n$, $n+1$ と表せるので、足すと $(n-1)+n+(n+1) = 3n$ となります。" },
+    { id: 59, type: "一問一答", cat: 5, q: "連続する5つの整数のうち、最も小さい整数を $n$ と表すとき、これら5つの整数の和を $n$ を使って表しなさい。", a: "$5n+10$", e: "和は $n+(n+1)+(n+2)+(n+3)+(n+4) = 5n+10$ となり、これは $5(n+2)$ と変形できます。" },
+    { id: 60, type: "一問一答", cat: 5, q: "2桁の正の整数において、十の位の数を $a$、一の位の数を $b$ とするとき、この整数を文字式で表しなさい。", a: "$10a+b$", e: "十の位の数字は10の重みを持つので $10a+b$ と表されます。" },
+    { id: 61, type: "一問一答", cat: 5, q: "2桁の正の整数 $10a+b$ の、十の位の数と一の位の数を入れかえてできる整数を文字式で表しなさい。", a: "$10b+a$", e: "十の位が $b$、一の位が $a$ になるので $10b+a$ となります。" },
+    { id: 62, type: "一問一答", cat: 5, q: "2桁の正の整数と、その十の位と一の位を入れかえてできる数の差は、常に何の倍数になりますか。数値を答えなさい。", a: "9", e: "$(10a+b)-(10b+a) = 9a-9b = 9(a-b)$ となり、9の倍数になります。" },
+    { id: 63, type: "一問一答", cat: 5, q: "3桁の正の整数のうち、百の位の数と一の位の数の和が、十の位の数に等しい数(374や561など)は、何の倍数になりますか。数値を答えなさい。", a: "11", e: "百を $a$, 一を $b$ とすると十は $a+b$ となります。数は $100a+10(a+b)+b = 110a+11b = 11(10a+b)$ となり、11の倍数です。" },
+    { id: 64, type: "一問一答", cat: 5, q: "連続する3つの偶数のうち、最も小さい偶数を $2n$ と表すとき、中央の偶数を $n$ を用いた式で表しなさい。", a: "$2n+2$", e: "偶数は2おきに並ぶので、最も小さい偶数が $2n$ であれば、中央は $2n+2$ となります。" },
+    { id: 65, type: "一問一答", cat: 5, q: "カレンダーで縦横に隣接する4つの数を四角形で囲んだとき、それらの和は常に何の倍数になりますか。数値を答えなさい。", a: "4", e: "最小を $n$ とすると4つの数は $n, n+1, n+7, n+8$。和は $4n+16 = 4(n+4)$ となり4の倍数です。" },
+    { id: 66, type: "一問一答", cat: 5, q: "底面の半径が $r$、高さが $h$ の円柱Aがあります。この底面の半径を2倍にし、高さを半分にした円柱Bを作るとき、円柱Bの体積は円柱Aの何倍になりますか。", a: "2倍", e: "円柱Aの体積は $\\pi r^2 h$ です。円柱Bは半径が $2r$, 高さが $\\frac{1}{2}h$ なので、体積は $\\pi (2r)^2 \\times \\frac{1}{2}h = 2\\pi r^2 h$ となり、2倍になります。" },
+    { id: 67, type: "一問一答", cat: 5, q: "上の問題の円柱Aと円柱Bについて、円柱Bの底面積は、円柱Aの底面積の何倍になりますか。", a: "4倍", e: "円柱Aの底面積は $\\pi r^2$ です。円柱Bの底面積は $\\pi (2r)^2 = 4\\pi r^2$。よって4倍になります。" },
+    { id: 68, type: "一問一答", cat: 5, q: "上の問題の円柱Aと円柱Bについて、円柱Bの側面積は、円柱Aの側面積の何倍になりますか。", a: "1倍", e: "側面積は $2\\pi \\times \\text{半径} \\times \\text{高さ}$ です。円柱Aは $2\\pi rh$ です。円柱Bは $2\\pi \\times (2r) \\times \\frac{1}{2}h = 2\\pi rh$。よって1倍（同じ）です。" },
+    { id: 69, type: "一問一答", cat: 5, q: "直径ABが12cmの円Oの中に、ACとCBをそれぞれ直径とする2つの円P、Qを描きます。Aから円の弧をなぞってBまで行くとき、大きな半円をなぞるルート（イ）と、円Pと円Qの半円を乗り継ぐルート（ア）では、どちらの道のりが長いですか。または同じですか。", a: "同じ", e: "円Pの直径を $2r$ とすると円Qの直径は $12-2r$ となります。アの長さは $\\pi r + \\pi(6-r) = 6\\pi$。円Oの半円のルートイの長さも $12\\pi \\times \\frac{1}{2} = 6\\pi$。よってどちらも同じです。" },
+    { id: 70, type: "一問一答", cat: 5, q: "等式 $m=\\frac{a+b}{2}$ を $b$ について解きなさい。", a: "$b=2m-a$", e: "左右を入れ替えて $\\frac{a+b}{2}=m$。両辺に2を掛けて $a+b=2m$。$a$ を移項して $b=2m-a$ となります。" }
+];
+
+let timeLeft = 40 * 60;
+const timerDisplay = document.getElementById('timer');
+const userScores = new Array(selectedQuestions.length).fill(null);
+
+function generateQuestions() {
+    selectedQuestions.forEach(q => {
+        const container = document.getElementById(`questions-container-${q.cat}`);
+        if (!container) return;
+        
+        const div = document.createElement('div');
+        div.className = 'question-item';
+        let content = `<span class="q-num">問${q.id}</span> <span class="q-type">${q.type}</span><br>${q.q}`;
+        
+        if (q.type === "記号選択" && q.options) {
+            content += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                content += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            content += `</div>`;
+        }
+        
+        div.innerHTML = content;
+        container.appendChild(div);
+    });
+
+    if (window.MathJax) {
+        MathJax.typesetPromise();
+    }
+}
+
+function showAnswers() {
+    clearInterval(countdown);
+    document.getElementById('test-page').classList.remove('active');
+    document.getElementById('answer-page').classList.add('active');
+    document.getElementById('score-bar').style.display = 'block';
+    
+    const container = document.getElementById('answers-container');
+    container.innerHTML = "";
+    
+    selectedQuestions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'ans-item';
+        
+        let qContent = `<div class="ans-q-text"><span class="q-num">問${q.id}</span> [${q.type}] ${q.q}`;
+        if (q.type === "記号選択" && q.options) {
+            qContent += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                qContent += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            qContent += `</div>`;
+        }
+        qContent += `</div>`;
+
+        let targetAnswer = q.a;
+        if (q.type === "記号選択" && q.ans_literal) {
+            targetAnswer = `${q.a} （${q.ans_literal}）`;
+        }
+
+        div.innerHTML = `
+            ${qContent}
+            <div><span class="ans-correct">正解：${targetAnswer}</span></div>
+            <div class="ans-explanation"><strong>解説:</strong> ${q.e}</div>
+            <div class="scoring-btns">
+                <button class="score-btn btn-correct" id="btn-c-${idx}" onclick="setScore(${idx}, true)">○ 正解</button>
+                <button class="score-btn btn-wrong" id="btn-w-${idx}" onclick="setScore(${idx}, false)">× 不正解</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+
+    if (window.MathJax) {
+        MathJax.typesetPromise();
+    }
+
+    window.scrollTo(0, 0);
+}
+
+const countdown = setInterval(() => {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+    if (timerDisplay) {
+        timerDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }
+    if (timeLeft <= 0) {
+        clearInterval(countdown);
+        alert('時間終了です！採点ページへ移ります。');
+        showAnswers();
+    }
+    timeLeft--;
+}, 1000);
+
+function setScore(idx, isCorrect) {
+    userScores[idx] = isCorrect;
+    
+    const btnCorrect = document.getElementById(`btn-c-${idx}`);
+    const btnWrong = document.getElementById(`btn-w-${idx}`);
+    
+    if (isCorrect) {
+        btnCorrect.classList.add('selected');
+        btnWrong.classList.remove('selected');
+    } else {
+        btnCorrect.classList.remove('selected');
+        btnWrong.classList.add('selected');
+    }
+    updateScore();
+}
+
+function updateScore() {
+    const correctCount = userScores.filter(s => s === true).length;
+    document.getElementById('correct-count').innerText = correctCount;
+    document.getElementById('score-val').innerText = Math.round((correctCount / selectedQuestions.length) * 100);
+}
+
+generateQuestions();
+</script>
+
+</body>
+</html>

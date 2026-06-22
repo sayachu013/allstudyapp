@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>数学_定期テスト完璧対策システム</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+<style>
+:root {
+--primary-color: #3498db;
+--secondary-color: #2ecc71;
+--accent-color: #e74c3c;
+--gold-color: #f1c40f;
+--bg-color: #f4f6f9;
+--text-color: #1e293b;
+--border-color: #e2e8f0;
+}
+body {
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", sans-serif;
+background-color: var(--bg-color);
+color: var(--text-color);
+margin: 0;
+padding: 15px;
+}
+.container { max-width: 500px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+h1 { text-align: center; font-size: 20px; color: #2c3e50; margin-top: 0; margin-bottom: 20px; }
+.hidden { display: none !important; }
+.form-group { margin-bottom: 15px; }
+label { display: block; margin-bottom: 5px; font-weight: bold; font-size: 14px; }
+select, input, button { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; box-sizing: border-box; }
+select:focus, input:focus { outline: none; border-color: var(--primary-color); }
+button { background-color: var(--primary-color); color: white; border: none; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+button:hover { background-color: #2980b9; }
+.menu-btn { background: white; color: var(--text-color); border: 1px solid var(--border-color); text-align: left; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; position: relative; overflow: hidden; }
+.menu-btn:hover { background: #f8fafc; border-color: #cbd5e1; }
+.menu-btn.completed { border-left: 5px solid var(--gold-color); }
+.badge { font-size: 12px; padding: 2px 8px; border-radius: 12px; background: #e2e8f0; color: #64748b; font-weight: bold; }
+.badge.gold { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
+.quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 14px; color: #64748b; }
+.question-box { font-size: 18px; line-height: 1.6; margin-bottom: 20px; padding: 15px; background: #f8fafc; border-radius: 8px; border-left: 4px solid var(--primary-color); min-height: 60px; }
+.choice-btn { background: white; color: var(--text-color); border: 1px solid var(--border-color); text-align: left; margin-bottom: 10px; font-size: 15px; transition: all 0.1s; }
+.choice-btn:hover { background: #f1f5f9; }
+.choice-btn.correct { background-color: #dcfce7 !important; border-color: #2ecc71 !important; color: #15803d !important; font-weight: bold; }
+.choice-btn.wrong { background-color: #fee2e2 !important; border-color: #e74c3c !important; color: #b91c1c !important; opacity: 0.7; }
+#hint-box { background: #fffbeb; border: 1px solid #fef08a; padding: 12px; border-radius: 8px; color: #a16207; font-size: 14px; margin-top: 10px; line-height: 1.5; }
+.result-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 100; }
+.result-anim { font-size: 80px; font-weight: bold; margin-bottom: 20px; animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.result-anim.maru { color: var(--secondary-color); }
+.result-anim.batsu { color: var(--accent-color); }
+@keyframes pop { 0% { transform: scale(0); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.loading { text-align: center; color: #64748b; padding: 20px; font-size: 14px; }
+.spinner { width: 30px; height: 30px; border: 3px solid #f3f3f3; border-top: 3px solid var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 10px; }
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+.header-info { display: flex; justify-content: space-between; align-items: center; background: #f1f5f9; padding: 8px 12px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; }
+.admin-link { text-align: right; margin-top: 15px; }
+.admin-link span { font-size: 12px; color: #94a3b8; cursor: pointer; text-decoration: underline; }
+.admin-student-card { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 10px; }
+.admin-student-name { font-weight: bold; font-size: 14px; color: #1e293b; margin-bottom: 8px; border-bottom: 1px dashed #cbd5e1; padding-bottom: 4px; }
+.admin-progress-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 4px; }
+.admin-progress-label { color: #475569; width: 65%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.admin-progress-bar-bg { width: 25%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; position: relative; }
+.admin-progress-bar-fill { height: 100%; background: var(--primary-color); width: 0; }
+.admin-progress-bar-fill.gold { background: var(--gold-color); }
+.admin-progress-text { width: 10%; text-align: right; font-weight: bold; color: #64748b; }
+.admin-progress-text.gold { color: #b45309; }
+</style>
+</head>
+<body>
+<div class="container">
+<div id="loading-screen" class="loading">
+<div class="spinner"></div>
+<div id="loading-text">システムを起動中...</div>
+</div>
+<div id="login-screen" class="hidden">
+<h1>定期テスト完璧対策システム</h1>
+<div class="form-group">
+<label for="student-select">あなたのお名前を選んでください</label>
+<select id="student-select">
+<option value="">-- 選択してください --</option>
+</select>
+</div>
+<button id="login-btn" style="margin-top:10px;">ログインする</button>
+<div class="admin-link">
+<span onclick="checkAdminPassword()">管理者用画面</span>
+</div>
+</div>
+<div id="menu-screen" class="hidden">
+<div class="header-info">
+<span id="user-display" style="font-weight:bold; color:#334155;"></span>
+<button onclick="backToLogin()" style="width:auto; padding:4px 10px; font-size:12px; background:#64748b;">ログアウト</button>
+</div>
+<h1 style="margin-bottom:15px; font-size:18px; text-align:left; border-left:4px solid var(--primary-color); padding-left:8px;">学習メニューを選択</h1>
+<div id="menu-container"></div>
+<div class="admin-link" style="margin-top:20px;">
+<span onclick="checkAdminPassword()">管理者用画面</span>
+</div>
+</div>
+<div id="quiz-screen" class="hidden">
+<div class="quiz-header">
+<span id="quiz-title" style="font-weight:bold; color:#1e293b;"></span>
+<span id="quiz-progress"></span>
+</div>
+<div id="question-text" class="question-box"></div>
+<div id="choices-container"></div>
+<button id="hint-btn" style="background:#f59e0b; margin-top:5px; margin-bottom:10px;">ヒントを見る</button>
+<div id="hint-box" class="hidden"></div>
+<button id="back-menu-btn" style="background:#94a3b8; margin-top:10px;">メニューに戻る</button>
+</div>
+<div id="admin-screen" class="hidden">
+<div class="header-info">
+<span style="font-weight:bold; color:#1e293b;">管理者ダッシュボード（リアルタイム進捗）</span>
+<button onclick="closeAdmin()" style="width:auto; padding:4px 10px; font-size:12px; background:#64748b;">戻る</button>
+</div>
+<div id="admin-content" style="max-height:500px; overflow-y:auto; padding-right:5px;"></div>
+</div>
+</div>
+<div id="result-overlay" class="result-overlay hidden">
+<div id="result-icon" class="result-anim"></div>
+<div id="result-msg" style="font-size:18px; font-weight:bold; color:#334155; text-align:center; padding:0 20px;"></div>
+</div>
+<script>
+const GAS_URL = "https://script.google.com/macros/s/AKfycbyR0j9D6vC6XfE1p6P1L1KqgW78p-P-N1sZ3Xq6Fsc3146j8gP6T0X9p278k3X9O40/exec";
+let students = [];
+let questions = [];
+let liveProgress = {};
+let currentStudentId = null;
+let currentStudentName = null;
+let currentStudentClass = null;
+let currentConfig = null;
+let currentQuizList = [];
+let currentQuizIndex = 0;
+const modeConfigs中2 = [
+{ category: "多項式の計算", difficulty: "基本", label: "多項式の計算（基本）" },
+{ category: "多項式の計算", difficulty: "標準", label: "多項式の計算（標準）" },
+{ category: "多項式の計算", difficulty: "発展", label: "多項式の計算（発展）" },
+{ category: "単項式の乗除", difficulty: "基本", label: "単項式の乗除（基本）" },
+{ category: "単項式の乗除", difficulty: "標準", label: "単項式の乗除（標準）" },
+{ category: "文字式の利用", difficulty: "基本", label: "文字式の利用（基本）" },
+{ category: "文字式の利用", difficulty: "標準", label: "文字式の利用（標準）" },
+{ category: "文字式の利用", difficulty: "発展", label: "文字式の利用（発展）" },
+{ category: "等式の変形", difficulty: "基本", label: "等式の変形（基本）" },
+{ category: "等式の変形", difficulty: "標準", label: "等式の変形（標準）" },
+{ category: "連立方程式の解き方", difficulty: "基本", label: "連立方程式の解き方（基本）" },
+{ category: "連立方程式の解き方", difficulty: "標準", label: "連立方程式の解き方（標準）" },
+{ category: "かっこ・複雑な計算", difficulty: "基本", label: "かっこ・複雑な計算（基本）" },
+{ category: "かっこ・複雑な計算", difficulty: "標準", label: "かっこ・複雑な計算（標準）" }
+];
+const modeConfigs中3 = [
+{ category: "式の計算の利用", difficulty: "基本", label: "式の計算の利用（基本）" },
+{ category: "式の計算の利用", difficulty: "標準", label: "式の計算の利用（標準）" },
+{ category: "式の計算の利用", difficulty: "発展", label: "式の計算の利用（発展）" },
+{ category: "平方根の基礎", difficulty: "基本", label: "平方根の基礎（基本）" },
+{ category: "平方根の基礎", difficulty: "標準", label: "平方根の基礎（標準）" },
+{ category: "平方根の基礎", difficulty: "発展", label: "平方根の基礎（発展）" },
+{ category: "根号を含む式の計算", difficulty: "基本", label: "根号を含む式の計算（基本）" },
+{ category: "根号を含む式の計算", difficulty: "標準", label: "根号を含む式の計算（標準）" },
+{ category: "根号を含む式の計算", difficulty: "発展", label: "根号を含む式の計算（発展）" }
+];
+let allModeConfigs = [];
+window.addEventListener("DOMContentLoaded", () => { loadSystemData(); });
+function showScreen(screenId) {
+["loading-screen", "login-screen", "menu-screen", "quiz-screen", "admin-screen"].forEach(id => {
+document.getElementById(id).classList.add("hidden");
+});
+document.getElementById(screenId).classList.remove("hidden");
+}
+function loadSystemData() {
+document.getElementById("loading-text").innerText = "最新のデータを読み込んでいます...";
+showScreen("loading-screen");
+fetch(`${GAS_URL}?action=getInitialData`)
+.then(res => res.json())
+.then(data => {
+students = data.students || [];
+questions = data.questions || [];
+liveProgress = data.liveProgress || {};
+buildLoginSelect();
+showScreen("login-screen");
+})
+.catch(err => {
+console.error(err);
+document.getElementById("loading-text").innerHTML = "<span style='color:red;'>データの読み込みに失敗しました。電波の良い場所でリロードしてください。</span>";
+});
+}
+function buildLoginSelect() {
+const select = document.getElementById("student-select");
+select.innerHTML = '<option value="">-- 選択してください --</option>';
+const classes = {};
+students.forEach(s => {
+if(!classes[s.className]) classes[s.className] = [];
+classes[s.className].push(s);
+});
+Object.keys(classes).sort().forEach(cName => {
+const optGroup = document.createElement("optgroup");
+optGroup.label = cName;
+classes[cName].forEach(s => {
+const opt = document.createElement("option");
+opt.value = s.id;
+opt.textContent = s.name;
+optGroup.appendChild(opt);
+});
+select.appendChild(optGroup);
+});
+document.getElementById("login-btn").onclick = () => {
+const val = select.value;
+if(!val) { alert("名前を選択してください。"); return; }
+const s = students.find(x => x.id === val);
+currentStudentId = s.id;
+currentStudentName = s.name;
+currentStudentClass = s.className;
+if(currentStudentClass.includes("中2") || currentStudentClass.includes("2年") || currentStudentClass.includes("中２")) { allModeConfigs = modeConfigs中2; } else { allModeConfigs = modeConfigs中3; }
+showMenuScreen();
+};
+}
+function backToLogin() { currentStudentId = null; currentStudentName = null; currentStudentClass = null; document.getElementById("student-select").value = ""; showScreen("login-screen"); }
+function showMenuScreen() {
+document.getElementById("user-display").innerText = `${currentStudentClass} : ${currentStudentName} さん`;
+renderMenu();
+showScreen("menu-screen");
+}
+function renderMenu() {
+const container = document.getElementById("menu-container");
+container.innerHTML = "";
+allModeConfigs.forEach(config => {
+const key = `${currentStudentId}__${config.category}__${config.difficulty}`;
+const score = liveProgress[key] || 0;
+const isGold = score >= 5;
+const btn = document.createElement("button");
+btn.className = `menu-btn ${isGold ? 'completed' : ''}`;
+const labelSpan = document.createElement("span");
+labelSpan.style.fontWeight = "bold";
+labelSpan.innerText = config.label;
+const badgeSpan = document.createElement("span");
+badgeSpan.className = `badge ${isGold ? 'gold' : ''}`;
+badgeSpan.innerText = isGold ? "👑 クリア！" : `${score} / 5問`;
+btn.appendChild(labelSpan);
+btn.appendChild(badgeSpan);
+btn.onclick = () => { startQuizMode(config); };
+container.appendChild(btn);
+});
+}
+function startQuizMode(config) {
+currentConfig = config;
+const filtered = questions.filter(q => q.category === config.category && q.difficulty === config.difficulty);
+if(filtered.length === 0) { alert("該当する問題がデータシート内に見つかりません。"); return; }
+currentQuizList = shuffleArray([...filtered]).slice(0, 5);
+currentQuizIndex = 0;
+document.getElementById("back-menu-btn").onclick = () => { if(confirm("メニューに戻りますか？（現在の進捗は保存されません）")) { showMenuScreen(); } };
+showQuizQuestion();
+showScreen("quiz-screen");
+}
+function showQuizQuestion() {
+if(currentQuizIndex >= currentQuizList.length) { finishQuizSet(); return; }
+const q = currentQuizList[currentQuizIndex];
+document.getElementById("quiz-title").innerText = `${currentConfig.label}`;
+document.getElementById("quiz-progress").innerText = `${currentQuizIndex + 1} / 5 問目`;
+const qBox = document.getElementById("question-text");
+qBox.innerHTML = q.question;
+const hintBtn = document.getElementById("hint-btn");
+const hintBox = document.getElementById("hint-box");
+hintBox.classList.add("hidden");
+hintBox.innerHTML = q.hint ? q.hint : "この問題にヒントはありません。";
+hintBtn.onclick = () => { hintBox.classList.toggle("hidden"); };
+const choicesContainer = document.getElementById("choices-container");
+choicesContainer.innerHTML = "";
+const rawChoices = [q.choice1, q.choice2, q.choice3, q.choice4].filter(c => c !== undefined && c !== null && c !== "");
+const uniqueChoices = [...new Set(rawChoices)];
+let choices = shuffleArray(uniqueChoices);
+if(!choices.includes(q.answer)) { choices.push(q.answer); choices = shuffleArray([...new Set(choices)]); }
+choices.forEach(choiceText => {
+const btn = document.createElement("button");
+btn.className = "choice-btn";
+btn.innerHTML = choiceText;
+btn.onclick = () => { checkAnswer(btn, choiceText, q.answer); };
+choicesContainer.appendChild(btn);
+});
+renderMathInElement(document.getElementById("quiz-screen"), {
+delimiters: [
+{left: '$$', right: '$$', display: true},
+{left: '$', right: '$', display: false},
+{left: '\\(', right: '\\)', display: false},
+{left: '\\[', right: '\\]', display: true}
+],
+throwOnError: false
+});
+}
+function checkAnswer(selectedBtn, chosen, correct) {
+const choicesContainer = document.getElementById("choices-container");
+const buttons = choicesContainer.getElementsByClassName("choice-btn");
+for(let btn of buttons) { btn.disabled = true; if(btn.innerHTML === correct) { btn.classList.add("correct"); } }
+const isCorrect = (chosen === correct);
+if(!isCorrect) { selectedBtn.classList.add("wrong"); }
+showResultOverlay(isCorrect, () => {
+if(isCorrect) { currentQuizIndex++; showQuizQuestion(); } else { saveProgressLog(false); }
+});
+}
+function showResultOverlay(isCorrect, callback) {
+const overlay = document.getElementById("result-overlay");
+const icon = document.getElementById("result-icon");
+const msg = document.getElementById("result-msg");
+if(isCorrect) {
+icon.className = "result-anim maru";
+icon.innerText = "〇";
+msg.innerText = "正解！その調子です！";
+} else {
+icon.className = "result-anim batsu";
+icon.innerText = "×";
+msg.innerText = "惜しい！もう一度メニューから挑戦しよう！";
+}
+overlay.classList.remove("hidden");
+setTimeout(() => { overlay.classList.add("hidden"); callback(); }, 1800);
+}
+function finishQuizSet() { saveProgressLog(true); }
+function saveProgressLog(isAllCorrect) {
+document.getElementById("loading-text").innerText = "解いた結果を進捗シートに送信しています...";
+showScreen("loading-screen");
+const lastQ = currentQuizList[currentQuizList.length - 1] || {};
+const pData = {
+studentId: currentStudentId,
+studentName: currentStudentName,
+className: currentStudentClass,
+questionId: lastQ.id || "Q_UNKNOWN",
+category: currentConfig.category,
+difficulty: currentConfig.difficulty,
+isCorrect: isAllCorrect ? "〇" : "×"
+};
+const queryParams = new URLSearchParams(pData).toString();
+fetch(`${GAS_URL}?action=saveLog&${queryParams}`, { method: "POST" })
+.then(res => res.json())
+.then(res => {
+if(res.status === "success") {
+const pKey = `${currentStudentId}__${currentConfig.category}__${currentConfig.difficulty}`;
+if(isAllCorrect) { liveProgress[pKey] = 5; alert("全問正解！クリア王冠を獲得しました！"); } else { liveProgress[pKey] = 0; alert("間違えてしまったため、このマスの進捗はリセットされました。再挑戦しましょう！"); }
+} else { alert("データ保存時にエラーが発生しました: " + res.message); }
+showMenuScreen();
+})
+.catch(err => { console.error(err); alert("通信エラーが発生しましたが、アプリ内の表示を更新します。"); showMenuScreen(); });
+}
+function checkAdminPassword() {
+const password = prompt("管理者の認証パスワードを入力してください：");
+if (password === "12345") {
+showScreen("loading-screen");
+document.getElementById("loading-text").innerText = "リアルタイム進捗データを集計中...";
+fetch(`${GAS_URL}?action=getInitialData`)
+.then(res => res.json())
+.then(data => {
+students = data.students || [];
+liveProgress = data.liveProgress || {};
+showScreen("admin-screen");
+renderAdminDashboard();
+})
+.catch(err => { alert("データの再取得に失敗しました。"); showMenuScreen(); });
+} else if (password !== null) { alert("パスワードが違います。"); }
+}
+function closeAdmin() { if(currentStudentId) { showMenuScreen(); } else { backToLogin(); } }
+function renderAdminDashboard() {
+const container = document.getElementById("admin-content");
+container.innerHTML = "<p style='font-size:12px; color:#64748b; margin-bottom:15px;'>※ スプレッドシートからリアルタイムに全生徒の正確なクリア状況を集計しています。</p>";
+students.forEach(s => {
+if(s) {
+const card = document.createElement("div");
+card.className = "admin-student-card";
+let cardHtml = `<div class="admin-student-name">${s.className || 'クラス不明'} : ${s.name || '名前不明'}</div>`;
+let targetConfigs = (s.className.includes("中2") || s.className.includes("2年") || s.className.includes("中２")) ? modeConfigs中2 : modeConfigs中3;
+targetConfigs.forEach(m => {
+const key = `${s.id}__${m.category}__${m.difficulty}`;
+const score = liveProgress[key] || 0;
+const percent = Math.min((score / 5) * 100, 100);
+const isGold = score >= 5;
+cardHtml += `
+<div class="admin-progress-row">
+<div class="admin-progress-label">${m.label}</div>
+<div class="admin-progress-bar-bg">
+<div class="admin-progress-bar-fill ${isGold ? 'gold' : ''}" style="width: ${percent}%;"></div>
+</div>
+<div class="admin-progress-text ${isGold ? 'gold' : ''}">${isGold ? '👑' : score + '/5'}</div>
+</div>`;
+});
+card.innerHTML = cardHtml;
+container.appendChild(card);
+}
+});
+}
+function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } return array; }
+</script>
+</body>
+</html>

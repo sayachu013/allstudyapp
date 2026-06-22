@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3年理科 1学期期末対策テスト（化学変化と電池・生物の成長と生殖）</title>
+    <style>
+        /* --- 画面表示用（通常スタイル） --- */
+        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f0f2f5; color: #333; }
+        .page { display: none; }
+        .active { display: block; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        h1 { color: #2c5282; text-align: center; border-bottom: 3px solid #2c5282; padding-bottom: 10px; margin-top: 10px; }
+        #timer-bar, #score-bar { position: sticky; top: 0; background: #c53030; color: white; padding: 10px; text-align: center; font-weight: bold; border-radius: 5px; z-index: 1000; font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        #score-bar { background: #2f855a; top: 50px; display: none; }
+        .question-item { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #cbd5e0; position: relative; }
+        .q-num { font-weight: bold; color: #2b6cb0; margin-right: 10px; }
+        .q-type { font-size: 0.8em; background: #edf2f7; padding: 2px 8px; border-radius: 4px; margin-left: 10px; color: #4a5568; }
+        .options-container { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .option-item { background: #fff; border: 1px solid #2b6cb0; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; color: #2b6cb0; }
+        .btn { display: block; width: 100%; padding: 15px; background: #2b6cb0; color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; text-align: center; margin-top: 20px; text-decoration: none; }
+        .btn:hover { background: #2c5282; }
+        .scoring-btns { margin-top: 10px; display: flex; gap: 10px; }
+        .score-btn { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-correct { background: #e6fffa; color: #234e52; border: 1px solid #38b2ac; }
+        .btn-correct.selected { background: #38b2ac; color: white; }
+        .btn-wrong { background: #fff5f5; color: #742a2a; border: 1px solid #f56565; }
+        .btn-wrong.selected { background: #f56565; color: white; }
+        .ans-item { margin-bottom: 20px; padding: 15px; background: #f7fafc; border-left: 4px solid #2f855a; }
+        .ans-q-text { font-size: 0.95em; color: #4a5568; margin: 10px 0; border-bottom: 1px solid #e2e880; padding-bottom: 10px; }
+        .ans-correct { font-weight: bold; color: #2f855a; font-size: 1.1em; }
+        .ans-explanation { font-size: 0.9em; color: #4a5568; margin-top: 5px; background: #fff; padding: 10px; border-radius: 4px; }
+        .category-header { background: #4a5568; color: white; padding: 8px 15px; margin: 30px 0 15px 0; border-radius: 5px; font-size: 1em; }
+        
+        .print-ans-space, .print-score-table, .print-header-meta { display: none; }
+
+        /* --- 印刷用スタイル（Ctrl+Pで自動適用） --- */
+        @media print {
+            @page {
+                size: A4;
+                margin: 12mm 12mm 12mm 12mm;
+            }
+            body { background-color: #fff; color: #000; padding: 0; font-size: 10pt; max-width: 100%; }
+            .card { box-shadow: none; padding: 0; margin: 0; }
+            h1 { font-size: 16pt; color: #000; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 5px; }
+            
+            #timer-bar, #score-bar, .btn, .scoring-btns, .q-type, .card > p { display: none !important; }
+            
+            .print-header-meta { display: flex; justify-content: flex-end; gap: 20px; font-size: 10.5pt; margin-bottom: 15px; border-bottom: 1px solid #000; padding-bottom: 5px; }
+            .print-score-table { display: table; border-collapse: collapse; float: left; margin-right: 20px; }
+            .print-score-table td { border: 1px solid #000; padding: 4px 12px; text-align: center; font-size: 9.5pt; }
+            
+            .category-header { background: none !important; color: #000 !important; font-weight: bold; font-size: 11pt; border: 1px solid #000; padding: 3px 8px; margin: 15px 0 10px 0; border-radius: 0; page-break-after: avoid; }
+            
+            #questions-container-1, #questions-container-2, #questions-container-3 {
+                column-count: 2;
+                column-gap: 25px;
+                column-fill: auto;
+            }
+            
+            .question-item { page-break-inside: avoid; break-inside: avoid; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dotted #ccc; }
+            .q-num { color: #000; }
+            
+            .options-container { display: block; margin-top: 3px; }
+            .option-item { border: none; padding: 0; margin-right: 12px; display: inline-block; color: #000; font-size: 9.5pt; }
+            
+            .print-ans-space { display: block; margin-top: 5px; font-size: 9.5pt; color: #000; }
+            .ans-line { display: inline-block; width: 75%; border-bottom: 1px solid #000; margin-left: 5px; height: 16px; vertical-align: bottom; }
+            .ans-box { border: 1px solid #000; min-height: 40px; margin-top: 4px; width: 95%; }
+            
+            #questions-container-4, #questions-container-5 { column-count: 1 !important; }
+            
+            .ans-item { background: #fff; border: none; border-bottom: 1px dashed #000; padding: 8px 0; page-break-inside: avoid; }
+            .ans-q-text { color: #000; border-bottom: none; padding-bottom: 0; }
+            .ans-correct { color: #000; font-weight: bold; }
+            .ans-explanation { background: none; padding: 0; margin-top: 4px; font-size: 9pt; }
+        }
+    </style>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            chtml: { matchFontHeight: false }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+
+<div id="test-page" class="page active">
+    <div id="timer-bar">残り時間: <span id="timer">40:00</span></div>
+    
+    <div class="print-header-meta">
+        <table class="print-score-table">
+            <tr><td>得点</td><td style="width:60px; height:20px;">/100</td></tr>
+        </table>
+        <div>3年 &nbsp; &nbsp; 組 &nbsp; &nbsp; 番 &nbsp; 氏名：____________________</div>
+    </div>
+
+    <h1>3年理科 1学期期末対策テスト（化学変化と電池・生物の成長と生殖）</h1>
+    <div class="card">
+        <p>※ノートに解答を記入し、最後に「採点ページへ」を押して確認してください。</p>
+        <div id="test-container">
+            <div class="category-header">第1ブロック：記号選択（10問）</div>
+            <div id="questions-container-1"></div>
+            <div class="category-header">第2ブロック：頻出イオン式・化学式（10問）</div>
+            <div id="questions-container-2"></div>
+            <div class="category-header">第3ブロック：一問一答（20問）</div>
+            <div id="questions-container-3"></div>
+            <div class="category-header">第4ブロック：記述問題（10問）</div>
+            <div id="questions-container-4"></div>
+            <div class="category-header">第5ブロック：発展・応用（10問）</div>
+            <div id="questions-container-5"></div>
+        </div>
+        <button class="btn" onclick="showAnswers()">テストを終了して採点ページへ</button>
+    </div>
+</div>
+
+<div id="answer-page" class="page">
+    <div id="score-bar">正答率: <span id="score-val">0</span>% (<span id="correct-count">0</span>/60問)</div>
+    <h1>解答・解説一覧</h1>
+    <div class="card" id="answers-container"></div>
+    <button class="btn" onclick="location.reload()">テストTOPに戻る</button>
+</div>
+
+<script>
+const questions = [
+    // 第1ブロック：記号選択 (1-10)
+    { id: 1, type: "記号選択", cat: 1, q: "うすい塩酸に2種類の異なる金属板を入れて電池をつくるとき、最も大きい電圧が得られる組み合わせを次から選びなさい。", options: ["銅板 と 亜鉛板", "銅板 と マグネシウムリボン", "亜鉛板 と マグネシウムリボン", "銅板 と 銅板"], a: "イ", ans_literal: "銅板 と マグネシウムリボン", e: "実験結果より、銅とマグネシウムの組み合わせの電圧は1.55Vであり、最も大きくなります。イオンへのなりやすさの差が大きい組み合わせほど大きな電圧が得られます。" },
+    { id: 2, type: "記号選択", cat: 1, q: "タネギの根の先端の細胞分裂を観察する実験において、3%塩酸に根の先端をしばらくひたす理由として最も適切なものを選びなさい。", options: ["細胞を成長させて大きくするため", "細胞を赤く染めて見やすくするため", "ひとつひとつの細胞をはなれやすくするため", "染色体を複製させるため"], a: "ウ", ans_literal: "ひとつひとつの細胞をはなれやすくするため", e: "塩酸処理を行うことで、ひとつひとつの細胞がはなれやすくなって顕微鏡での観察がしやすくなります。" },
+    { id: 3, type: "記号選択", cat: 1, q: "電流が流れている電池において、一の電気をもった電子の移動する向きとして正しいものを選びなさい。", options: ["電源の＋極から一極へ移動する", "電源の一極から＋極へ移動する", "水溶液の中からセロハン膜を通過して移動する", "電流の流れる向きと全く同じ向きに移動する"], a: "イ", ans_literal: "電源の一極から＋極へ移動する", e: "電流が流れているとき、実際は、一の電気をもった電子が、電源の一極（負極）から＋極（正極）へ移動しています。電子の移動の向きは、電流の流れる向きと反対です。" },
+    { id: 4, type: "記号選択", cat: 1, q: "サツマイモやオランダイチゴのように、からだの一部から新しい個体をつくる無性生殖の方法を何というか。", options: ["分裂", "出芽", "栄養生殖", "有性生殖"], a: "ウ", ans_literal: "栄養生殖", e: "植物において、からだの一部から新しい個体をつくる無性生殖を栄養生殖と呼びます。" },
+    { id: 5, type: "記号選択", cat: 1, q: "次の水溶液のうち、どの金属の組み合わせを用いても電流をとり出すことができない非電解質の水溶液を選びなさい。", options: ["うすい塩酸", "硫酸銅水溶液", "硫酸亜鉛水溶液", "砂糖水"], a: "エ", ans_literal: "砂糖水", e: "砂糖水は非電解質の水溶液であるため、どの金属の組み合わせでも電流はとり出せません。電解質の水溶液を使う必要があります。" },
+    { id: 6, type: "記号選択", cat: 1, q: "細胞分裂が始まるときに、核の中に現れるひものような構造を何というか。", options: ["細胞質", "染色体", "遺伝子", "胚"], a: "イ", ans_literal: "染色体", e: "細胞分裂が始まると核の中に見られるひものようなものを染色体と呼び、これには遺伝子が存在します。" },
+    { id: 7, type: "記号選択", cat: 1, q: "ダニエル電池において、2種類の電解質水溶液がすぐに混ざり合わないように区切るために用いられる膜を選びなさい。", options: ["プラスチック膜", "セロハン膜", "ろ紙膜", "金属膜"], a: "イ", ans_literal: "セロハン膜", e: "ダニエル電池では、2種類の電解質の水溶液がすぐに混ざらないようにセロハン膜で区切ります。" },
+    { id: 8, type: "記号選択", cat: 1, q: "植物の細胞分裂において、動物の細胞分裂の過程とは異なる特徴的な点を次から選びなさい。", options: ["染色体が複製されて2本ずつになる点", "細胞の中央付近に染色体が並ぶ点", "細胞の中央にしきりができて2つに分かれる点", "細胞のまわりからくびれができて分かれる点"], a: "ウ", ans_literal: "細胞の中央にしきりができて2つに分かれる点", e: "動物の細胞ではくびれができて分裂するのに対し、植物の細胞ではしきりができて2個に分裂するのが異なる点です。" },
+    { id: 9, type: "記号選択", cat: 1, q: "次の電池のうち、外部から逆向きの電流を流すことで、低下した電圧が回復し、くり返し使うことができる「二次電池」に該当するものを選びなさい。", options: ["マンガン乾電池", "アルカリ乾電池", "リチウムイオン電池", "燃料電池"], a: "ウ", ans_literal: "リチウムイオン電池", e: "外部から逆向きの電流を流すと低下した電圧が回復し、くり返し使うことができる電池を二次電池（蓄電池）といい、リチウムイオン電池などがこれにあたります。" },
+    { id: 10, type: "記号選択", cat: 1, q: "被子植物の有性生殖において、受精卵が細胞分裂をくり返してできた、将来植物のからだになるつくりを備えている部分の名称を選びなさい。", options: ["胚珠", "胚", "種子", "子房"], a: "イ", ans_literal: "胚", e: "受精卵が細胞分裂をくり返して胚になり、胚は将来植物のからだになるつくりを備えています。" },
+
+    // 第2ブロック：頻出イオン式・化学式 (11-20)
+    { id: 11, type: "短答式", cat: 2, q: "銅原子が電子を2個失ってできる「銅イオン」のイオン式を書きなさい。", a: "Cu^{2+}", e: "銅イオンは2価の陽イオンなので $Cu^{2+}$ と書き表します。" },
+    { id: 12, type: "短答式", cat: 2, q: "亜鉛原子が電子を2個失ってできる「亜鉛イオン」のイオン式を書きなさい。", a: "Zn^{2+}", e: "亜鉛が電子を放出して陽イオンになったものは 亜鉛イオン（$Zn^{2+}$）です。" },
+    { id: 13, type: "短答式", cat: 2, q: "ダニエル電池の一極（負極）で起こっている、亜鉛原子が電子を放出する化学変化を、電子を $e^-$ として式で表しなさい。", a: "Zn \\rightarrow Zn^{2+} + 2e^-", e: "ダニエル電池の一極では、亜鉛原子が電子を放出して亜鉛イオンになります（$Zn \\rightarrow Zn^{2+} + 2e^-$）。" },
+    { id: 14, type: "短答式", cat: 2, q: "ダニエル電池の＋極（正極）で起こっている、銅イオンが電子を受け取る化学変化を、電子を $e^-$ として式で表しなさい。", a: "Cu^{2+} + 2e^- \\rightarrow Cu", e: "＋極では、硫酸銅水溶液中の銅イオンが電子を受けとって銅になります（$Cu^{2+} + 2e^- \\rightarrow Cu$）。" },
+    { id: 15, type: "短答式", cat: 2, q: "硫酸（$H_2SO_4$）が電離したときに生じる「硫酸イオン」のイオン式を書きなさい。", a: "SO_4^{2-}", e: "硫酸の電離の式から、硫酸イオンは ${SO_4}^{2-}$ であることがわかります。" },
+    { id: 16, type: "短答式", cat: 2, q: "水酸化ナトリウム（$NaOH$）などが電離したときに生じる、アルカリ性の性質を示す原因となる「水酸化物イオン」のイオン式を書きなさい。", a: "OH^-", e: "アルカリ性の性質を示す原因となるイオンは水酸化物イオンで、化学式は $OH^-$ です。" },
+    { id: 17, type: "短答式", cat: 2, q: "塩化銅（$CuCl_2$）が電離して陽イオンと陰イオンに分かれる変化を、電離の式で表しなさい。", a: "CuCl_2 \\rightarrow Cu^{2+} + 2Cl^-", e: "塩化銅の電離を表す式は $CuCl_2 \\rightarrow Cu^{2+} + 2Cl^-$ となります。" },
+    { id: 18, type: "短答式", cat: 2, q: "燃料電池において、電気エネルギーを取り出すときに起こる化学変化全体の化学反応式を書きなさい。", a: "2H_2 + O_2 \\rightarrow 2H_2O", e: "燃料電池 of 反応（水素 ＋ 酸素 &rightarrow; 水）の化学反応式は $2H_2 + O_2 &rightarrow; 2H_2O$ です。" },
+    { id: 19, type: "短答式", cat: 2, q: "被子植物の有性生殖において、花粉管の中にある、植物の雄の生殖細胞の名称を答えなさい。", a: "精細胞", e: "被子植物の生殖細胞のうち、雄のものは精細胞と呼ばれます。" },
+    { id: 20, type: "短答式", cat: 2, q: "被子植物の胚珠の中にあり、精細胞と受精する、植物の雌の生殖細胞の名称を答えなさい。", a: "卵細胞", e: "被子植物の生殖細胞のうち、雌のものは卵細胞と呼ばれます。" },
+
+    // 第3ブロック：一問一答 (21-40)
+    { id: 21, type: "一問一答", cat: 3, q: "化学変化を利用して、物質のもつ化学エネルギーを電気エネルギーに変える装置を何というか。", a: "電池", e: "重解（電解質）の水溶液と2種類の異なる金属板を使って電気をとり出す装置を電池といいます。" },
+    { id: 22, type: "一問一答", cat: 3, q: "2種類の金属板で電池をつくったとき、どちらが＋極になりどちらが一極になるかは、金属のどのようなちがいによって決まるか。", a: "陽イオンへのなりやすさのちがい", e: "金属によって陽イオンへのなりやすさには差があり、これによってどちらの極になるかが決まります。" },
+    { id: 23, type: "一問一答", cat: 3, q: "マグネシウム（$Mg$）、亜鉛（$Zn$）、銅（$Cu$）の3つの金属を、陽イオンに「なりやすい順」に不等号を用いて並べなさい。", a: "マグネシウム ＞ 亜鉛 ＞ 銅", e: "実験結果より、マグネシウム ＞ 亜鉛 ＞ 銅 の順番にイオンになりやすいことがわかっています。" },
+    { id: 24, type: "一問一答", cat: 3, q: "2種類の金属板を用いて電池をつくるとき、一極（負極）になるのは、イオンになりやすい方となりにくい方のどちらの金属か。", a: "イオンになりやすい方の金属", e: "電池では、陽イオンになりやすい金属が一極（負極）になります。" },
+    { id: 25, type: "一問一答", cat: 3, q: "1個の細胞が2つに分かれて2個の細胞になることを何というか。", a: "細胞分裂", e: "細胞が2つに分かれて数を増やす現象を細胞分裂といいます。" },
+    { id: 26, type: "一問一答", cat: 3, q: "新しくできる細胞の核に含まれる染色体の数は、細胞分裂前と比べてどうなっているか。", a: "全く同じ数", e: "新しくできる細胞の核には、細胞分裂前と全く同じ数、同じ内容の染色体がおさめられます。" },
+    { id: 27, type: "一問一答", cat: 3, q: "植物の根の先端近くにある、細胞分裂がさかんに行われている部分を何というか。", a: "成長点", e: "根の先端近くの細胞分裂が行われるところを成長点といいます。" },
+    { id: 28, type: "一問一答", cat: 3, q: "タネギの根の細胞分裂の観察で、核や染色体をはっきりと染めるために一般的に用いられる染色液の名称を1つ答えなさい。", a: "酢酸カーミン溶液（または酢酸オルセイン溶液、酢酸ダーリアバイオレット）", e: "体細胞分裂の観察では、酢酸カーミンや酢酸オルセインなどの染色液を使用します。" },
+    { id: 30, type: "一問一答", cat: 3, q: "アメーバやミカヅキモのように、受精を行わずに新しい個体（子）をつくる生殖を何というか。", a: "無性生殖", e: "受精を行わずに新しい個体をつくる生殖を無性生殖といいます。" },
+    { id: 31, type: "一問一答", cat: 3, q: "無性生殖によって生まれた子のもつ形質や性質は、親と比べてどうなっているか。", a: "親と全く同じ（または、自分と同じ種類の新しい個体になる）", e: "無性生殖は受精を行わないため、親と全く同じ遺伝子を持ち、自分と同じ種類の個体が生まれます。" },
+    { id: 32, type: "一問一答", cat: 3, q: "生殖細胞の受精によって新しい個体（子）をつくる生殖の方法を何というか。", a: "有性生殖", e: "受精によって新しい個体をつくる生殖を有性生殖といいます。" },
+    { id: 33, type: "一問一答", cat: 3, q: "2種類の生殖細胞が結合し、それぞれの核が合体して1個の細胞になることを何というか。", a: "受精", e: "生殖細胞が結合し、それぞれの核が合体することを受精といいます。" },
+    { id: 34, type: "一問一答", cat: 3, q: "受精によってつくられる、新しい1個の細胞を何というか。", a: "受精卵", e: "受精によってつくられる新しい細胞を受精卵と呼びます。" },
+    { id: 35, type: "一問一答", cat: 3, q: "動物において、受精卵が細胞分裂を始めてから、自分で食物をとることのできる個体になる前までの状態を何というか。", a: "胚", e: "自分で食物をとることのできる個体になる前までを「胚」と呼びます。" },
+    { id: 36, type: "一問一答", cat: 3, q: "受精卵が胚になり、個体としてのからだのつくりが完成していく過程を何というか。", a: "発生", e: "受精卵が細胞分裂をくり返し、個体としてのからだのつくりが完成していく過程を発生といいます。" },
+    { id: 37, type: "一問一答", cat: 3, q: "被子植物で、めしべの柱頭に花粉がつくことを何というか。", a: "受粉", e: "被子植物において、めしべの柱頭に花粉がつくことを受粉といいます。" },
+    { id: 38, type: "一問一答", cat: 3, q: "受粉が起こったあと、花粉から胚珠へとのびていくくだを何というか。", a: "花粉管", e: "受粉後に花粉からのびていくくだを花粉管といいます。" },
+    { id: 39, type: "一問一答", cat: 3, q: "同じ元素（陽子の数が同じ）でも、中性子の数が異なる原子どうしを何というか。", a: "同位体", e: "同じ元素で、中性子の数が異なる原子を同位体といいます。" },
+    { id: 40, type: "一問一答", cat: 3, q: "マンガン乾電池のように、使うと電圧が低下し、もともとにもどらない使い切りの電池を何というか。", a: "一次電池", e: "使うと電圧が低下し、もとにもどらない電池を一次電池といいます。" },
+
+    // 第4ブロック：記述問題 (41-50)
+    { id: 41, type: "記述", cat: 4, q: "うすい塩酸に亜鉛板と銅板を入れた電池では、使い続けるとすぐに電圧が低下してしまいます。この原因として、＋極の表面で何が発生し、どのような不都合が起こるか説明しなさい。", a: "＋極の表面で水素が発生し、その水素によって水溶液中の水素イオンが電子を受けとりにくくなってしまうため。", e: "電極表面に発生した水素が原因で、水素イオンの電子受け取りが阻害され、電圧が低下します。" },
+    { id: 42, type: "記述", cat: 4, q: "ダニエル電池が、うすい塩酸に亜鉛と銅を入れた電池（図4の電池）よりもすぐれている点を、気体の発生と電圧の観点から2つ説明しなさい。", a: "電極で気体（水素）が発生しない点と、長い時間電圧が一定で安定している点。", e: "気体が発生しないため、長期間にわたり安定した電流を得ることができます。" },
+    { id: 43, type: "記述", cat: 4, q: "ダニエル電池から、より長時間電流をとり出すために、あらかじめ2つの水溶液（硫酸亜鉛水溶液と硫酸銅水溶液）の濃度をどのように調整すればよいか、理由をあわせて説明しなさい。", a: "硫酸亜鉛水溶液の濃度を小さくし、硫酸銅水溶液の濃度を大きくする。理由は、一極側で亜鉛イオンの数を少なくして溶けやすくし、＋極側で電子を受けとる銅イオンの量を多くするため。", e: "一極側の濃度を小さく、＋極側の濃度を大きくすることで、効率よく電子の受け渡しが行われ長時間稼働します。" },
+    { id: 44, type: "記述", cat: 4, q: "2種類の異なる金属板で電池をつくったとき、どちらが＋極でどちらが一極（負極）になるか、金属の「イオンへのなりやすさ」という言葉を使って説明しなさい。", a: "陽イオンになりやすい方の金属が一極になり、イオンになりにくい方の金属が＋極になる。", e: "イオンになりやすい金属が一極として溶け出し、なりにくい金属が＋極となります。" },
+    { id: 45, type: "記述", cat: 4, q: "タネギの根の細胞分裂を観察する実験で、調べる水溶液や電極などの器具を水道水で洗ったあと、さらに「精製水（純水）」で洗い流す必要があるのはなぜか、理由を説明しなさい。", a: "電極などを水道水で洗ったままだと、水道水に含まれるわずかな電解質（塩素など）やほかの水溶液が混じり合ってしまい、正確な結果が得られないため。", e: "水道水に含まれる不純物（電解質）や前実験の残留物が次の実験に影響するのを防ぐためです。" },
+    { id: 46, type: "記述", cat: 4, q: "ヘリウム原子は、全体として電気を帯びていません。この理由を「陽子と電子の数」および「電気の量」という言葉を用いて説明しなさい。", a: "ヘリウム原子の陽子の数と電子の数が等しく、陽子1個がもつ+の電気の量と電子1個がもつ一の電気の量が等しいため。", e: "陽子のプラスの電気量と電子のマイナスの電気量が完全に等しく相殺されるためです。" },
+    { id: 47, type: "記述", cat: 4, q: "酸性の性質を示す水溶液に電圧を加えたとき、酸性の原因となる水素イオン（$H^+$）が陰極側に引き寄せられて移動する理由を説明しなさい。", a: "酸性の性質を示す原因となる水素イオンは陽（+）の電気をもっており、異なる種類の電気どうしは引き合うため、負（ー）の電気をもつ陰極に引き寄せられるから。", e: "水素イオンはプラスの電荷を持つため、マイナスの陰極へと移動します。" },
+    { id: 48, type: "記述", cat: 4, q: "「中和」とはどのような化学変化か、「水素イオン」と「水酸化物イオン」という言葉を使って説明しなさい。", a: "水素イオンと水酸化物イオンが結びついて水をつくり、酸とアルカリのたがいの性質を打ち消し合う化学変化。", e: "水素イオン（$H^+$）と水酸化物イオン（$OH^-$）が結合して水（$H_2O$）になり、互いの性質を失わせる反応です。" },
+    { id: 49, type: "記述", cat: 4, q: "多細胞生物が「成長する」仕組みについて、細胞の「数」と「大きさ」がどのように変化するか説明しなさい。", a: "細胞分裂が行われて細胞の数がふえ、その後、ひとつひとつの細胞が大きくなることで成長する。", e: "生物の体は、細胞の数の増加と、その細胞が肥大化することの相乗効果で大きくなります。" },
+    { id: 50, type: "記述", cat: 4, q: "被子植物が受精を行うために、「花粉管」がのびることにはどのような役割（目的）があるか説明しなさい。", a: "柱頭についた花粉の中の精細胞を、胚珠の中の卵細胞まで送り届ける役割。", e: "動くことのできない精細胞を卵細胞まで安全に運搬するために花粉管がのびます。" },
+
+    // 第5ブロック：発展・応用 (51-60)
+    { id: 51, type: "一問一答", cat: 5, q: "【実験の考察】硫酸銅水溶液にマグネシウム片を入れると、マグネシウムの表面に赤色の物質（銅）が付着し、水溶液の青色がうすくなりました。このとき水溶液中の「銅イオン」に起こった変化を、「電子」という言葉を使って説明しなさい。", a: "水溶液中の銅イオン（$Cu^{2+}$）が、マグネシウムが放出した電子を受けとって銅の原子（$Cu$）に変化した。", e: "マグネシウムが溶ける際に排出した電子を、銅イオンが受け取って金属の銅になります。" },
+    { id: 52, type: "一問一答", cat: 5, q: "【金属の比較】硝酸銀水溶液に銅線を入れると銅線に銀が付着し、銅が水溶液中にとけ出しました。この結果から、銅（$Cu$）と銀（$Ag$）では、どちらの方が「陽イオンなりやすい」といえますか。", a: "銅 （Cu）", e: "銅の方が銀よりもイオンになりやすいため、銅が溶け出して銀が析出します。" },
+    { id: 53, type: "一問一答", cat: 5, q: "【中和の計算】うすい硫酸に水酸化バリウム水溶液を混ぜ合わせると、白い沈殿（硫酸バリウム）ができます。この2つの水溶液が過不足なく完全に中和したとき、水溶液に電流は流れるか、それともほとんど流れなくなるか答えなさい。", a: "ほとんど流れなくなる", e: "すべてのイオンが反応して水と不溶性の塩（硫酸バリウム）になり、水溶液中のイオンがなくなるため電流が流れなくなります。" },
+    { id: 54, type: "一問一答", cat: 5, q: "【グラフの読解】酸性の畑の土に、消石灰（水酸化カルシウム）を少しずつ加えながら、土の中のあるイオンの数を調べたところ、中和の進行にともなって数が減り、やがてほぼゼロになるグラフが得られました。このイオンの名称を答えなさい。", a: "水素イオン", e: "消石灰の水酸化物イオンと、もともと土中にあった水素イオンが中和して水になるため、水素イオンの数が減っていきます。" },
+    { id: 55, type: "一問一答", cat: 5, q: "【環境土壌の性質】最適な土壌のpHは、ジャガイモが 5.5〜6.0（弱酸性）、ホウレンソウが 6.5〜7.0 です。ある酸性の土に炭酸カルシウムを混ぜて調整したところ、ジャガイモはうまく育ちましたが、ホウレンソウは育ちませんでした。調整した土のpHはどの程度であったと考えられますか。", a: "5.5〜6.0 の間（またはホウレンソウによく育つpHより小さかった）", e: "ジャガイモがよく育つ 5.5〜6.0 に土壌が調整されていたため、ホウレンソウにとってはpHが足りなかったと考えられます。" },
+    { id: 56, type: "一問一答", cat: 5, q: "【細胞分裂の順序】タネギの根の細胞分裂を観察した際に見られた次のア〜エの段階を、正しい分裂の順序に並び替えなさい。<br>ア：染色体が細胞の中央付近に集まり、並ぶ。<br>イ：染色体が2つに分かれ、細胞の両端に移動する。<br>ウ：核の中に、ひものような染色体が見え始める。<br>エ：染色体を包む膜が生じて2個の核が形成され、細胞質が分かれる。", a: "ウ &rightarrow; ア &rightarrow; イ &rightarrow; エ", e: "細胞分裂の過程は、染色体の出現（ウ） &rightarrow; 中央へ整列（ア） &rightarrow; 両端へ移動（イ） &rightarrow; 核膜の形成と細胞質の分裂（エ）の順です。" },
+    { id: 57, type: "一問一答", cat: 5, q: "【生殖の応用】栄養生殖（無性生殖）によって増やされたジャガイモやバナナの個体群は、すべて親と「全く同じ遺伝子」を持っています。このような個体群において、致命的な伝染病や急激な気候変化が起きたときに想定される最大の弱点（リスク）を説明しなさい。", a: "すべての個体が全く同じ遺伝子をもつクローンであるため、ある特定の病気や環境変化に対してすべての個体が同時に全滅してしまうリスクがある。", e: "無性生殖では多様性が生まれないため、一つの病気や環境変化で一網打尽になり全滅する危険性があります。" },
+    { id: 58, type: "一問一答", cat: 5, q: "【電池の質量変化】うすい塩酸に亜鉛板と銅板を入れた電池でしばらくモーターを回転させたあと、それぞれの金属板を取り出して質量をはかりました。実験前と比べて「亜鉛板」の質量はどう変化しているか答えなさい。", a: "軽くなっている（または減少している）", e: "一極である亜鉛板の亜鉛原子が電子を失って亜鉛イオンになり、水溶液中へと溶け出すため、亜鉛板は軽くなります。" },
+    { id: 59, type: "一問一答", cat: 5, q: "【観察の条件】花粉管ののびるようすを顕微鏡で調べる実験において、スライドガラスの上にただの水ではなく「寒天溶液」をたらして固め、その上で花粉を発芽させるのはなぜか、理由を説明しなさい。", a: "めしべの柱頭の細胞と似た、水分と糖分をふくむ状態をつくり出すため。", e: "寒天を用いるのは、めしべの柱頭と似た水分・糖分を含んだ環境を再現して、花粉管をのばしやすくするためです。" },
+    { id: 60, type: "一問一答", cat: 5, q: "【電池の濃度変化】ダニエル電池に電流を流し続けたとき、時間が経つにつれて電解質水溶液の濃度が「だんだん濃くなっていく」のは、硫酸亜鉛水溶液と硫酸銅水溶液のどちらか答えなさい。", a: "硫酸亜鉛水溶液", e: "一極（亜鉛板）側では、亜鉛原子が次々と亜鉛イオンになって硫酸亜鉛水溶液中に溶け出してくるため、濃度が濃くなっていきます。" }
+];
+
+let timeLeft = 40 * 60;
+const timerDisplay = document.getElementById('timer');
+const userScores = new Array(questions.length).fill(null);
+
+function generateQuestions() {
+    questions.forEach(q => {
+        const container = document.getElementById(`questions-container-${q.cat}`);
+        const div = document.createElement('div');
+        div.className = 'question-item';
+        
+        let content = `<span class="q-num">問${q.id}</span> <span class="q-type">${q.type}</span><br>${q.q}`;
+        
+        if (q.type === "記号選択" && q.options) {
+            content += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                content += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            content += `</div>`;
+            
+            content += `<div class="print-ans-space">答：[ &nbsp; &nbsp; ]</div>`;
+        } else {
+            if (q.type === "記述" || q.id === 57) {
+                content += `<div class="print-ans-space">答：<div class="ans-box"></div></div>`;
+            } else {
+                content += `<div class="print-ans-space">答：<span class="ans-line"></span></div>`;
+            }
+        }
+        
+        div.innerHTML = content;
+        container.appendChild(div);
+    });
+
+    if (window.MathJax) {
+        MathJax.typesetPromise();
+    }
+}
+
+function showAnswers() {
+    clearInterval(countdown);
+    document.getElementById('test-page').classList.remove('active');
+    document.getElementById('answer-page').classList.add('active');
+    document.getElementById('score-bar').style.display = 'block';
+    
+    const container = document.getElementById('answers-container');
+    questions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'ans-item';
+        div.id = `ans-item-${idx}`;
+        
+        let qContent = `<div class="ans-q-text"><span class="q-num">問${q.id}</span> [${q.type}] ${q.q}`;
+        if (q.type === "記号選択" && q.options) {
+            qContent += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                qContent += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            qContent += `</div>`;
+        }
+        qContent += `</div>`;
+
+        let targetAnswer = q.a;
+        if (q.type === "記号選択" && q.ans_literal) {
+            targetAnswer = `${q.a} （${q.ans_literal}）`;
+        }
+
+        if (q.type === "短答式" && (targetAnswer.includes('^') || targetAnswer.includes('_') || targetAnswer.includes('\\rightarrow'))) {
+            targetAnswer = `$${targetAnswer}$`;
+        }
+
+        div.innerHTML = `
+            ${qContent}
+            <div><span class="ans-correct">正解：${targetAnswer}</span></div>
+            <div class="ans-explanation"><strong>解説:</strong> ${q.e}</div>
+            <div class="scoring-btns">
+                <button class="score-btn btn-correct" id="btn-c-${idx}" onclick="setScore(${idx}, true)">○ 正解</button>
+                <button class="score-btn btn-wrong" id="btn-w-${idx}" onclick="setScore(${idx}, false)">× 不正解</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+
+    if (window.MathJax) {
+        MathJax.typesetPromise();
+    }
+
+    window.scrollTo(0, 0);
+}
+
+const countdown = setInterval(() => {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+    timerDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    if (timeLeft <= 0) {
+        clearInterval(countdown);
+        alert('時間終了です！採点ページへ移ります。');
+        showAnswers();
+    }
+    timeLeft--;
+}, 1000);
+
+function setScore(idx, isCorrect) {
+    userScores[idx] = isCorrect;
+    document.getElementById(`btn-c-${idx}`).classList.toggle('selected', isCorrect);
+    document.getElementById(`btn-w-${idx}`).classList.toggle('selected', !isCorrect);
+    updateScore();
+}
+
+function updateScore() {
+    const correctCount = userScores.filter(s => s === true).length;
+    document.getElementById('correct-count').innerText = correctCount;
+    document.getElementById('score-val').innerText = Math.round((correctCount / questions.length) * 100);
+}
+
+generateQuestions();
+</script>
+
+</body>
+</html>

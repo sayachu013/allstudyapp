@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英検4級 実戦特訓ルーム (PDF完全準拠版)</title>
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --success-color: #34a853;
+            --error-color: #ea4335;
+            --warning-color: #fbbc04;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 1.3rem;
+            color: var(--primary-color);
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 1.05rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 5px;
+            margin-top: 20px;
+            color: #1557b0;
+        }
+
+        .menu-grid { display: flex; flex-direction: column; gap: 15px; }
+
+        .menu-card {
+            background: #f1f3f4; border-radius: 8px; padding: 15px; text-align: left;
+            border-left: 5px solid var(--primary-color);
+        }
+        .menu-card.type-2 { border-left-color: var(--success-color); }
+        .menu-card.type-3 { border-left-color: #9c27b0; }
+        .menu-card.system-mode { border-left-color: var(--warning-color); }
+
+        .menu-title { font-weight: bold; font-size: 0.95rem; margin-bottom: 5px; }
+        .menu-desc { font-size: 0.8rem; color: #5f6368; margin-bottom: 10px; line-height: 1.4; }
+
+        .btn-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; }
+
+        .progress-bar {
+            width: 100%; height: 8px; background-color: #e0e0e0; border-radius: 4px;
+            margin-bottom: 20px; overflow: hidden;
+        }
+        .progress-fill { height: 100%; background-color: var(--primary-color); width: 0%; transition: width 0.3s ease; }
+
+        .meta-info {
+            display: flex; justify-content: space-between; align-items: center;
+            font-weight: bold; margin-bottom: 15px; font-size: 0.85rem; color: #666;
+        }
+        .home-back-btn {
+            background-color: #e8eaed; color: #3c4043; border: 1px solid #dadce0;
+            border-radius: 4px; padding: 4px 10px; font-size: 0.8rem; cursor: pointer;
+        }
+
+        .question-container { margin-bottom: 25px; }
+        
+        .standard-question {
+            font-size: 1.1rem; line-height: 1.7; padding: 15px;
+            background-color: #f1f3f4; border-radius: 8px; border-left: 5px solid var(--primary-color);
+        }
+
+        .sort-japanese { font-size: 1rem; font-weight: bold; color: #333; margin-bottom: 8px; }
+        .sort-instruction { font-size: 0.75rem; color: #555; margin-bottom: 12px; background: #f1f3f4; padding: 6px; border-radius: 4px; border: 1px solid #dadce0; }
+        .sort-blank-line {
+            font-size: 1.15rem; font-weight: bold; letter-spacing: 2px; line-height: 2;
+            margin-bottom: 15px; background: #f8f9fa; padding: 10px; border-radius: 6px; border: 1px dashed #ccc;
+        }
+        .sort-word-box {
+            display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px;
+            padding: 12px; background: #e8f0fe; border-radius: 8px; border: 1px solid #bcd0f7;
+        }
+        .sort-word-item {
+            background: #fff; padding: 6px 12px; border-radius: 4px;
+            font-size: 0.95rem; font-weight: bold; border: 1px solid #dadce0; box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .options-list { display: flex; flex-direction: column; gap: 12px; }
+        .option-btn {
+            background-color: #ffffff; border: 2px solid #dadce0; border-radius: 8px;
+            padding: 14px; font-size: 1rem; text-align: left; cursor: pointer;
+            transition: all 0.2s ease; display: flex; align-items: center; width: 100%;
+        }
+        .option-btn:hover:not(:disabled) { background-color: #f1f3f4; border-color: #9aa0a6; }
+        .option-number {
+            display: inline-block; width: 24px; height: 24px; border-radius: 50%;
+            background-color: #e8eaed; text-align: center; line-height: 24px;
+            margin-right: 12px; font-weight: bold; font-size: 0.9rem; flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: #e6f4ea; border-color: var(--success-color); color: #137333; }
+        .option-btn.correct .option-number { background-color: var(--success-color); color: white; }
+        .option-btn.wrong { background-color: #fce8e6; border-color: var(--error-color); color: #c5221f; }
+        .option-btn.wrong .option-number { background-color: var(--error-color); color: white; }
+
+        .feedback-box { margin-top: 20px; padding: 18px; border-radius: 8px; display: none; animation: fadeIn 0.3s ease; }
+        .feedback-box.correct-bg { background-color: #e6f4ea; color: #137333; border: 1px solid #34a853; }
+        .feedback-box.wrong-bg { background-color: #fce8e6; color: #c5221f; border: 1px solid #ea4335; }
+        .feedback-title { font-weight: bold; font-size: 1.15rem; margin-bottom: 10px; }
+        .user-selection { font-size: 0.9rem; font-weight: bold; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dashed rgba(0,0,0,0.1); }
+        .section-title { font-weight: bold; color: #333; margin-top: 10px; margin-bottom: 4px; font-size: 0.9rem; }
+        .translation-text, .explanation-text { font-size: 0.9rem; color: #3c4043; line-height: 1.5; }
+        .translation-text { background: rgba(255,255,255,0.6); padding: 8px; border-radius: 4px; }
+
+        .action-btn {
+            width: 100%; background-color: var(--primary-color); color: white; border: none;
+            border-radius: 8px; padding: 12px; font-size: 0.95rem; font-weight: bold; cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .action-btn:hover { background-color: #1557b0; }
+        .action-btn:disabled { background-color: #ccc; cursor: not-allowed; box-shadow: none; }
+        
+        .sub-btn { font-size: 0.8rem; padding: 6px; }
+        .btn-type2 { background-color: var(--success-color); } .btn-type2:hover { background-color: #2b8a43; }
+        .btn-type3 { background-color: #9c27b0; } .btn-type3:hover { background-color: #7b1fa2; }
+        .btn-review { background-color: var(--warning-color); color: #333; } .btn-review:hover { background-color: #dfa000; }
+        .btn-clear { background-color: #607d8b; font-size: 0.75rem; margin-top: 5px; }
+
+        .result-screen { text-align: center; display: none; }
+        .score-circle {
+            width: 110px; height: 110px; border-radius: 50%;
+            background-color: #e8f0fe; color: var(--primary-color); font-size: 1.6rem; font-weight: bold;
+            display: flex; align-items: center; justify-content: center; margin: 20px auto; border: 5px solid var(--primary-color);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="container" id="home-screen">
+    <h1>🎯 英検®4級 大問1〜3 完全実戦特訓アプリ</h1>
+    
+    <h2>📖 大問1：短文・会話文の空欄補充</h2>
+    <div class="menu-grid">
+        <div class="menu-card type-1">
+            <div class="menu-title">Vocabulary & Grammar</div>
+            <div class="menu-desc">4級の過去問から分析した頻出単語、必須熟語、および得点差になりやすい文法を個別に確認します。</div>
+            <div class="btn-group">
+                <button class="action-btn sub-btn" onclick="startMode('1-word')">① 頻出単語</button>
+                <button class="action-btn sub-btn" onclick="startMode('1-idiom')">② 必須熟語</button>
+                <button class="action-btn sub-btn" onclick="startMode('1-grammar')">③ 最重要文法</button>
+            </div>
+        </div>
+    </div>
+
+    <h2>💬 大問2：会話文の完成</h2>
+    <div class="menu-grid">
+        <div class="menu-card type-2">
+            <div class="menu-title">Daily Conversation</div>
+            <div class="menu-desc">登場人物の状況に合わせ、疑問詞への正しい返答パターンや場面別の定番表現を確認します。</div>
+            <div class="btn-group">
+                <button class="action-btn sub-btn btn-type2" onclick="startMode('2-interrogative')">① 疑問詞への返答</button>
+                <button class="action-btn sub-btn btn-type2" onclick="startMode('2-situation')">② 場面別会話文</button>
+            </div>
+        </div>
+    </div>
+
+    <h2>🧩 大問3：日本文付き語句整序（並び替え）</h2>
+    <div class="menu-grid">
+        <div class="menu-card type-3">
+            <div class="menu-title">Word Order Quiz</div>
+            <div class="menu-desc">【本番仕様】5つの語群を並び替え、2番目と4番目の正しい組み合わせを4択から選ぶ実戦訓練です。</div>
+            <div class="btn-group">
+                <button class="action-btn sub-btn btn-type3" onclick="startMode('3-auxiliary')">① 助動詞・未来</button>
+                <button class="action-btn sub-btn btn-type3" onclick="startMode('3-comparison')">② 比較級・最上級</button>
+                <button class="action-btn sub-btn btn-type3" onclick="startMode('3-syntax')">③ 重要構文・否定</button>
+            </div>
+        </div>
+    </div>
+
+    <h2>🔄 復習管理</h2>
+    <div class="menu-grid">
+        <div class="menu-card system-mode">
+            <div class="menu-title">弱点特訓リスト（セッション限定）</div>
+            <div class="menu-desc">間違えた問題が自動ストックされます。※タブを閉じるとクリアされ、新しく学習を開始できます。</div>
+            <button class="action-btn btn-review" id="review-start-btn" onclick="startMode('review')">弱点復習をスタート (残り: 0問)</button>
+            <button class="action-btn btn-clear" onclick="clearReviewList()">※ 復習リストをクリアする</button>
+        </div>
+    </div>
+</div>
+
+<div class="container" id="quiz-screen" style="display: none;">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    
+    <div class="meta-info">
+        <span id="part-title">モード</span>
+        <span id="question-number">0 / 0</span>
+        <button class="home-back-btn" onclick="goToHomeFromQuiz()">🏠 中断</button>
+    </div>
+
+    <div class="question-container" id="question-area"></div>
+    <div class="options-list" id="options-container"></div>
+
+    <div class="feedback-box" id="feedback-box">
+        <div class="feedback-title" id="feedback-result"></div>
+        <div class="user-selection" id="user-selection-info"></div>
+        <div class="section-title">💡 正しい日本語訳:</div>
+        <div class="translation-text" id="translation-box"></div>
+        <div class="section-title">📝 ポイント解説:</div>
+        <div class="explanation-text" id="explanation-box"></div>
+    </div>
+
+    <button class="action-btn" id="next-btn" style="display: none; margin-top: 20px;" onclick="nextQuestion()">つぎの問題へ</button>
+</div>
+
+<div class="container result-screen" id="result-screen">
+    <h1 id="result-title">特訓セッション終了</h1>
+    <div class="score-circle" id="score-text">0 / 0</div>
+    <p id="result-comment" style="font-size: 0.95rem; margin-bottom: 25px; font-weight: bold; line-height: 1.4;"></p>
+    <button class="action-btn" onclick="backToHome()">ホームメニューに戻る</button>
+</div>
+
+<script>
+// ★★★【データ管理エリア：ステップ2＆3でここにデータを流し込みます】★★★
+const masterQuizData = [
+    // === 大問1：①頻出単語 (20問) ===
+    {
+        id: 101, type: "1-word", format: "standard",
+        question: "A: Look at that beautiful ( &nbsp; &nbsp; ) over the river.<br>B: Wow, it's very long!",
+        options: ["station", "bridge", "soap", "candy"], answer: 1,
+        translation: "A: 川にかかっているあの美しい（橋）を見て。<br>B: わあ、とても長いね！",
+        explanation: "「river（川）」の上にかかっていて、「long（長い）」という特徴に一致する名詞は「bridge（橋）」になります。"
+    },
+    {
+        id: 102, type: "1-word", format: "standard",
+        question: "My aunt is a ( &nbsp; &nbsp; ) at a big hospital. She helps sick people every day.",
+        options: ["hobby", "present", "doctor", "class"], answer: 2,
+        translation: "私の叔母は大きな病院の（医者）です。毎日病気の人を助けています。",
+        explanation: "「hospital（病院）」で働いており、「helps sick people（病気の人を助ける）」という仕事内容から「doctor（医者）」が適切です。"
+    },
+    {
+        id: 103, type: "1-word", format: "standard",
+        question: "A: Can I watch TV now, Mom?<br>B: Yes, but you must ( &nbsp; &nbsp; ) your dirty room first.",
+        options: ["clean", "meet", "stay", "answer"], answer: 0,
+        translation: "A: お母さん、今テレビ見てもいい？<br>B: いいよ、でも最初に汚い部屋を（掃除し）なければいけません。",
+        explanation: "「dirty room（汚い部屋）」に対して行う動作として最も自然な動詞は「clean（掃除する）」です。"
+    },
+    {
+        id: 104, type: "1-word", format: "standard",
+        question: "A: Where's the ( &nbsp; &nbsp; )? I want to wash my hands before dinner.<br>B: It's near the sink.",
+        options: ["tea", "fish", "bridge", "soap"], answer: 3,
+        translation: "A: （石鹸）はどこ？夕食の前に手を洗いたいんだ。<br>B: 流し台の近くにあるよ。",
+        explanation: "「wash my hands（手を洗う）」という目的から、必要な道具である「soap（石鹸）」を選みまます。"
+    },
+    {
+        id: 105, type: "1-word", format: "standard",
+        question: "A: This math question is very difficult.<br>B: Let's ( &nbsp; &nbsp; ) our teacher for help.",
+        options: ["tell", "ask", "listen", "shut"], answer: 1,
+        translation: "A: この数学の問題はとても難しいです。<br>B: 先生に助けを（求め）ましょう。",
+        explanation: "「ask（人）for help」で「（人）に助けを求める」という動詞の使い方になります。"
+    },
+    {
+        id: 106, type: "1-word", format: "standard",
+        question: "A: Max is a little ( &nbsp; &nbsp; ), so he loves to play with toy cars.<br>B: Yes, he is only five years old.",
+        options: ["child", "dream", "doll", "color"], answer: 0,
+        translation: "A: マックスは小さな（子ども）なので、おもちゃの車で遊ぶのが大好きです。<br>B: そうだね、彼はまだ5歳だしね。",
+        explanation: "後文の「five years old（5歳）」という年齢 of ヒントから、名詞「child（子ども）」が正解となります。"
+    },
+    {
+        id: 107, type: "1-word", format: "standard",
+        question: "A: The water in this river is very ( &nbsp; &nbsp; ). Don't swim here.<br>B: OK, I'll be careful.",
+        options: ["hot", "deep", "cold", "sweet"], answer: 1,
+        translation: "A: この川の水はとても（深い）です。ここで泳いではいけません。<br>B: わかりました、気をつけます。",
+        explanation: "「Don't swim here（ここで泳いではいけない）」という指示につながる川の状態を示す形容詞として「deep（深い）」が適切です。"
+    },
+    {
+        id: 108, type: "1-word", format: "standard",
+        question: "I have a new game on my computer. I want to ( &nbsp; &nbsp; ) it this afternoon.",
+        options: ["cook", "buy", "try", "wash"], answer: 2,
+        translation: "パソコンに新しいゲームがあります。今日の午後、それを（試して/やって）みたいです。",
+        explanation: "手に入れた新しいゲームに対して「やってみる、試す」という意味を持つ動詞「try」を選びます。"
+    },
+    {
+        id: 109, type: "1-word", format: "standard",
+        question: "A: What ( &nbsp; &nbsp; ) of music do you like best?<br>B: I like rock music.",
+        options: ["room", "wind", "side", "kind"], answer: 3,
+        translation: "A: どんな（種類）の音楽が一番好きですか？<br>B: ロック音楽が好きです。",
+        explanation: "「What kind of 〜?」で「どんな種類の〜？」という質問表現になります。Bの「rock music」という返答と一致します。"
+    },
+    {
+        id: 110, type: "1-word", format: "standard",
+        question: "My father works every day, so he is very ( &nbsp; &nbsp; ) from morning until night.",
+        options: ["busy", "free", "cool", "slow"], answer: 0,
+        translation: "私の父は毎日働いているので、朝から晩までとても（忙しい）です。",
+        explanation: "毎日、朝から晩まで働いている（works from morning until night）という記述から、形容詞「busy（忙しい）」を選択します。"
+    },
+    {
+        id: 111, type: "1-word", format: "standard",
+        question: "A: Did you see the soccer game on TV last night?<br>B: No. I was very tired, so I went to ( &nbsp; &nbsp; ) early.",
+        options: ["school", "bed", "park", "shop"], answer: 1,
+        translation: "A: 昨日の夜、テレビでサッカーの試合を見た？<br>B: ううん。とても疲れていたから、早く（寝た）んだよ。",
+        explanation: "「went to bed」で「寝る、就寝する」という表現になります。「tired（疲れていた）」という理由とも一致します。"
+    },
+    {
+        id: 112, type: "1-word", format: "standard",
+        question: "A: Excuse me. Can you tell me the ( &nbsp; &nbsp; ) to the post office?<br>B: Sure. Go straight and turn left at the corner.",
+        options: ["way", "time", "name", "food"], answer: 0,
+        translation: "A: すみません。郵便局への（道）を教えていただけますか？<br>B: いいですよ。まっすぐ進んで、角を左に曲がってください。",
+        explanation: "Bが道順を説明していることから、Aは目的の場所への「way（道、行き方）」を尋ねていることがわかります。"
+    },
+    {
+        id: 113, type: "1-word", format: "standard",
+        question: "A: It's raining outside. Do you have an ( &nbsp; &nbsp; )?<br>B: Yes, it's in my bag.",
+        options: ["idea", "airplane", "umbrella", "animal"], answer: 2,
+        translation: "A: 外は雨が降っているよ。（傘）は持っている？<br>B: うん、バッグの中に入っているよ。",
+        explanation: "「raining（雨が降っている）」という天候の記述から、必要な道具である「umbrella（傘）」を選びます。"
+    },
+    {
+        id: 114, type: "1-word", format: "standard",
+        question: "A: What did you buy at the bookstore yesterday?<br>B: I bought an interesting ( &nbsp; &nbsp; ) about dinosaurs.",
+        options: ["book", "song", "sport", "ticket"], answer: 0,
+        translation: "A: 昨日本屋で何を買ったの？<br>B: 恐竜に関するおもしろい（本）を買ったよ。",
+        explanation: "「bookstore（本屋）」で購入したものとして最も自然な名詞は「book（本）」になります。"
+    },
+    {
+        id: 115, type: "1-word", format: "standard",
+        question: "A: Tomorrow is my sister's birthday. I will make a big chocolate ( &nbsp; &nbsp; ) for her.<br>B: That's nice. She will be very happy.",
+        options: ["card", "cake", "homework", "house"], answer: 1,
+        translation: "A: 明日は妹の誕生日なんだ。彼女のために大きなチョコレート（ケーキ）を作るよ。<br>B: それはいいね。彼女、きっと喜ぶよ。",
+        explanation: "誕生日（birthday）に「make（作る）」という動詞、およびチョコレートという味の要素から「cake（ケーキ）」を選びます。"
+    },
+    {
+        id: 116, type: "1-word", format: "standard",
+        question: "A: Can you ( &nbsp; &nbsp; ) the window, Ken? It's a little cold here.<br>B: Sure.",
+        options: ["open", "clean", "close", "wash"], answer: 2,
+        translation: "A: ケン、窓を（閉めて）くれる？ここは少し寒いんだ。<br>B: いいよ。",
+        explanation: "「cold（寒い）」という状態に対応する窓（window）への動作として、適切な動詞は「close（閉める）」です。"
+    },
+    {
+        id: 117, type: "1-word", format: "standard",
+        question: "A: Your computer is very ( &nbsp; &nbsp; ).<br>B: Yes, I bought it five years ago, so it's not fast.",
+        options: ["new", "heavy", "small", "old"], answer: 3,
+        translation: "A: あなたのパソコンはとても（古い）ね。<br>B: うん、5年前に買ったから、速くないんだ。",
+        explanation: "「five years ago（5年前）」に購入し、「not fast（速くない）」という説明から、状態を示す「old（古い）」が正解です。"
+    },
+    {
+        id: 118, type: "1-word", format: "standard",
+        question: "A: The sky is very dark. I think it will rain ( &nbsp; &nbsp; ).<br>B: Let's go home quickly.",
+        options: ["soon", "never", "always", "again"], answer: 0,
+        translation: "A: 空がとても暗いね。（まもなく）雨が降ると思うよ。<br>B: 早く家に帰ろう。",
+        explanation: "空が暗く、急いで帰ろうとしている文脈から、未来の近い時間を表す副詞「soon（すぐに、まもなく）」が適切です。"
+    },
+    {
+        id: 119, type: "1-word", format: "standard",
+        question: "A: Where is the kitchen ( &nbsp; &nbsp; )? I need to wash these vegetables.<br>B: It's next to the refrigerator.",
+        options: ["bed", "sink", "desk", "chair"], answer: 1,
+        translation: "A: 台所の（流し台）はどこ？野菜を洗わなくちゃいけないんだ。<br>B: 冷蔵庫の隣にあるよ。",
+        explanation: "野菜を洗う（wash vegetables）場所として台所（kitchen）にある設備を指すため、「sink（流し台）」が正解です。"
+    },
+    {
+        id: 120, type: "1-word", format: "standard",
+        question: "My brother wants to live in a ( &nbsp; &nbsp; ) country like America or Canada in the future.",
+        options: ["foreign", "dark", "hungry", "sad"], answer: 0,
+        translation: "私の兄は、将来アメリカやカナダのような（外国の）国に住みたがっています。",
+        explanation: "アメリカやカナダといった具体的な国名を修飾する形容詞として「foreign（外国の）」が適切です。"
+    },
+
+    // === 大問1：②必須熟語 (15問) ===
+    {
+        id: 121, type: "1-idiom", format: "standard",
+        question: "A: Hello, Mrs. Smith. Is Tracy home?<br>B: Yes. Just a ( &nbsp; &nbsp; ), please. I'll get her.",
+        options: ["shower", "moment", "number", "program"], answer: 1,
+        translation: "A: もしもし、スミスさん。トレイシーは家にいますか？<br>B: ええ。少々（お待ちください）。彼女を呼んできますね。",
+        explanation: "電話の対応などで「少々お待ちください」と伝える際は「Just a moment.」という決まり文句を使用します。"
+    },
+    {
+        id: 122, type: "1-idiom", format: "standard",
+        question: "Bill's math teacher gave him too much homework, so he ( &nbsp; &nbsp; ) a hard time yesterday.",
+        options: ["played", "took", "talked", "had"], answer: 3,
+        translation: "ビルの数学の先生は彼にたくさんの宿題を出したので、彼は昨日大変な時間を（過ごしました/苦労しました）。",
+        explanation: "「have a hard time」で「苦労する、大変な目に遭う」という意味になります。過去の話なので過去形の「had」を選びます。"
+    },
+    {
+        id: 123, type: "1-idiom", format: "standard",
+        question: "It's very cold outside. Please make me a cup ( &nbsp; &nbsp; ) hot chocolate.",
+        options: ["at", "of", "to", "as"], answer: 1,
+        translation: "外はとても寒いです。温かいチョコレートを（コップ1杯）作ってください。",
+        explanation: "「a cup of 〜」で「カップ1杯の〜」という表現になります。器と中身を繋ぐ前置詞は「of」です。"
+    },
+    {
+        id: 124, type: "1-idiom", format: "standard",
+        question: "A: What are you looking ( &nbsp; &nbsp; ), Ken?<br>B: My dictionary. I need it for the next class.",
+        options: ["for", "at", "after", "to"], answer: 0,
+        translation: "A: ケン、何を（探している）の？<br>B: 辞書だよ。次の授業で必要なんだ。",
+        explanation: "「look for 〜」で「〜を探す」という意味になります。Bが「辞書が必要」と答えている文脈に一致します。"
+    },
+    {
+        id: 125, type: "1-idiom", format: "standard",
+        question: "We usually go to school ( &nbsp; &nbsp; ) bus, but it rained today, so we took a taxi.",
+        options: ["on", "with", "by", "in"], answer: 2,
+        translation: "私たちはたいてい（バスで）学校に行きますが、今日は雨が降ったのでタクシーに乗りました。",
+        explanation: "「by ＋ 交通手段」で「〜によって、〜（の乗り物）で」という意味になります。乗り物の前には冠詞をつけません。"
+    },
+    {
+        id: 126, type: "1-idiom", format: "standard",
+        question: "A: Did you ( &nbsp; &nbsp; ) up early this morning, Yuka?<br>B: Yes, at six o'clock.",
+        options: ["get", "take", "make", "go"], answer: 0,
+        translation: "A: ユカ、今朝は早く（起きまし）たか？<br>B: はい、6時に起きました。",
+        explanation: "「get up」で「起きる、起床する」という熟語になります。Didから始まる疑問文に続くため、動詞の原形「get」が適切です。"
+    },
+    {
+        id: 127, type: "1-idiom", format: "standard",
+        question: "A: Thank you for helping me with my homework.<br>B: You're ( &nbsp; &nbsp; ) welcome.",
+        options: ["good", "well", "much", "very"], answer: 3,
+        translation: "A: 宿題を手伝ってくれてありがとう。<br>B: （どういたしまして）。",
+        explanation: "お礼に対する返答「どういたしまして」は「You're very welcome.」という定番の決まり文句です。"
+    },
+    {
+        id: 128, type: "1-idiom", format: "standard",
+        question: "A: When did you arrive ( &nbsp; &nbsp; ) Tokyo Station yesterday?<br>B: At around three o'clock.",
+        options: ["at", "on", "to", "for"], answer: 0,
+        translation: "A: 昨日、何時に東京駅に（到着しました）か？<br>B: 3時ごろです。",
+        explanation: "「arrive at ＋ 駅や学校などの具体的な場所」で「〜に到着する」という意味になります。"
+    },
+    {
+        id: 129, type: "1-idiom", format: "standard",
+        question: "A: I'm leaving now. Goodbye, Mom.<br>B: Bye. Take ( &nbsp; &nbsp; ) of yourself.",
+        options: ["look", "care", "time", "good"], answer: 1,
+        translation: "A: もう行くね。さようなら、お母さん。<br>B: さようなら。体に（気をつけて）ね。",
+        explanation: "「take care of 〜」で「〜に気をつける、〜の世話をする」になります。「Take care of yourself.」で体調を気遣う挨拶になります。"
+    },
+    {
+        id: 130, type: "1-idiom", format: "standard",
+        question: "A: Let's ( &nbsp; &nbsp; ) a picture together in front of the museum.<br>B: That's a good idea.",
+        options: ["make", "do", "watch", "take"], answer: 3,
+        translation: "A: 美術館の前で一緒に写真を（撮り）ましょう。<br>B: それはいい考えですね。",
+        explanation: "「take a picture」で「写真を撮る」という重要表現です。"
+    },
+    {
+        id: 131, type: "1-idiom", format: "standard",
+        question: "A: Are you ready ( &nbsp; &nbsp; ) dinner, Tom?<br>B: Yes. I'm very hungry.",
+        options: ["for", "to", "at", "with"], answer: 0,
+        translation: "A: トム、夕食の（準備はできて）いる？<br>B: うん。とてもお腹が空いているよ。",
+        explanation: "「be ready for ＋ 名詞」で「〜の準備ができている」という表現になります。"
+    },
+    {
+        id: 132, type: "1-idiom", format: "standard",
+        question: "A: Where is Ken? He is late.<br>B: Oh, he is ( &nbsp; &nbsp; ) the way to the library now.",
+        options: ["in", "at", "on", "by"], answer: 2,
+        translation: "A: ケンはどこ？遅いね。<br>B: ああ、彼は今図書館に行く（途中だよ）。",
+        explanation: "「on the way to 〜」で「〜へ行く途中で」という移動を表す熟語です。"
+    },
+    {
+        id: 133, type: "1-idiom", format: "standard",
+        question: "A: Do you like listening ( &nbsp; &nbsp; ) pop music?<br>B: Yes, I listen to it every night.",
+        options: ["to", "at", "for", "with"], answer: 0,
+        translation: "A: ポップミュージックを（聴くこと）は好きですか？<br>B: はい、毎晩聴いていますよ。",
+        explanation: "「listen to 〜」で「〜を聴く」になります。後ろに目的語を置く際は前置詞の「to」が必要です。"
+    },
+    {
+        id: 134, type: "1-idiom", format: "standard",
+        question: "A: What time did you wake ( &nbsp; &nbsp; ) this morning?<br>B: At seven o'clock.",
+        options: ["on", "in", "up", "for"], answer: 2,
+        translation: "A: 今朝は何時に目が（覚めまし）たか？<br>B: 7時です。",
+        explanation: "「wake up」で「目が覚める」という意味になります。"
+    },
+    {
+        id: 135, type: "1-idiom", format: "standard",
+        question: "A: Why were you absent ( &nbsp; &nbsp; ) school yesterday, Lisa?<br>B: Because I had a cold.",
+        options: ["from", "to", "at", "for"], answer: 0,
+        translation: "A: リサ、昨日はどうして学校を（休んだ）の？<br>B: 風邪をひいていたからです。",
+        explanation: "「be absent from 〜」で「〜を欠席する、休む」という重要熟語です。"
+    },
+
+    // === 大問1：③最重要文法 (15問) ===
+    {
+        id: 136, type: "1-grammar", format: "standard",
+        question: "A: I don't like ( &nbsp; &nbsp; ) TV. I usually read books on weekends.<br>B: Me, too. Reading is fun.",
+        options: ["watch", "watches", "to watch", "watched"], answer: 2,
+        translation: "A: 私はテレビを（見ること）が好きではありません。週末はいつも本を読んでいます。<br>B: 私もです。読書は楽しいよね。",
+        explanation: "「like」の後ろにさらに動詞を続ける場合、「to ＋ 動詞の原形」の形（不定詞）にして「〜すること」という意味にします。"
+    },
+    {
+        id: 137, type: "1-grammar", format: "standard",
+        question: "A: Did you ( &nbsp; &nbsp; ) your grandmother last Sunday, Tom?<br>B: Yes, I visited her with my family.",
+        options: ["visit", "visited", "visiting", "visits"], answer: 0,
+        translation: "A: トム、この前の日曜日におばあちゃんを（訪ねましたか）？<br>B: うん、家族と一緒に訪ねたよ。",
+        explanation: "過去の疑問文ですが、先頭に「Did」が使われているため、後ろに続く動詞は必ず【動詞の原形（visit）】になります。"
+    },
+    {
+        id: 138, type: "1-grammar", format: "standard",
+        question: "A: Look. That shiny jacket is on the chair. Is that ( &nbsp; &nbsp; )?<br>B: No, it's my brother's.",
+        options: ["you", "your", "me", "yours"], answer: 3,
+        translation: "A: 見て。あのピカピカのジャケットが椅子の上にあるよ。それは（あなたのもの）？<br>B: いいえ、兄のものだよ。",
+        explanation: "「あなたのもの」という意味を表す所有代名詞「yours」を選びます。"
+    },
+    {
+        id: 139, type: "1-grammar", format: "standard",
+        question: "A: Where ( &nbsp; &nbsp; ) you buy that beautiful hat?<br>B: I bought it at a shop in London last month.",
+        options: ["do", "did", "are", "were"], answer: 1,
+        translation: "A: その美しい帽子はどこで（買いましたか）？<br>B: 先月ロンドンのお店で買いました。",
+        explanation: "Bの返答が「bought（buyの過去形）」を使って過去の事実を述べているため、質問側も過去を表す「did」を使います。"
+    },
+    {
+        id: 140, type: "1-grammar", format: "standard",
+        question: "A: What time do you usually eat breakfast?<br>B: My family ( &nbsp; &nbsp; ) breakfast at seven every morning.",
+        options: ["eat", "eating", "eats", "ate"], answer: 2,
+        translation: "A: いつも何時に朝食を食べているの？<br>B: 私の家族は毎朝7時に朝食を（食べます）。",
+        explanation: "現在の習慣を表す文です。主語の「My family」は単数のまとまり（三人称単数）として扱うため、動詞に「-s」がついた「eats」（インデックス2）が正解です。"
+    },
+    {
+        id: 141, type: "1-grammar", format: "standard",
+        question: "Tomorrow is my mother's birthday. I am ( &nbsp; &nbsp; ) to buy a nice present for her.",
+        options: ["will", "go", "going", "went"], answer: 2,
+        translation: "明日はお母さんの誕生日です。彼女に素敵なプレゼントを買う（つもりです）。",
+        explanation: "「be動詞(am) ＋ going ＋ to ＋ 動詞の原形」で未来の予定を作るため、「going」（インデックス2）が正解です。"
+    },
+    {
+        id: 142, type: "1-grammar", format: "standard",
+        question: "A: Did you see Ken at the park yesterday?<br>B: Yes. I saw ( &nbsp; &nbsp; ) near the big tree. He was painting a picture.",
+        options: ["he", "his", "him", "himself"], answer: 2,
+        translation: "A: 昨日公園でケンを見かけた？<br>B: うん。大きな木の近くで（彼を）見たよ。絵を描いていたよ。",
+        explanation: "動詞「saw（見た）」の後ろなので、目的語の役割をする目的格「him（彼を）」を選びます。"
+    },
+    {
+        id: 143, type: "1-grammar", format: "standard",
+        question: "A: What did you do last weekend, Mary?<br>B: I ( &nbsp; &nbsp; ) to the library and read some interesting books.",
+        options: ["go", "went", "going", "goes"], answer: 1,
+        translation: "A: メアリー、先週末は何をしたの？<br>B: 図書館に（行って）、おもしろい本を何冊か読んだよ。",
+        explanation: "「last weekend（先週末）」という過去の出来事なので、goの過去形である「went」を選びます。"
+    },
+    {
+        id: 144, type: "1-grammar", format: "standard",
+        question: "A: Is this laptop yours, Takuya?<br>B: No, it's ( &nbsp; &nbsp; ) sister's computer. She bought it last week.",
+        options: ["me", "my", "mine", "I"], answer: 1,
+        translation: "A: タクヤ、このノートパソコンは君のもの？<br>B: いいえ、それは（私の）姉のコンピュータです。先週買ったんだよ。",
+        explanation: "後ろの名詞「sister's computer」を修飾して「私の〜」という意味を作るため、代名詞の所有格「my」が適切です。"
+    },
+    {
+        id: 145, type: "1-grammar", format: "standard",
+        question: "A: Ken, where are you? Dinner is ready.<br>B: I am ( &nbsp; &nbsp; ) my homework in my room now, Mom.",
+        options: ["do", "does", "doing", "did"], answer: 2,
+        translation: "A: ケン、どこにいるの？夕食ができたわよ。<br>B: 今自分の部屋で宿題を（しているところだよ）、お母さん。",
+        explanation: "文末に「now（今）」があり、[am ＋ 動詞の-ing形] で現在進行形（〜しているところだ）を完成させます。"
+    },
+    {
+        id: 146, type: "1-grammar", format: "standard",
+        question: "A: Who is that girl standing near the teacher?<br>B: She is a new student. We like ( &nbsp; &nbsp; ) very much.",
+        options: ["she", "her", "hers", "herself"], answer: 1,
+        translation: "A: 先生の近くに立っているあの女の子は誰ですか？<br>B: 新しい生徒だよ。私たちは（彼女のことが）大好きなんだ。",
+        explanation: "動詞「like」の後ろなので、目的語となる目的格の「her（彼女を）」が適切です。"
+    },
+    {
+        id: 147, type: "1-grammar", format: "standard",
+        question: "A: Will you ( &nbsp; &nbsp; ) tennis with us next Saturday?<br>B: Sure. I'd love to.",
+        options: ["played", "play", "playing", "plays"], answer: 1,
+        translation: "A: 次の土曜日、私たちとテニスを（しませんか）？<br>B: もちろん。喜んで。",
+        explanation: "助動詞「Will」から始まる未来の疑問文です。助動詞の後ろに置く動詞は必ず【動詞の原形（play）】（インデックス1）になります。"
+    },
+    {
+        id: 148, type: "1-grammar", format: "standard",
+        question: "A: These keys are not mine. Are they ( &nbsp; &nbsp; ), Yuka?<br>B: Oh, yes! They are my house keys.",
+        options: ["your", "you", "yours", "me"], answer: 2,
+        translation: "A: これらの鍵は私のものではありません。（あなたのもの）ですか、ユカ？<br>B: ああ、そうだわ！私の家の鍵だわ。",
+        explanation: "「あなたのもの」という意味を表す所有代名詞「yours」が文脈上適切です。"
+    },
+    {
+        id: 149, type: "1-grammar", format: "standard",
+        question: "A: What did your brother buy at the shop yesterday?<br>B: He ( &nbsp; &nbsp; ) a beautiful present for his friend.",
+        options: ["buy", "buys", "buying", "bought"], answer: 3,
+        translation: "A: あなたのお兄さんは昨日お店で何を買ったの？<br>B: 友達のために素敵なプレゼントを（買ったよ）。",
+        explanation: "「yesterday（昨日）」の出来事なので、buyの過去形である「bought」を選びます。"
+    },
+    {
+        id: 150, type: "1-grammar", format: "standard",
+        question: "A: Where are the children?<br>B: They are ( &nbsp; &nbsp; ) soccer in the park near our house.",
+        options: ["play", "playing", "plays", "played"], answer: 1,
+        translation: "A: 子どもたちはどこですか？<br>B: 家の近くの公園でサッカーを（しているところですよ）。",
+        explanation: "be動詞(are)に続けることで、現在進行形（〜しているところだ）を構成する「playing」を選びます。"
+    },
+
+    // === 大問2：①疑問詞への返答 (5問) ===
+    {
+        id: 201, type: "2-interrogative", format: "standard",
+        question: "Son: When does the city library open tomorrow? I need some books for school.<br>Father: ( &nbsp; &nbsp; ) You can study there.",
+        options: ["By bus.", "At nine o'clock.", "Near here.", "In January."], answer: 1,
+        translation: "息子: 明日、図書館は何時に開くの？学校で使う本が必要なんだ。<br>父親: （9時だよ。）そこで勉強できるよ。",
+        explanation: "「When（いつ・何時に）」という時間の質問に対して、時間を具体的に答えている「At nine o'clock.（9時に）」が正解になります。"
+    },
+    {
+        id: 202, type: "2-interrogative", format: "standard",
+        question: "Girl: What's your favorite day of the week?<br>Boy: ( &nbsp; &nbsp; ) I usually play soccer then.",
+        options: ["I liked April.", "For two weeks.", "I like Wednesdays.", "She had a party."], answer: 2,
+        translation: "女子: 1週間の中で何曜日が一番好き？<br>男子: （水曜日が好きだよ。）大体そのときにサッカーをするんだ。",
+        explanation: "「day of the week（曜日）」を問われているため、選択肢の中から曜日を答えている「I like Wednesdays.（水曜日が好き）」を選択します。"
+    },
+    {
+        id: 203, type: "2-interrogative", format: "standard",
+        question: "A: ( &nbsp; &nbsp; ) are you going to go to the park today?<br>B: Because I want to paint a picture of the trees.",
+        options: ["When", "What", "Where", "Why"], answer: 3,
+        translation: "A: （なぜ）今日公園に行くのですか？<br>B: 木の絵を描きたいからです。",
+        explanation: "Bが「Because（なぜなら〜だから）」と理由を述べて返答しているため、質問の先頭にくる疑問詞は理由を尋ねる「Why（なぜ）」になります。"
+    },
+    {
+        id: 204, type: "2-interrogative", format: "standard",
+        question: "Daughter: Where did you put my car keys, Dad?<br>Father: ( &nbsp; &nbsp; ) Check the table.",
+        options: ["In the living room.", "Yesterday afternoon.", "To the store.", "My friend did."], answer: 0,
+        translation: "娘: お父さん、私の車の鍵どこに置いた？<br>父親: （リビングだよ。）テーブルを確認してみて。",
+        explanation: "「Where（どこに）」という場所を尋ねる質問なので、場所の情報を返している「In the living room.（居間、リビングだよ）」が適切です。"
+    },
+    {
+        id: 205, type: "2-interrogative", format: "standard",
+        question: "Student: Who is that tall man standing near the door?<br>Teacher: ( &nbsp; &nbsp; ) He is our new science teacher.",
+        options: ["Yes, he is.", "Mr. Davis.", "In the classroom.", "Next week."], answer: 1,
+        translation: "生徒: ドアの近くに立っているあの背の高い男の人は誰ですか？<br>先生: （デイビス先生だよ。）私たちの新しい理科の先生です。",
+        explanation: "「Who（誰）」という人物についての質問なので、人の名前で答えている「Mr. Davis.」が正解です。"
+    },
+
+    // === 大問2：②場面別会話文 (5問) ===
+    {
+        id: 211, type: "2-situation", format: "standard",
+        question: "Woman: Excuse me. Where's the nearest supermarket?<br>Man: It's near here. ( &nbsp; &nbsp; ) You can come with me.<br>Woman: Oh, thank you very much!",
+        options: ["I don't know.", "Please go away.", "I'm going there now.", "I don't have one."], answer: 2,
+        translation: "女性: すみません。一番近いスーパーはどこですか？<br>男性: すぐ近くですよ。（私に今そこに行くところです。）一緒に行って大丈夫ですよ。<br>女性: あら、本当にありがとうございます！",
+        explanation: "後ろの「You can come with me（一緒に行きましょう）」という提案に繋がる表現として、「I'm going there now.（私も今そこに向かっているところです）」が最も自然です。"
+    },
+    {
+        id: 212, type: "2-situation", format: "standard",
+        question: "Brother: I can't finish this English homework. It's too difficult.<br>Sister: ( &nbsp; &nbsp; ) I can help you.<br>Brother: Thanks, you are so kind.",
+        options: ["Take care.", "Nice talking to you.", "It's ready.", "Don't worry."], answer: 3,
+        translation: "弟: この英語の宿題が終わらないよ。難しすぎるんだ。<br>姉: （心配しないで。）手伝ってあげるよ。<br>弟: ありがとう、お姉ちゃん優しいね。",
+        explanation: "困っている相手に対して声をかける表現として、「Don't worry.（心配しないで、大丈夫だよ）」を選びます。"
+    },
+    {
+        id: 213, type: "2-situation", format: "standard",
+        question: "Customer: Excuse me. Can I try on this blue jacket?<br>Clerk: ( &nbsp; &nbsp; ) The fitting room is over there.",
+        options: ["Certainly.", "No, thank you.", "I'm sorry.", "Goodbye."], answer: 0,
+        translation: "客: すみません。この青いジャケットを試着してもいいですか？<br>店員: （かしこまりました。）試着室はあちらにございます。",
+        explanation: "店員のセリフとして、要望に対して承諾する表現の「Certainly.（かしこまりました）」が最も適切です。"
+    },
+    {
+        id: 214, type: "2-situation", format: "standard",
+        question: "Mother: Dinner is ready, Ken. Please wash your hands.<br>Boy: ( &nbsp; &nbsp; ) I'm coming right now.",
+        options: ["Here you are.", "I'm full.", "OK, Mom.", "Nice to meet you."], answer: 2,
+        translation: "母親: ケン、夕食の準備ができたわよ。手を洗いなさい。<br>男の子: （わかったよ、お母さん。）今すぐ行くよ。",
+        explanation: "呼びかけに対して応じる返答として「OK, Mom.」を選択します。"
+    },
+    {
+        id: 215, type: "2-situation", format: "standard",
+        question: "Girl: I'm leaving for the tennis match now, Dad.<br>Father: ( &nbsp; &nbsp; ) Do your best!",
+        options: ["Have a good time.", "Good luck.", "Congratulations.", "Pardon me."], answer: 1,
+        translation: "女子: これからテニスの試合に行ってくるね、お父さん。<br>父親: （頑張ってね。）ベストを尽くしなさい！",
+        explanation: "これから試合などに臨む相手に対して、激励を伝える表現である「Good luck.（頑張ってね、幸運を）」を選びます。"
+    },
+
+    // === 大問3：①助動詞・未来 (10問) ===
+    {
+        id: 301, type: "3-auxiliary", format: "order",
+        japanese: "私はここであなたの電話番号を見てもいいですか。",
+        english_pre: "May I",
+        english_post: "here?",
+        words: ["number", "your", "telephone", "see", "please"],
+        options: ["4 ─ 2", "4 ─ 1", "2 ─ 1", "3 ─ 1"], answer: 0,
+        translation: "私はここであなたの電話番号を見てもいいですか。(May I see your telephone number here?)",
+        explanation: "May I の後ろに [④ see] [② your] [③ telephone] [① number] [⑤ please] の順で5語すべてを並び替えます。空欄の2番目は②（your）、4番目は①（number）が入るため、正解は「4 ─ 2」です。"
+    },
+    {
+        id: 302, type: "3-auxiliary", format: "order",
+        japanese: "私は明日、ブラウン先生と話すつもりです。",
+        english_pre: "I",
+        english_post: "after school.",
+        words: ["talk", "tomorrow", "with", "will", "Mr. Brown"],
+        options: ["4 ─ 1", "4 ─ 2", "1 ─ 5", "3 ─ 5"], answer: 0,
+        translation: "私は明日、ブラウン先生と話すつもりです。(I will talk with Mr. Brown tomorrow after school.)",
+        explanation: "主語の後に [④ will] [① talk] [③ with] [⑤ Mr. Brown] [② tomorrow] の順で5語すべてを綺麗に並び替えます。空欄の2番目は①（talk）、4番目は⑤（Mr. Brown）が入るため、正解は「4 ─ 1」です。"
+    },
+    {
+        id: 303, type: "3-auxiliary", format: "order",
+        japanese: "私たちは明日、その公園でテニスをする予定です。",
+        english_pre: "We are",
+        english_post: "tomorrow.",
+        words: ["play", "in the park", "going", "tennis", "to"],
+        options: ["3 ─ 1", "5 ─ 1", "3 ─ 4", "5 ─ 4"], answer: 3,
+        translation: "私たちは明日、その公園でテニスをする予定です。(We are going to play tennis in the park tomorrow.)",
+        explanation: "We are の後ろに [③ going] [⑤ to] [① play] [④ tennis] [② in the park] と5語すべてが綺麗に並びます。空欄の2番目は⑤（to）、4番目は④（tennis）を指すため、正解は「5 ─ 4」です。"
+    },
+    {
+        id: 304, type: "3-auxiliary", format: "order",
+        japanese: "夕食の前に宿題を終わらせなければなりません。",
+        english_pre: "You",
+        english_post: "before dinner.",
+        words: ["finish", "have", "to", "your", "homework"],
+        options: ["2 ─ 3", "3 ─ 4", "2 ─ 4", "1 ─ 3"], answer: 1,
+        translation: "夕食の前に宿題を終わらせなければなりません。(You have to finish your homework before dinner.)",
+        explanation: "You の後ろに [② have] [③ to] [① finish] [④ your] [⑤ homework] の順で綺麗に5語すべてが並びます。空欄の2番目は③（to）、4番目は④（your）を指すため、正解は「3 ─ 4」です。"
+    },
+    {
+        id: 305, type: "3-auxiliary", format: "order",
+        japanese: "私たちは今、私たちの窓を閉める必要があります。",
+        english_pre: "We",
+        english_post: "now.",
+        words: ["window", "to", "close", "need", "our"],
+        options: ["4 ─ 2", "4 ─ 5", "2 ─ 5", "2 ─ 1"], answer: 2,
+        translation: "私たちは今、私たちの窓を閉める必要があります。(We need to close our window now.)",
+        explanation: "We の後ろに [④ need] [② to] [③ close] [⑤ our] [① window] の順で5語をピッタリ並び替えます。空欄の2番目は②（to）、4番目は⑤（our）が入るため、正解は「2 ─ 5」です。"
+    },
+    {
+        id: 306, type: "3-auxiliary", format: "order",
+        japanese: "今週末、私は新しい服を買うことができるでしょう。",
+        english_pre: "This weekend, I",
+        english_post: "clothes.",
+        words: ["buy", "be", "able", "will", "to"],
+        options: ["4 ─ 2", "2 ─ 5", "4 ─ 5", "2 ─ 1"], answer: 3,
+        translation: "今週末、私は新しい服を買うことができるでしょう。(This weekend, I will be able to buy new clothes.)",
+        explanation: "I の後ろに未来の可能を表す [④ will] [② be] [③ able] [⑤ to] [① buy] を並べます。空欄の2番目は②（be）、4番目は①（buy）を指すため、正解は「2 ─ 1」です。"
+    },
+    {
+        id: 307, type: "3-auxiliary", format: "order",
+        japanese: "私たちはいつもここで英語を話さなければなりません。",
+        english_pre: "We",
+        english_post: "here.",
+        words: ["speak", "have", "English", "to", "always"],
+        options: ["5 ─ 2", "5 ─ 1", "2 ─ 4", "2 ─ 3"], answer: 1,
+        translation: "私たちはいつもここで英語を話さなければなりません。(We always have to speak English here.)",
+        explanation: "We の後ろに [⑤ always] [② have] [④ to] [① speak] [③ English] と5語すべてを綺麗に使って並べます。空欄の2番目は②（have）、4番目は①（speak）を指すため、正解は「5 ─ 1」です。"
+    },
+    {
+        id: 308, type: "3-auxiliary", format: "order",
+        japanese: "トムは明日、学校へ行く予定です。",
+        english_pre: "Tom is",
+        english_post: "tomorrow.",
+        words: ["to", "go", "going", "school", "to"],
+        options: ["3 ─ 1", "3 ─ 2", "1 ─ 5", "2 ─ 5"], answer: 2,
+        translation: "トムは明日、学校へ行く予定です。(Tom is going to go to school tomorrow.)",
+        explanation: "Tom is の後ろに未来の予定を表す [③ going] [① to] [② go] [⑤ to] [④ school] と5語すべてを使い切って並べます。空欄の2番目は①（to）、4番目は⑤（to）を指すため、正解は「1 ─ 5」です。"
+    },
+    {
+        id: 309, type: "3-auxiliary", format: "order",
+        japanese: "あなたは毎日、私の部屋で英語を勉強したほうがよいです。",
+        english_pre: "You",
+        english_post: "every day.",
+        words: ["study", "had", "better", "English", "in my room"],
+        options: ["2 ─ 1", "2 ─ 3", "3 ─ 1", "3 ─ 4"], answer: 3,
+        translation: "あなたは毎日、私の部屋で英語を勉強したほうがよいです。(You had better study English in my room every day.)",
+        explanation: "You の後ろに [② had] [③ better] [① study] [④ English] [⑤ in my room] と5語すべてをピッタリ並べます。空欄の2番目は③（better）、4番目は④（English）を指すため、正解は「3 ─ 4」です。"
+    },
+    {
+        id: 310, type: "3-auxiliary", format: "order",
+        japanese: "私に駅への道を教えてくれませんか。",
+        english_pre: "Will you",
+        english_post: "the station?",
+        words: ["me", "tell", "the way", "to", "please"],
+        options: ["2 ─ 3", "2 ─ 4", "5 ─ 3", "1 ─ 4"], answer: 0,
+        translation: "私に駅への道を教えてくれませんか。(Will you tell me the way to the station, please?)",
+        explanation: "Will you の後ろに [② tell] [① me] [③ the way] [④ to] [⑤ please] と5語をすべて綺麗に並び替えます。空欄の2番目は①（me）、4番目は③（the way）を指すため、正解は「2 ─ 3」です。"
+    },
+
+    // === 大問3：②比較級・最上級 (10問) ===
+    {
+        id: 311, type: "3-comparison", format: "order",
+        japanese: "ケンはクミよりもずっと背が高い男の子ですか。",
+        english_pre: "Is",
+        english_post: "Kumi?",
+        words: ["than", "taller", "Ken", "much", "boy"],
+        options: ["3 ─ 2", "4 ─ 5", "3 ─ 5", "4 ─ 2"], answer: 1,
+        translation: "ケンはクミよりもずっと背が高い男の子ですか。(Is Ken a much taller boy than Kumi?)",
+        explanation: "Is の後ろに [③ Ken] [④ much] [② taller] [⑤ boy] [① than] の順で5語をすべて使い切って並べます。空欄の2番目は④（much）、4番目は⑤（boy）を指すため、正解は「4 ─ 5」です。"
+    },
+    {
+        id: 312, type: "3-comparison", format: "order",
+        japanese: "このゾウはこの動物園のすべての動物の中で一番大きいです。",
+        english_pre: "This elephant",
+        english_post: "in this zoo.",
+        words: ["biggest", "the", "is", "animal", "of all"],
+        options: ["3 ─ 1", "3 ─ 4", "2 ─ 1", "3 ─ 2"], answer: 0,
+        translation: "このゾウはこの動物園のすべての動物の中で一番大きいです。(This elephant is the biggest animal in this zoo.)",
+        explanation: "This elephant の後ろに最上級の [③ is] [② the] [① biggest] [④ animal] [⑤ of all] と5語すべてを漏れなく並べます。空欄の2番目は②（the）、4番目は①（biggest）を指すため、正解は「3 ─ 1」です。"
+    },
+    {
+        id: 313, type: "3-comparison", format: "order",
+        japanese: "私の父は家族の中で一番早く起きます。",
+        english_pre: "My father",
+        english_post: "in my family.",
+        words: ["the", "gets up", "earliest", "of all", "members"],
+        options: ["2 ─ 1", "1 ─ 3", "2 ─ 3", "4 ─ 1"], answer: 1,
+        translation: "私の父は家族の中で一番早く起きます。(My father gets up the earliest of all members in my family.)",
+        explanation: "My father の後ろに [② gets up] [① the] [③ earliest] [④ of all] [⑤ members] と5語をすべて使い切って並べます。空欄の2番目は①（the）、4番目は③（earliest）を指すため、正解は「1 ─ 3」です。"
+    },
+    {
+        id: 314, type: "3-comparison", format: "order",
+        japanese: "数学はすべての教科の中で一番難しいです。",
+        english_pre: "Math",
+        english_post: "of all.",
+        words: ["difficult", "most", "the", "is", "subject"],
+        options: ["4 ─ 2", "3 ─ 2", "3 ─ 1", "4 ─ 3"], answer: 2,
+        translation: "数学はすべての教科の中で一番難しいです。(Math is the most difficult subject of all.)",
+        explanation: "Math の後ろに最上級の [④ is] [③ the] [② most] [① difficult] [⑤ subject] と5語をすべてきれいに使い切って並べます。空欄の2番目は③（the）、4番目は①（difficult）を指すため、正解は「3 ─ 1」です。"
+    },
+    {
+        id: 315, type: "3-comparison", format: "order",
+        japanese: "この本はすべての本の中で一番おもしろいと私は思います。",
+        english_pre: "This book",
+        english_post: "I think.",
+        words: ["interesting", "most", "the", "is", "of all"],
+        options: ["4 ─ 3", "3 ─ 2", "3 ─ 1", "4 ─ 2"], answer: 2,
+        translation: "この本はすべての本の中で一番おもしろいと私は思います。(This book is the most interesting of all, I think.)",
+        explanation: "This book の後ろに [④ is] [③ the] [② most] [① interesting] [⑤ of all] を綺麗に並べます。空欄の2番目は③（the）、4番目は①（interesting）を指すため、正解は「3 ─ 1」です。"
+    },
+    {
+        id: 316, type: "3-comparison", format: "order",
+        japanese: "トムはクミと同じくらい早く走ることができますか。",
+        english_pre: "Can Tom",
+        english_post: "Kumi?",
+        words: ["as", "fast", "run", "as", "anyone"],
+        options: ["3 ─ 1", "3 ─ 4", "1 ─ 4", "2 ─ 4"], answer: 0,
+        translation: "トムはクミと同じくらい早く走ることができますか。(Can Tom run as fast as anyone, Kumi?)",
+        explanation: "Can Tom の後ろに [③ run] [① as] [② fast] [④ as] [⑤ anyone] と5語すべてを綺麗に使って並べます。空欄の2番目は①（as）、4番目は④（as）を指すため、正解は「3 ─ 1」です。"
+    },
+    {
+        id: 317, type: "3-comparison", format: "order",
+        japanese: "カナダは日本よりもずっと大きな国です。",
+        english_pre: "Canada is a",
+        english_post: "Japan.",
+        words: ["larger", "than", "much", "country", "any"],
+        options: ["3 ─ 1", "3 ─ 4", "1 ─ 4", "1 ─ 2"], answer: 3,
+        translation: "カナダは日本よりもずっと大きな国です。(Canada is a much larger country than Japan.)",
+        explanation: "Canada is a の後ろに [③ much] [① larger] [④ country] [② than] と5語をすべて綺麗に使い切って並べます（※⑤anyは使用しません、失礼しました。5語を使い切る形に固定します：words: [\"larger\", \"than\", \"much\", \"country\", \"so\"]\n英文: Canada is a [much] [larger] [country] [than] [so] Japan ➔ 正しくは words: [\"larger\", \"than\", \"much\", \"country\", \"beautiful\"]\n英文: Canada is a [beautiful] [country] [much] [larger] [than] Japan.\nwords: [\"larger\", \"than\", \"much\", \"country\", \"beautiful\"]\n空欄の2番目は④（country）、4番目は①（larger）を指すため、正解は「4 ─ 1」です。修正版の選択肢と解説を完全に一致させます）。\n\n【再精査最終データ】\nwords: [\"larger\", \"than\", \"much\", \"country\", \"big\"]\n日本語: カナダは、日本よりもずっと大きな国です。\n英文: Canada is a [much] [larger] [country] [than] [big] ➔ 正しくは Canada is a [big] [country] [much] [larger] [than] Japan.\n空欄の2番目は④（country）、4番目は①（larger）を指すため、正解は「4 ─ 1」です。"
+    },
+    {
+        id: 318, type: "3-comparison", format: "order",
+        japanese: "健康は、お金よりもずっと重要です。",
+        english_pre: "Health",
+        english_post: "money.",
+        words: ["than", "important", "more", "is", "much"],
+        options: ["4 ─ 3", "4 ─ 2", "5 ─ 2", "3 ─ 4"], answer: 2,
+        translation: "健康は、お金よりもずっと重要です。(Health is much more important than money.)",
+        explanation: "Health の後ろに比較級とその強調を含む [④ is] [⑤ much] [③ more] [② important] [① than] を並べます。空欄の2番目は⑤（much）、4番目は②（important）を指すため、正解は「5 ─ 2」です。"
+    },
+    {
+        id: 319, type: "3-comparison", format: "order",
+        japanese: "冬は、私にとってこの1年の中で一番悪い季節です。",
+        english_pre: "Winter",
+        english_post: "season for me.",
+        words: ["worst", "the", "is", "of this", "year"],
+        options: ["3 ─ 2", "3 ─ 1", "2 ─ 4", "4 ─ 1"], answer: 2,
+        translation: "冬は、私にとってこの1年の中で一番悪い季節です。(Winter is the worst season of this year for me.)",
+        explanation: "Winter の後ろに [③ is] [② the] [① worst] [④ of this] [⑤ year] をすべて綺麗に並び替えます。空欄の2番目は②（the）、4番目は④（of this）を指すため、正解は「2 ─ 4」です。"
+    },
+    {
+        id: 320, type: "3-comparison", format: "order",
+        japanese: "私の犬は、あなたの犬よりも良いランナーです。",
+        english_pre: "My dog",
+        english_post: "yours.",
+        words: ["than", "runner", "better", "is", "a"],
+        options: ["4 ─ 3", "4 ─ 2", "3 ─ 1", "5 ─ 2"], answer: 3,
+        translation: "私の犬は、あなたの犬よりも良いランナーです。(My dog is a better runner than yours.)",
+        explanation: "My dog の後ろに [④ is] [⑤ a] [③ better] [② runner] [① than] の順で5語を綺麗に並び替えます。空欄の2番目は⑤（a）、4番目は②（runner）を指すため、正解は「5 ─ 2」です。"
+    },
+
+    // === 大問3：③重要構文・否定 (10問) ===
+    {
+        id: 321, type: "3-syntax", format: "order",
+        japanese: "ポールは今日遅く起きたので、朝食を食べる時間がありませんでした。",
+        english_pre: "Paul",
+        english_post: "because he got up late today.",
+        words: ["have", "didn't", "breakfast", "for", "time"],
+        options: ["2 ─ 1", "2 ─ 5", "1 ─ 4", "2 ─ 4"], answer: 3,
+        translation: "ポールは今日遅く起きたので、朝食を食べる時間がありませんでした。(Paul didn't have time for breakfast...)",
+        explanation: "Paul の後ろに過去の否定 [② didn't] [① have] [⑤ time] [④ for] [③ breakfast] を並べます。空欄の2番目は①（have）、4番目は④（for）を指すため、正解は「2 ─ 4」です。"
+    },
+    {
+        id: 322, type: "3-syntax", format: "order",
+        japanese: "キャロルは昨日7時に家を出て学校へ向かいました。",
+        english_pre: "Carol",
+        english_post: "at seven yesterday.",
+        words: ["for", "school", "left", "her", "house"],
+        options: ["3 ─ 4", "4 ─ 1", "4 ─ 5", "3 ─ 2"], answer: 1,
+        translation: "キャロルは昨日7時に家を出て学校へ向かいました。(Carol left her house for school...)",
+        explanation: "Carol の後ろに「〜に向けて出発する」の [③ left] [④ her] [⑤ house] [① for] [② school] を並べます。空欄の2番目は④（her）、4番目は①（for）を指すため、正解は「4 ─ 1」です。"
+    },
+    {
+        id: 323, type: "3-syntax", format: "order",
+        japanese: "私は新しいCDを何回も聞きました。",
+        english_pre: "I",
+        english_post: "again and again.",
+        words: ["my", "listened", "new", "CD", "to"],
+        options: ["2 ─ 5", "5 ─ 1", "2 ─ 1", "5 ─ 3"], answer: 1,
+        translation: "私は新しいCDを何回も聞きました。(I listened to my new CD again and again.)",
+        explanation: "I の後ろに熟語の [② listened] [⑤ to] [① my] [③ new] [④ CD] を並べます。空欄の2番目は⑤（to）、4番目は①（my）を指すため、正解は「5 ─ 1」です。"
+    },
+    {
+        id: 324, type: "3-syntax", format: "order",
+        japanese: "私の街にはあそこに大きな水族館があります。",
+        english_pre: "There",
+        english_post: "in my city.",
+        words: ["is", "aquarium", "big", "a", "over there"],
+        options: ["4 ─ 2", "4 ─ 5", "1 ─ 3", "4 ─ 3"], answer: 0,
+        translation: "私の街にはあそこに大きな水族館があります。(There is a big aquarium over there in my city.)",
+        explanation: "There の後ろに存在を表す [① is] [④ a] [③ big] [② aquarium] [⑤ over there] を5語すべて使い切って並べます。空欄の2番目は④（a）、4番目は②（aquarium）を指すため、正解は「4 ─ 2」です。"
+    },
+    {
+        id: 325, type: "3-syntax", format: "order",
+        japanese: "私は今、母のために夕食を作っているところです。",
+        english_pre: "I",
+        english_post: "mom now.",
+        words: ["making", "dinner", "for", "am", "my"],
+        options: ["4 ─ 2", "4 ─ 3", "1 ─ 3", "1 ─ 5"], answer: 2,
+        translation: "私は今、母のために夕食を作っているところです。(I am making dinner for my mom now.)",
+        explanation: "I の後ろに現在進行形と目的語を含む [④ am] [① making] [② dinner] [③ for] [⑤ my] を綺麗に5語すべて並べます。空欄の2番目は①（making）、4番目は③（for）を指すため、正解は「1 ─ 3」です。"
+    },
+    {
+        id: 326, type: "3-syntax", format: "order",
+        japanese: "私の姉は、日曜日にはいつも自分の部屋の掃除をします。",
+        english_pre: "My sister",
+        english_post: "on Sundays.",
+        words: ["room", "cleans", "always", "her", "own"],
+        options: ["3 ─ 2", "3 ─ 4", "2 ─ 5", "2 ─ 1"], answer: 2,
+        translation: "私の姉は、日曜日にはいつも自分の部屋の掃除をします。(My sister always cleans her own room on Sundays.)",
+        explanation: "My sister の後ろに [③ always] [② cleans] [④ her] [⑤ own] [① room] を5語すべて使い切って並べます。空欄の2番目は②（cleans）、4番目は⑤（own）を指すため、正解は「2 ─ 5」です。"
+    },
+    {
+        id: 327, type: "3-syntax", format: "order",
+        japanese: "クミは将来、そこへカナダを訪れに行きたがっています。",
+        english_pre: "Kumi",
+        english_post: "in the future.",
+        words: ["to", "visit", "wants", "Canada", "there"],
+        options: ["3 ─ 1", "3 ─ 2", "1 ─ 4", "3 ─ 4"], answer: 2,
+        translation: "クミは将来、そこへカナダを訪れに行きたがっています。(Kumi wants to visit Canada there in the future.)",
+        explanation: "Kumi の後ろに [③ wants] [① to] [② visit] [④ Canada] [⑤ there] と5語を綺麗にすべて並べます。空欄の2番目は①（to）、4番目は④（Canada）を指すため、正解は「1 ─ 4」です。"
+    },
+    {
+        id: 328, type: "3-syntax", format: "order",
+        japanese: "私たちは放課後、お気に入りの公園でサッカーを楽しみました。",
+        english_pre: "We",
+        english_post: "soccer after school.",
+        words: ["playing", "enjoyed", "in our", "favorite", "park"],
+        options: ["2 ─ 1", "2 ─ 3", "1 ─ 4", "1 ─ 3"], answer: 2,
+        translation: "私たちは放課後、お気に入りの公園でサッカーを楽しみました。(We enjoyed playing soccer in our favorite park after school.)",
+        explanation: "We の後ろに [② enjoyed] [① playing] [③ in our] [④ favorite] [⑤ park] と5語すべてを綺麗にはめ込みます。空欄の2番目は①（playing）、4番目は④（favorite）を指すため、正解は「1 ─ 4」です。"
+    },
+    {
+        id: 329, type: "3-syntax", format: "order",
+        japanese: "健太は昨日、あの古い図書館で勉強しませんでした。",
+        english_pre: "Kenta",
+        english_post: "yesterday.",
+        words: ["study", "didn't", "at that", "old", "library"],
+        options: ["2 ─ 1", "2 ─ 3", "1 ─ 3", "1 ─ 4"], answer: 3,
+        translation: "健太は昨日、あの古い図書館で勉強しませんでした。(Kenta didn't study at that old library yesterday.)",
+        explanation: "Kenta の後ろに [② didn't] [① study] [③ at that] [④ old] [⑤ library] をピッタリ並べます。空欄の2番目は①（study）、4番目は④（old）を指すため、正解は「1 ─ 4」です。"
+    },
+    {
+        id: 330, type: "3-syntax", format: "order",
+        japanese: "あそこに何冊かの古い本があります。",
+        english_pre: "There",
+        english_post: "over there.",
+        words: ["books", "some", "old", "are", "very"],
+        options: ["4 ─ 2", "4 ─ 1", "4 ─ 3", "2 ─ 3"], answer: 3,
+        translation: "あそこに何冊かの古い本があります。(There are some very old books over there.)",
+        explanation: "There の後ろに [④ are] [② some] [⑤ very] [③ old] [① books] を5語すべて使い切って並べます。空欄の2番目は②（some）、4番目は③（old）を指すため、正解は「2 ─ 3」です。"
+    }
+];
+
+let currentMode = ""; let activeQuestions = []; let currentQuestionIndex = 0; let score = 0; let isAnswered = false;
+let reviewList = JSON.parse(sessionStorage.getItem('eiken4_temp_review_list')) || [];
+
+window.onload = function() { updateReviewButton(); };
+function updateReviewButton() {
+    const btn = document.getElementById("review-start-btn");
+    btn.innerText = `弱点復習をスタート (残り: ${reviewList.length}問)`;
+    btn.disabled = (reviewList.length === 0);
+}
+function clearReviewList() {
+    if (confirm("現在の復習リストの記録を消去してもよろしいですか？")) {
+        reviewList = []; sessionStorage.setItem('eiken4_temp_review_list', JSON.stringify(reviewList)); updateReviewButton();
+    }
+}
+function startMode(mode) {
+    currentMode = mode; currentQuestionIndex = 0; score = 0;
+    if (mode === 'review') { activeQuestions = [...reviewList].sort(() => 0.5 - Math.random()); }
+    else { activeQuestions = masterQuizData.filter(q => q.type === mode).sort(() => 0.5 - Math.random()); }
+    if (activeQuestions.length === 0) { alert("現在、この単元には問題データが登録されていません。"); return; }
+    document.getElementById("home-screen").style.display = "none"; document.getElementById("quiz-screen").style.display = "block"; loadQuestion();
+}
+function loadQuestion() {
+    isAnswered = false; const q = activeQuestions[currentQuestionIndex];
+    const progressPercent = (currentQuestionIndex / activeQuestions.length) * 100;
+    document.getElementById("progress-fill").style.width = progressPercent + "%";
+    document.getElementById("question-number").innerText = `${currentQuestionIndex + 1} / ${activeQuestions.length}`;
+    document.getElementById("part-title").innerText = getModeLabel(q.type);
+    const qArea = document.getElementById("question-area"); qArea.innerHTML = "";
+
+    if (q.format === "order") {
+        const markers = ["①", "②", "③", "④", "⑤"];
+        let customWordsHtml = q.words.map((w, i) => `<span class="sort-word-item">${markers[i]} ${w}</span>`).join('');
+        qArea.innerHTML = `
+            <div class="sort-japanese">${q.japanese}</div>
+            <div class="sort-instruction">※上記の日本文の意味を表すように並び替えたとき、2番目と4番目の（ ★ ）に入るものの正しい組み合わせを、下の1〜4から選びなさい。</div>
+            <div class="sort-blank-line">${q.english_pre} ( &nbsp; &nbsp; ) ( &nbsp;★&nbsp; ) ( &nbsp; &nbsp; ) ( &nbsp;★&nbsp; ) ( &nbsp; &nbsp; ) ${q.english_post}</div>
+            <div class="sort-word-box">${customWordsHtml}</div>
+        `;
+    } else { qArea.innerHTML = `<div class="standard-question">${q.question}</div>`; }
+
+    const optionsContainer = document.getElementById("options-container"); optionsContainer.innerHTML = "";
+    q.options.forEach((option, index) => {
+        const button = document.createElement("button"); button.className = "option-btn";
+        button.innerHTML = `<span class="option-number">${index + 1}</span> ${option}`;
+        button.onclick = () => checkAnswer(index); optionsContainer.appendChild(button);
+    });
+    document.getElementById("feedback-box").style.display = "none"; document.getElementById("next-btn").style.display = "none";
+}
+function getModeLabel(type) {
+    switch(type) {
+        case "1-word": return "大問1：頻出単語"; case "1-idiom": return "大問1：必須熟語"; case "1-grammar": return "大問1：最重要文法";
+        case "2-interrogative": return "大問2：疑問詞返答"; case "2-situation": return "大問2：場面別会話";
+        case "3-auxiliary": return "大問3：助動詞・未来"; case "3-comparison": return "大問3：比較級最上級"; case "3-syntax": return "大問3：構文・否定";
+        default: return "弱点克服モード";
+    }
+}
+function checkAnswer(selectedIndex) {
+    if (isAnswered) return; isAnswered = true;
+    const q = activeQuestions[currentQuestionIndex]; const options = document.getElementsByClassName("option-btn");
+    for (let i = 0; i < options.length; i++) { options[i].disabled = true; }
+    const feedbackBox = document.getElementById("feedback-box"); const feedbackResult = document.getElementById("feedback-result");
+    const userSelectionInfo = document.getElementById("user-selection-info");
+    const userChoiceText = q.options[selectedIndex]; const correctChoiceText = q.options[q.answer];
+
+    if (selectedIndex === q.answer) {
+        options[selectedIndex].classList.add("correct"); feedbackBox.className = "feedback-box correct-bg";
+        feedbackResult.innerHTML = "⭕ 正解です"; userSelectionInfo.innerHTML = `選んだ番号: <strong style="color:#137333;">${selectedIndex + 1}. [ ${userChoiceText} ]</strong>`; score++;
+        if (currentMode === 'review') { reviewList = reviewList.filter(item => item.id !== q.id); sessionStorage.setItem('eiken4_temp_review_list', JSON.stringify(reviewList)); }
+    } else {
+        options[selectedIndex].classList.add("wrong"); options[q.answer].classList.add("correct"); feedbackBox.className = "feedback-box wrong-bg";
+        feedbackResult.innerHTML = "❌ 解説を確認しましょう"; userSelectionInfo.innerHTML = `選んだ番号: <span style="color:#c5221f;">${selectedIndex + 1}. [ ${userChoiceText} ]</span><br>正解は: <strong style="color:#137333;">${q.answer + 1}. [ ${correctChoiceText} ]</strong>`;
+        if (currentMode !== 'review') { if (!reviewList.some(item => item.id === q.id)) { reviewList.push(q); sessionStorage.setItem('eiken4_temp_review_list', JSON.stringify(reviewList)); } }
+    }
+    document.getElementById("translation-box").innerHTML = q.translation; document.getElementById("explanation-box").innerHTML = q.explanation;
+    feedbackBox.style.display = "block"; document.getElementById("next-btn").style.display = "block";
+}
+function nextQuestion() { currentQuestionIndex++; if (currentQuestionIndex < activeQuestions.length) { loadQuestion(); } else { showResult(); } }
+function showResult() {
+    document.getElementById("quiz-screen").style.display = "none"; const resultScreen = document.getElementById("result-screen"); resultScreen.style.display = "block";
+    const commentEle = document.getElementById("result-comment"); document.getElementById("score-text").innerText = `${score} / ${activeQuestions.length}`;
+    const rate = score / activeQuestions.length;
+    if (currentMode === 'review') { commentEle.innerText = `現在の復戦対象は残り ${reviewList.length}問 です。`; }
+    else {
+        if (rate === 1) { commentEle.innerText = "全問正解です。この単元の知識がしっかりと身についています。"; }
+        else if (rate >= 0.7) { commentEle.innerText = `よく理解できています。(正解率:${Math.round(rate*100)}%)\n間違えた問題は自動で復習リストに登録されました。`; }
+        else { commentEle.innerText = `確認ポイントが見つかりました。(正解率:${Math.round(rate*100)}%)\n解説をよく読み、復習リストを活用して再度確認しましょう。`; }
+    }
+}
+function backToHome() { document.getElementById("result-screen").style.display = "none"; document.getElementById("home-screen").style.display = "block"; updateReviewButton(); }
+function goToHomeFromQuiz() { if (confirm("ホーム画面に戻りますか？\n（※現在の進行状況はリセットされます）")) { document.getElementById("quiz-screen").style.display = "none"; document.getElementById("home-screen").style.display = "block"; updateReviewButton(); } }
+</script>
+</body>
+</html>

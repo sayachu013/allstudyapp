@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>埼玉県高校模試 英語大問2突破マスター</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #eff6ff;
+            --success: #10b981;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --gray: #f3f4f6;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; }
+        body { background-color: #f8fafc; color: var(--dark); line-height: 1.6; padding: 15px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; }
+        h1 { font-size: 20px; text-align: center; color: var(--primary); margin-bottom: 20px; border-bottom: 3px solid var(--primary); padding-bottom: 10px; padding-right: 90px; padding-left: 90px; }
+        h2 { font-size: 16px; margin-bottom: 15px; color: var(--primary); }
+        .btn { display: block; width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: #172554; }
+        .btn-gray { background: var(--gray); color: var(--dark); border: 1px solid #d1d5db; }
+        .btn-gray:hover { background: #e5e7eb; }
+        .hidden { display: none !important; }
+        
+        /* 右上ホームボタン */
+        .btn-home-top { position: absolute; top: 15px; right: 15px; width: auto; padding: 6px 12px; font-size: 12px; margin: 0; background: #64748b; color: white; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; z-index: 10; }
+        .btn-home-top:hover { background: #475569; }
+        
+        /* メニュー画面 */
+        .menu-section { margin-bottom: 20px; padding: 15px; background: var(--primary-light); border-radius: 8px; border-left: 5px solid var(--primary); }
+        .unit-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 8px 0; background: #ffffff; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0; }
+        .unit-title { font-size: 14px; font-weight: bold; flex-grow: 1; color: var(--dark); }
+        .btn-sub { width: auto; min-width: 95px; padding: 8px 12px; font-size: 13px; margin: 0; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; text-align: center; transition: all 0.3s ease; }
+        .btn-sub-basic { background: #e2e8f0; color: #334155; border: 1px solid #cbd5e1; }
+        .btn-sub-basic:hover { background: #cbd5e1; }
+        .btn-sub-advanced { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .btn-sub-advanced:hover { background: #fde68a; }
+        
+        /* テストセクション専用マルチボタンコンテナ */
+        .test-btn-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 5px; }
+        .btn-test-sub { padding: 10px 5px; font-size: 13px; font-weight: bold; border-radius: 6px; border: 1px solid #cbd5e1; cursor: pointer; background: #ffffff; color: #334155; transition: all 0.3s ease; }
+        .btn-test-sub:hover { background: #f1f5f9; }
+
+        /* 王冠クリア時のゴールドクラス仕様 */
+        .btn-gold-clear { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important; color: #ffffff !important; border: 1px solid #b45309 !important; box-shadow: 0 2px 4px rgba(217, 119, 6, 0.3); text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .btn-gold-clear:hover { background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important; }
+        
+        /* 問題画面 */
+        .status-bar { display: flex; justify-content: space-between; font-size: 13px; color: #6b7280; margin-bottom: 15px; font-weight: bold; padding-right: 90px; }
+        .instruction-box { background: #fef08a; padding: 10px; border-radius: 6px; font-size: 14px; margin-bottom: 15px; font-weight: bold; text-align: center; border: 1px solid #fef08a; }
+        .question-text { font-size: 16px; font-weight: bold; text-align: left; padding: 20px 15px; background: #fafafa; border: 2px dashed #cbd5e1; border-radius: 8px; margin-bottom: 20px; white-space: pre-wrap; }
+        
+        /* スペル入力フォーム記述エリア用スタイル */
+        .input-container { margin-top: 15px; display: flex; flex-direction: column; gap: 12px; }
+        .text-input-field { width: 100%; padding: 14px; font-size: 18px; font-weight: bold; border: 2px solid #cbd5e1; border-radius: 8px; text-align: center; font-family: 'Times New Roman', Georgia, serif; letter-spacing: 1px; }
+        .text-input-field:focus { outline: none; border-color: var(--primary); background: var(--primary-light); }
+        
+        /* 並び替え用ワードブロックUI専用スタイル */
+        .sort-tray-box { border: 2px dashed #94a3b8; background: #f8fafc; padding: 15px; min-height: 60px; border-radius: 8px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; }
+        .sort-pool-box { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px; background: #f1f5f9; padding: 12px; border-radius: 8px; }
+        .word-chip { background: white; border: 2px solid #cbd5e1; color: var(--dark); padding: 8px 14px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: all 0.2s ease; user-select: none; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        .word-chip:hover { border-color: var(--primary); background: var(--primary-light); transform: translateY(-1px); }
+        .word-chip:active { transform: translateY(1px); }
+        
+        /* 数学フォント用スタイル（明朝・イタリックベースに統一） */
+        .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; padding: 0 4px; font-size: 20px; font-family: 'Times New Roman', Georgia, serif; font-style: italic; font-weight: bold; }
+        .num { border-bottom: 2px solid var(--dark); padding-bottom: 2px; }
+        .den { padding-top: 2px; }
+        .math-inline { display: inline-flex; align-items: center; justify-content: center; font-family: 'Times New Roman', Georgia, serif; font-style: italic; font-weight: bold; font-size: 22px; }
+        
+        /* 連立方程式用の縦並びブロック配置 */
+        .sys-eq { display: inline-flex; align-items: center; font-size: 22px; font-family: 'Times New Roman', Georgia, serif; font-style: italic; font-weight: bold; vertical-align: middle; text-align: left; }
+        .sys-brace { font-size: 40px; font-weight: 100; font-family: 'Times New Roman', serif; margin-right: 2px; line-height: 1; }
+        .sys-lines { display: inline-flex; flex-direction: column; gap: 2px; }
+
+        /* 解答画面のスタイリッシュな正誤判定モジュール */
+        .result-alert { padding: 20px; border-radius: 14px; text-align: center; font-size: 26px; font-weight: 800; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; letter-spacing: 1px; transition: all 0.4s ease; border: 1px solid transparent; }
+        .result-badge-icon { font-size: 36px; line-height: 1; margin-bottom: 2px; animation: popBadge 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .result-badge-sub { font-size: 13px; font-weight: 600; opacity: 0.8; letter-spacing: 0.5px; text-transform: uppercase; }
+        
+        .alert-success { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.15), 0 8px 10px -6px rgba(16, 185, 129, 0.1); }
+        .alert-danger { background: #fff5f5; color: #9b1c1c; border-color: #fee2e2; box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.12), 0 8px 10px -6px rgba(239, 68, 68, 0.08); }
+        
+        @keyframes popBadge {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .explanation-box { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 15px; }
+        .grid-title { font-weight: bold; color: var(--primary); margin-bottom: 8px; font-size: 14px; }
+        .exp-text { font-size: 16px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button id="btn-top-home" class="btn-home-top hidden" onclick="confirmGoHome()">ホームへ</button>
+
+    <h1>埼玉県高校模試 英語記述・一行問題マスター</h1>
+
+    <div id="screen-home">
+        <div class="menu-section">
+            <h2>🏆 全単元確認テスト</h2>
+            <p style="font-size:13px; color:#4b5563; margin-bottom:10px;">全単元から10問をランダム出題。記述による正答率9割（90点）以上でクリア王冠👑が解放されます！</p>
+            <div class="test-btn-grid">
+                <button id="btn-test-basic" class="btn-test-sub" onclick="startTest('basic')">基本のみ</button>
+                <button id="btn-test-mix" class="btn-test-sub" onclick="startTest('mix')">基本+応用</button>
+                <button id="btn-test-advanced" class="btn-test-sub" onclick="startTest('advanced')">応用のみ</button>
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <h2>📂 模試記述頻出スロット別特訓 (10連勝で完全クリア👑)</h2>
+            <div class="unit-row">
+                <span class="unit-title">単元①：適切な前置詞の補充（1語記述）</span>
+                <button id="btn-1-basic" class="btn-sub btn-sub-basic" onclick="startUnit(1, 'basic')">基本</button>
+                <button id="btn-1-advanced" class="btn-sub btn-sub-advanced" onclick="startUnit(1, 'advanced')">応用</button>
+            </div>
+            <div class="unit-row">
+                <span class="unit-title">単元②：曜日・月名・日付の表現（1語記述）</span>
+                <button id="btn-2-basic" class="btn-sub btn-sub-basic" onclick="startUnit(2, 'basic')">基本</button>
+                <button id="btn-2-advanced" class="btn-sub btn-sub-advanced" onclick="startUnit(2, 'advanced')">応用</button>
+            </div>
+            <div class="unit-row">
+                <span class="unit-title">単元③：接続詞・重要代名詞の補充（1語記述）</span>
+                <button id="btn-3-basic" class="btn-sub btn-sub-basic" onclick="startUnit(3, 'basic')">基本</button>
+                <button id="btn-3-advanced" class="btn-sub btn-sub-advanced" onclick="startUnit(3, 'advanced')">応用</button>
+            </div>
+            <div class="unit-row">
+                <span class="unit-title">単元④：動詞の形変化［過去形］（1語記述）</span>
+                <button id="btn-4-basic" class="btn-sub btn-sub-basic" onclick="startUnit(4, 'basic')">基本</button>
+                <button id="btn-4-advanced" class="btn-sub btn-sub-advanced" onclick="startUnit(4, 'advanced')">応用</button>
+            </div>
+            <div class="unit-row">
+                <span class="unit-title">単元⑤：動詞の形変化［動名詞・分詞］（1語記述）</span>
+                <button id="btn-5-basic" class="btn-sub btn-sub-basic" onclick="startUnit(5, 'basic')">基本</button>
+                <button id="btn-5-advanced" class="btn-sub btn-sub-advanced" onclick="startUnit(5, 'advanced')">応用</button>
+            </div>
+            <div class="unit-row">
+                <span class="unit-title">単元⑥：読解本文に基づく内容質問応答（短文記述）</span>
+                <button id="btn-6-basic" class="btn-sub btn-sub-basic" onclick="startUnit(6, 'basic')">基本</button>
+                <button id="btn-6-advanced" class="btn-sub btn-sub-advanced" onclick="startUnit(6, 'advanced')">応用</button>
+            </div>
+            <div class="unit-row">
+                <span class="unit-title">単元⑦：対話・要約の空欄補完（短文記述）</span>
+                <button id="btn-7-basic" class="btn-sub btn-sub-basic" onclick="startUnit(7, 'basic')">基本</button>
+                <button id="btn-7-advanced" class="btn-sub btn-sub-advanced" onclick="startUnit(7, 'advanced')">応用</button>
+            </div>
+            <div class="unit-row">
+                <span class="unit-title">単元⑧：読解内・並び替え［整序英作文］（ブロック選択形式）</span>
+                <button id="btn-8-basic" class="btn-sub btn-sub-basic" onclick="startUnit(8, 'basic')">基本</button>
+                <button id="btn-8-advanced" class="btn-sub btn-sub-advanced" onclick="startUnit(8, 'advanced')">応用</button>
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <h2>🔄 復習メニュー</h2>
+            <p style="font-size:13px; color:#4b5563; margin-bottom:10px;">過去に間違えた問題データのみを抽出し、解き直すことができます。（※タブをリロードするとリセットされます）</p>
+            <button id="btn-review" class="btn btn-gray" onclick="startReviewMode()">間違えた問題を復習する (<span id="review-count">0</span>問)</button>
+        </div>
+    </div>
+
+    <div id="screen-quiz" class="hidden">
+        <div class="status-bar">
+            <span id="quiz-title">単元特訓</span>
+            <span id="quiz-progress">1 / 10 問目</span>
+        </div>
+        
+        <div id="phase-write">
+            <div id="combo-alert" class="instruction-box">【ステップ1】問題文を読み、空欄に当てはまる、または質問に対する正しい英語をノートに書き出しなさい。</div>
+            <div id="question-area" class="question-text"></div>
+            <div style="text-align: center; margin-bottom: 10px;">※ノートにメモしたら下のボタンを押してください。</div>
+            <button class="btn btn-primary" onclick="showChoicesPhase()">解き終わったので解答を入力する</button>
+        </div>
+
+        <div id="phase-choose" class="hidden">
+            <div class="instruction-box" id="inputInstruction">【ステップ2】正しい英語表現をキーボードで入力しなさい。</div>
+            <div class="input-container">
+                <input type="text" id="userEnglishInput" class="text-input-field" placeholder="Type your answer here" autocomplete="off" spellcheck="false">
+                
+                <div id="sortingModuleArea" class="hidden">
+                    <div id="sortingAnswerTray" class="sort-tray-box"></div>
+                    <div style="text-align:center; font-size:12px; color:#64748b; margin-top:4px;">※下の単語をタップして並び替えなさい（トレイ側をタップで戻せます）</div>
+                    <div id="sortingWordPool" class="sort-pool-box"></div>
+                </div>
+
+                <button class="btn btn-primary" style="margin-top:5px;" onclick="checkWrittenAnswer()">解答を確定する</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="screen-result" class="hidden">
+        <div id="result-judge" class="result-alert"></div>
+        
+        <div class="explanation-box">
+            <div class="grid-title">■ あなたの入力した答え</div>
+            <div id="user-answer-display" style="font-size:16px; font-weight:bold; margin-bottom:15px; color:#475569; white-space:pre-wrap;"></div>
+            
+            <div class="grid-title" style="color:#047857;">■ 正しい答え（模範解答例）</div>
+            <div id="correct-answer-display" style="font-size:16px; font-weight:bold; margin-bottom:15px; color:#047857; white-space:pre-wrap;"></div>
+            
+            <div class="grid-title">■ 正解のポイント・解説</div>
+            <div id="explanation-display" class="exp-text" style="color:#1f2937;"></div>
+        </div>
+        
+        <button id="btn-next" class="btn btn-primary" onclick="nextQuestion()">次の問題へ進む</button>
+    </div>
+
+    <div id="screen-score" class="hidden">
+        <h2 style="text-align: center; font-size: 22px; margin-bottom: 20px;">🎉 演習終了結果</h2>
+        <div id="score-report" style="text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 20px; color: var(--primary);"></div>
+        <div id="score-comment" style="text-align: center; margin-bottom: 20px; font-size: 15px; padding: 10px; background: #f1f5f9; border-radius: 6px;"></div>
+        <button class="btn btn-primary" onclick="backToHome()">ホームメニューへ戻る</button>
+    </div>
+</div>
+
+<script>
+// --- アプリ共通データ管理 ---
+let reviewPool = JSON.parse(sessionStorage.getItem('math_review_pool')) || [];
+let crownRecords = JSON.parse(sessionStorage.getItem('math_clear_crowns')) || {};
+
+let currentMode = ''; 
+let currentUnitId = 0;
+let currentLevel = 'basic'; 
+let currentQuestions = [];
+let currentIndex = 0;
+let correctCount = 0; 
+let isInterrupted = false; 
+
+// 並び替え状態保持用のグローバル変数
+let trayWords = [];
+let poolWords = [];
+
+function updateReviewBadge() {
+    document.getElementById('review-count').innerText = reviewPool.length;
+    document.getElementById('btn-review').disabled = reviewPool.length === 0;
+}
+
+function updateCrownDisplays() {
+    for (let u = 1; u <= 8; u++) { 
+        let basicBtn = document.getElementById(`btn-${u}-basic`);
+        let advBtn = document.getElementById(`btn-${u}-advanced`);
+        
+        if (basicBtn) {
+            if (crownRecords[`${u}_basic`]) {
+                basicBtn.innerText = "👑 基本";
+                basicBtn.classList.add('btn-gold-clear');
+            } else {
+                basicBtn.innerText = "基本";
+                basicBtn.classList.remove('btn-gold-clear');
+            }
+        }
+        if (advBtn) {
+            if (crownRecords[`${u}_advanced`]) {
+                advBtn.innerText = "👑 応用";
+                advBtn.classList.add('btn-gold-clear');
+            } else {
+                advBtn.innerText = "応用";
+                advBtn.classList.remove('btn-gold-clear');
+            }
+        }
+    }
+    
+    let testBasicBtn = document.getElementById('btn-test-basic');
+    let testMixBtn = document.getElementById('btn-test-mix');
+    let testAdvBtn = document.getElementById('btn-test-advanced');
+    
+    if(testBasicBtn) {
+        if(crownRecords['test_basic']) { testBasicBtn.innerText = "👑 基本のみ"; testBasicBtn.classList.add('btn-gold-clear'); }
+        else { testBasicBtn.innerText = "基本のみ"; testBasicBtn.classList.remove('btn-gold-clear'); }
+    }
+    if(testMixBtn) {
+        if(crownRecords['test_mix']) { testMixBtn.innerText = "👑 基本+応用"; testMixBtn.classList.add('btn-gold-clear'); }
+        else { testMixBtn.innerText = "基本+応用"; testMixBtn.classList.remove('btn-gold-clear'); }
+    }
+    if(testAdvBtn) {
+        if(crownRecords['test_advanced']) { testAdvBtn.innerText = "👑 応用のみ"; testAdvBtn.classList.add('btn-gold-clear'); }
+        else { testAdvBtn.innerText = "応用のみ"; testAdvBtn.classList.remove('btn-gold-clear'); }
+    }
+}
+
+updateReviewBadge();
+updateCrownDisplays();
+
+function confirmGoHome() {
+    backToHome();
+}
+
+function setTopHomeButtonVisibility(visible) {
+    const homeBtn = document.getElementById('btn-top-home');
+    if (visible) {
+        homeBtn.classList.remove('hidden');
+    } else {
+        homeBtn.classList.add('hidden');
+    }
+}
+
+function getGCD(x, y) {
+    x = Math.abs(x); y = Math.abs(y);
+    while(y) { var t = y; y = x % y; x = t; }
+    return x;
+}
+
+function makeReducedFracHtml(num, den) {
+    let gcd = getGCD(num, den);
+    let rNum = num / gcd;
+    let rDen = den / gcd;
+    if (rDen === 1) return `${rNum}`;
+    return `<div class="frac"><span class="num">${rNum}</span><span class="den">${rDen}</span></div>`;
+}
+
+function cleanExpression(str) {
+    return str
+        .replace(/\b0[a-z]/g, '0')       
+        .replace(/\+ -/g, '- ')
+        .replace(/- -/g, '+ ')
+        .replace(/\+ \+/g, '+ ')
+        .replace(/\(\+(\d+)\)/g, '$1')   
+        .replace(/\b1([a-z])/g, '$1')   
+        .replace(/-1([a-z])/g, '-$1')   
+        .replace(/\s\+\s0\s/g, '')       
+        .replace(/\s-\s0\s/g, '')       
+        .trim();
+}
+
+function getRandomInt(min, max) {
+    let val = 0;
+    while(val === 0) { 
+        val = Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    return val;
+}
+
+function wrapNegative(num) {
+    return num < 0 ? `(${num})` : `${num}`;
+}
+
+function formatFactored(val) {
+    if (val > 0) return `+ ${val}`;
+    return `- ${Math.abs(val)}`;
+}
+
+// --- 単元別問題自動生成ロジックエンジン ---
+function generateQuestion(unitId, level) {
+    let qType = unitId;
+    if (unitId === 'random') qType = Math.floor(Math.random() * 8) + 1; 
+
+    let targetLevel = level;
+    if (level === 'mix') {
+        targetLevel = Math.random() > 0.5 ? 'basic' : 'advanced';
+    }
+
+    let html = '';
+    let correctAnsHtml = '';
+    let explanationHtml = '';
+    let matchKeywords = [];
+    let isShortText = false;
+    let isSortingType = false; 
+
+    const subjects = ['history', 'science', 'math', 'music', 'art'];
+    const names = ['Ken', 'Taku', 'Yuka', 'Emi', 'Kota', 'Saki'];
+    const places = ['Kyoto', 'Nagano', 'Fukuoka', 'Okinawa', 'Hokkaido'];
+    const animals = ['dog', 'cat', 'puppy', 'bird'];
+
+    switch(qType) {
+        case 1: { 
+            let pIdx = getRandomInt(0, 4);
+            let sIdx = getRandomInt(0, 4);
+            let n = names[getRandomInt(0, 5)];
+
+            if (targetLevel === 'advanced') { 
+                let template = Math.random() > 0.5;
+                if (template) {
+                    html = `【英文の空欄を埋めなさい】\n${n} and his family are looking forward (  [1]  ) visiting the big theme park in ${places[pIdx]} next month.`;
+                    correctAnsHtml = 'to';
+                    explanationHtml = `「〜を楽しみに待つ」は <strong>look forward to ~</strong> という重要熟語です。この to は前置詞なので、後ろには名詞や動名詞（visiting）が続きます。`;
+                } else {
+                    html = `【英文の空欄を埋めなさい】\nIt took about forty minutes from the station to the clean museum on (  [1]  ).`;
+                    correctAnsHtml = 'foot';
+                    explanationHtml = `「徒歩で、歩いて」を意味するお決まりの副詞句は <strong>on foot</strong> です。by train や by bus などの交通手段の表現と区別して覚えましょう。`;
+                }
+            } else { 
+                let template = Math.random() > 0.5;
+                if (template) {
+                    html = `【英文の空欄を埋めなさい】\nJane is studying Japanese ${subjects[sIdx]} here in ${places[pIdx]}. She came (  [1]  ) Japan six months ago.`;
+                    correctAnsHtml = 'to';
+                    explanationHtml = `「〜へ来る」は方向・目的地を示す前置詞 <strong>to</strong> を使用して [come to + 場所] と表現します。`;
+                } else {
+                    html = `【英文の空欄を埋めなさい】\n${n} was walking in the park (  [1]  ) about an hour yesterday.`;
+                    correctAnsHtml = 'for';
+                    explanationHtml = `「〜の間（時間の長さ・期間）」を表す場合は、前置詞 <strong>for</strong> を使用します。`;
+                }
+            }
+            break;
+        }
+        case 2: { 
+            const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            const months = ['January', 'April', 'June', 'July', 'September', 'October', 'December'];
+            let idx = getRandomInt(0, 6);
+
+            if (targetLevel === 'advanced') { 
+                let altMonths = ['February', 'Wednesday', 'September', 'November', 'December'];
+                let altJp = ['2月', '水曜日', '9月', '11月', '12月'];
+                let rIdx = getRandomInt(0, 4);
+                let targetStr = altMonths[rIdx];
+
+                html = `【日本語に合う英単語を1語で記述しなさい】\n英文：Our special event will be held on (  [2]  ).\n日本語：私たちの特別なイベントは、${altJp[rIdx]}に開催される予定です。`;
+                correctAnsHtml = targetStr;
+                explanationHtml = `「${altJp[rIdx]}」を意味する正しいスペルは <strong>${targetStr}</strong> です。模試で最もスペルミスが起きやすい要注意単語です。`;
+            } else { 
+                let mStr = months[idx];
+                html = `【日本語に合う月名を1語で記述しなさい】\n英文：On ${mStr} 2nd, my parents didn't have to work and were at home.\n日本語：${idx + 1}月2日、私の両親は仕事をする必要がなく、家にいました。`;
+                correctAnsHtml = mStr;
+                explanationHtml = `指定された月を意味する正しい月名表記は <strong>${mStr}</strong> です。文頭は大文字で書き始めます。`;
+            }
+            break;
+        }
+        case 3: { 
+            let n = names[getRandomInt(0, 5)];
+            let s = subjects[getRandomInt(0, 4)];
+
+            if (targetLevel === 'advanced') { 
+                let template = Math.random() > 0.5;
+                if (template) {
+                    html = `【文脈に合う適切な英語を1語で記述しなさい】\n${n}'s family used the train this time (  [3]  ) they know there are always a lot of traffic jams during the holidays.\n訳：いつも休暇中は大渋滞が起こることを知っていた［ので］、${n}の家族は今回、電車を利用しました。`;
+                    correctAnsHtml = 'because';
+                    explanationHtml = `「なぜなら〜だから（理由・根拠）」を後ろの節（主語＋動詞）を伴ってつなぐ接続詞は <strong>because</strong> です。`;
+                } else {
+                    html = `【文脈に合う適切な英語を1語で記述しなさい】\n${n} tried to tell the tourist the way to the temple in English, (  [3]  ) he couldn't say much.\n訳：${n}は英語で観光客にそのお寺への道を教えようとしましたが、あまり多くを話せ［ませんでした］。`;
+                    correctAnsHtml = 'but';
+                    explanationHtml = `「しかしながら、〜だが（逆接）」の関係を繋ぐ最もポピュラーな接続詞は <strong>but</strong> です。`;
+                }
+            } else { 
+                html = `【文脈に合う適切な接続詞を1語で記述しなさい】\n${n} loved the book very much, (  [3]  ) ${n} read it many times.\n訳：${n}はその本をとても気に入ったので、何度も読みました。`;
+                correctAnsHtml = 'so';
+                explanationHtml = `「〜なので（原因 ➔ 結果）」という因源関係を繋ぐ接続詞は <strong>so</strong> が適切です。`;
+            }
+            break;
+        }
+        case 4: { 
+            let n = names[getRandomInt(0, 5)];
+
+            if (targetLevel === 'advanced') { 
+                let template = Math.random() > 0.5;
+                if (template) {
+                    html = `【( ) 内の動詞を適切な形（1語）に変形しなさい】\nWhen ${n} was walking near the lake, a woman (speak) to him in English.`;
+                    correctAnsHtml = 'spoke';
+                    explanationHtml = `過去の一時点の動作（話しかけてきた）を表すため、speak の不規則変化過去形である <strong>spoke</strong> が正解です。`;
+                } else {
+                    html = `【( ) 内の動詞を適切な形（1語）に変形しなさい】\n${n} learned that the traditional family (live) in the old castle hundreds of years ago.`;
+                    correctAnsHtml = 'lived';
+                    explanationHtml = `hundreds of years ago（何百年も前）という明確な過去の歴史的事実を記述しているため、過去形 <strong>lived</strong> に変形します。`;
+                }
+            } else { 
+                html = `【( ) 内の動詞を適切な形（1語）に変形しなさい】\n${n}'s grandmother (tell) him many interesting stories about the old town yesterday.`;
+                correctAnsHtml = 'told';
+                explanationHtml = `昨日（yesterday）の出来事なので過去形にします。tell の過去形は <strong>told</strong> です。`;
+            }
+            break;
+        }
+        case 5: { 
+            let n = names[getRandomInt(0, 5)];
+
+            if (targetLevel === 'advanced') { 
+                let template = Math.random() > 0.5;
+                if (template) {
+                    html = `【( ) 内の動詞を適切な形（1語）に変形しなさい】\nAfter the festival, the heavy logs were (use) to renew the local shrine.`;
+                    correctAnsHtml = 'used';
+                    explanationHtml = `「丸太は〜するために【使われた】」という受動態（be動詞 + 過去分詞）の文章を完成させるため、正解は過去分詞の <strong>used</strong> です。`;
+                } else {
+                    html = `【( ) 内の動詞を適切な形（1語）に変形しなさい】\n${n} was very (excite) when he watched the final game on TV.`;
+                    correctAnsHtml = 'excited';
+                    explanationHtml = `人が「ワクワクさせられている、興奮している」という感情の状態を表すには、過去分詞の形容詞用法である <strong>excited</strong> を使います。`;
+                }
+            } else { 
+                html = `【( ) 内の動詞を適切な形（1語）に変形しなさい】\nBefore (leave) the city, ${n} and his family went to visit the historical museum.`;
+                correctAnsHtml = 'leaving';
+                explanationHtml = `前置詞 Before の直後に動詞を置く場合、必ず<strong>動名詞（~ing形）</strong>である <strong>leaving</strong> にします。`;
+            }
+            break;
+        }
+        case 6: { 
+            isShortText = true;
+            let template = Math.random() > 0.5;
+            let n = names[getRandomInt(0, 5)];
+            let p = places[getRandomInt(0, 4)];
+            let a = animals[getRandomInt(0, 3)];
+
+            if (template) {
+                html = `【読解ミニ本文】\n${n}'s father bought a nice camera last year. Yesterday, ${n} borrowed the camera from his father to take some pictures of ${a}s in ${p}.\n\n【質問に答える、主語と動詞を含む適切な英語を記述しなさい】\nQuestion: Why did ${n} borrow the camera from his father?\nAnswer: (                                          )`;
+                correctAnsHtml = `To take some pictures of ${a}s.`;
+                matchKeywords = ['to', 'take', 'pictures', a];
+                explanationHtml = `「なぜ〜ですか（Why?）」という目的を問う質問には、<strong>[To + 動詞の原形]（〜するため）</strong>の不定詞の副詞的用法を用いて答えるのが最もスマートな正解になります。`;
+            } else { 
+                html = `【読解ミニ本文】\nTen years ago, ${n}'s grandfather lived in ${p}. He lived there alone and wanted to have a pet, so ${n}'s father gave a ${a} to him.\n\n【質問に答える3〜4語の英語を記述しなさい】\nQuestion: Who gave a ${a} to ${n}'s grandfather?\nAnswer: (              )`;
+                correctAnsHtml = `${n}'s father did.`;
+                matchKeywords = [n, 'father', 'did'];
+                explanationHtml = `Whoが主語の過去形質問なので、[名詞 + did.] で応答文を完成させます。`;
+            }
+            break;
+        }
+        case 7: { 
+            isShortText = true;
+            let n = names[getRandomInt(0, 5)];
+            let a = animals[getRandomInt(0, 3)];
+
+            if (targetLevel === 'advanced') { 
+                html = `【会話文を読み、空欄に文脈が通るような3〜5語の適切な英語を記述しなさい】\n${n}: I want to buy a new smartphone, but it is too expensive for me.\nFriend: Don't worry. You can look at this website. You can find a (              ) one easily.`;
+                correctAnsHtml = 'cheaper smartphone at a lower';
+                matchKeywords = ['cheaper', 'smartphone', 'or', 'one'];
+                explanationHtml = `「高すぎる（too expensive）」の文脈に対比させて、「より安いスマートフォン、安価なもの」という意味をなすように比較級 <strong>cheaper one</strong> などの言葉を補完します。`;
+            } else { 
+                html = `【対話文の流れに合うように、空欄に3〜4語の適切な英語を記述しなさい】\n${n}: I heard that your ${a} ran away last week.\nFriend: Yes. But yesterday, he returned safely!\n${n}: That's great! He just wanted to (              ) again.`;
+                correctAnsHtml = `see you`;
+                matchKeywords = ['see', 'you'];
+                explanationHtml = `文脈から「あなたに会いたかったんだね」となるよう、see you などのシンプルな目的を表す語を補います。`;
+            }
+            break;
+        }
+        case 8: { 
+            isShortText = true;
+            isSortingType = true; 
+            let template = Math.random() > 0.5;
+
+            if (template) {
+                html = `【[ ] 内のすべての英語を、最も適切な順序に並べかえて正しい英文を記述しなさい】\n${n}'s grandfather told many things about the traditional festival. \n句：He [ was / happy / looked / when / talking / very / he ].`;
+                correctAnsHtml = "looked very happy when he was talking";
+                matchKeywords = ['looked', 'very', 'happy', 'when', 'he', 'was', 'talking'];
+                explanationHtml = `【並び替えの解説】<br>[主語 + looked + 形容詞]（〜そうに見えた）の第2文型を完成させ、後ろに接続詞 when の節を繋ぎます。`;
+            } else {
+                html = `【[ ] 内のすべての英語を、最も適切な順序に並べかえて正しい英文を記述しなさい】\n${n} accepted the invitation to the dinner party. \n句：I [ e-mail / it / you / will / about / an / send ] later.`;
+                correctAnsHtml = "will send you an e-mail about it";
+                matchKeywords = ['will', 'send', 'you', 'an', 'e-mail', 'about', 'it'];
+                explanationHtml = `【並び替えの解説】<br>助動詞 will の後ろに [授与動詞 send + 人 + 物] の第4文型を配置し、最後に修飾語（about it）を繋ぎます。`;
+            }
+            break;
+        }
+    }
+
+    return {
+        unitId: qType,
+        level: targetLevel,
+        type: isShortText ? "write" : "word", 
+        isSorting: isSortingType, 
+        matchKeywords: matchKeywords, 
+        questionHtml: html,
+        correctHtml: correctAnsHtml,
+        wrongs: [],
+        explanation: explanationHtml
+    };
+}
+
+// --- 画面遷移・ゲームロジック群 ---
+function startUnit(unitId, level) {
+    currentMode = 'unit';
+    currentUnitId = unitId;
+    currentLevel = level || 'basic';
+    isInterrupted = false; 
+    currentIndex = 0; 
+    correctCount = 0; 
+    
+    const lvlName = currentLevel === 'advanced' ? '【応用】' : '【基本】';
+    document.getElementById('quiz-title').innerText = `単元特訓：NO.${unitId} ${lvlName}`;
+    setupQuizSet();
+}
+
+function startTest(testLevel) {
+    currentMode = 'test';
+    currentLevel = testLevel; 
+    isInterrupted = false;
+    currentIndex = 0;
+    correctCount = 0; 
+    
+    let titleText = "🏆 総合実力テスト";
+    if(testLevel === 'basic') titleText += " (基本のみ)";
+    if(testLevel === 'mix') titleText += " (基本+応用)";
+    if(testLevel === 'advanced') titleText += " (応用のみ)";
+    
+    document.getElementById('quiz-title').innerText = titleText;
+    setupQuizSet();
+}
+
+function startReviewMode() {
+    if (reviewPool.length === 0) return;
+    currentMode = 'review';
+    isInterrupted = false;
+    currentIndex = 0;
+    correctCount = 0;
+    document.getElementById('quiz-title').innerText = `🔄 弱点克服復習モード`;
+    
+    currentQuestions = [];
+    let poolCopy = [...reviewPool];
+    for(let i=0; i<10 && poolCopy.length > 0; i++) {
+        let idx = Math.floor(Math.random() * poolCopy.length);
+        currentQuestions.push(poolCopy.splice(idx, 1)[0]);
+    }
+    showQuiz();
+}
+
+function setupQuizSet() {
+    currentQuestions = [];
+    for(let i = 0; i < 10; i++) {
+        let q = (currentMode === 'test') ? generateQuestion('random', currentLevel) : generateQuestion(currentUnitId, currentLevel);
+        currentQuestions.push(q);
+    }
+    showQuiz();
+}
+
+function showQuiz() {
+    document.getElementById('screen-home').classList.add('hidden');
+    document.getElementById('screen-result').classList.add('hidden');
+    document.getElementById('screen-score').classList.add('hidden');
+    document.getElementById('screen-quiz').classList.remove('hidden');
+    
+    document.getElementById('phase-write').classList.remove('hidden');
+    document.getElementById('phase-choose').classList.add('hidden');
+    
+    let alertBox = document.getElementById('combo-alert');
+    if (currentMode === 'unit') {
+        alertBox.innerHTML = `🔥 【記述特訓】現在 <strong>${correctCount}問連続正解中</strong>！(間違えると別の新しい問題セットの1問目に戻る・10連勝でクリア)`;
+        document.getElementById('quiz-progress').innerText = `現在 ${correctCount} 連勝中 / 目標10連勝`;
+    } else {
+        alertBox.innerHTML = `【ステップ1】問題文を読み、空欄に当てはまる、または質問に対する正しい英語をノートに書き出しなさい。`;
+        document.getElementById('quiz-progress').innerText = `${currentIndex + 1} / ${currentQuestions.length} 問目`;
+    }
+    
+    document.getElementById('question-area').innerHTML = currentQuestions[currentIndex].questionHtml;
+    setTopHomeButtonVisibility(true);
+}
+
+function showChoicesPhase() {
+    document.getElementById('phase-write').classList.add('hidden');
+    document.getElementById('phase-choose').classList.remove('hidden');
+    
+    let q = currentQuestions[currentIndex];
+    let inst = document.getElementById('inputInstruction');
+    let inputField = document.getElementById('userEnglishInput');
+    let sortingArea = document.getElementById('sortingModuleArea');
+    
+    if (q.isSorting) {
+        inst.innerText = "【ステップ2】下の単語ブロックを正しい語順になるように順番にタップしなさい。";
+        inputField.classList.add('hidden');
+        sortingArea.classList.remove('hidden');
+        
+        trayWords = [];
+        poolWords = [...q.matchKeywords];
+        poolWords.sort(() => Math.random() - 0.5);
+        
+        renderSortingBlocks();
+    } else {
+        if(q.type === "write") {
+            inst.innerText = "【ステップ2】正しい英語フレーズ（短文または並び替え語句）を入力欄にタイピングしなさい。";
+        } else {
+            inst.innerText = "【ステップ2】空欄に当てはまる1語の英単語をキーボードで入力しなさい。";
+        }
+        inputField.classList.remove('hidden');
+        sortingArea.classList.add('hidden');
+        
+        inputField.value = '';
+        setTimeout(() => { inputField.focus(); }, 50);
+    }
+}
+
+// 【バグ修正】タップイベントハンドラ内の配列同期スコープを最適化し、完全復元
+function renderSortingBlocks() {
+    let trayContainer = document.getElementById('sortingAnswerTray');
+    let poolContainer = document.getElementById('sortingWordPool');
+    
+    trayContainer.innerHTML = '';
+    poolContainer.innerHTML = '';
+    
+    trayWords.forEach((word, index) => {
+        let chip = document.createElement('span');
+        chip.className = 'word-chip';
+        chip.innerText = word;
+        chip.onclick = function() {
+            trayWords.splice(index, 1);
+            poolWords.push(word);
+            renderSortingBlocks();
+        };
+        trayContainer.appendChild(chip);
+    });
+    
+    poolWords.forEach((word, index) => {
+        let chip = document.createElement('span');
+        chip.className = 'word-chip';
+        chip.innerText = word;
+        chip.onclick = function() {
+            poolWords.splice(index, 1);
+            trayWords.push(word);
+            renderSortingBlocks();
+        };
+        poolContainer.appendChild(chip);
+    });
+}
+
+function selectAnswer(isCorrect, selectedHtml) {
+    document.getElementById('screen-quiz').classList.add('hidden');
+    document.getElementById('screen-result').classList.remove('hidden');
+    
+    let judge = document.getElementById('result-judge');
+    let q = currentQuestions[currentIndex];
+    
+    document.getElementById('user-answer-display').innerText = selectedHtml === '' ? '（未入力）' : selectedHtml;
+    document.getElementById('correct-answer-display').innerText = q.correctHtml;
+    document.getElementById('explanation-display').innerHTML = q.explanation;
+    
+    if(isCorrect) {
+        correctCount++;
+        judge.innerHTML = `
+            <div class="result-badge-icon">✓</div>
+            <div>CORRECT</div>
+            <div class="result-badge-sub">正解です！条件を完全にクリアしています。</div>
+        `;
+        judge.className = "result-alert alert-success";
+        reviewPool = reviewPool.filter(item => item.questionHtml !== q.questionHtml);
+    } else {
+        if(currentMode === 'unit') {
+            correctCount = 0;
+            currentIndex = -1; 
+            isInterrupted = true; 
+            
+            currentQuestions = [];
+            for(let i = 0; i < 10; i++) {
+                currentQuestions.push(generateQuestion(currentUnitId, currentLevel));
+            }
+            judge.innerHTML = `
+                <div class="result-badge-icon">✗</div>
+                <div>FAILED</div>
+                <div class="result-badge-sub">条件未達成またはスペルミス：新しい別の問題の1問目から再リトライ</div>
+            `;
+        } else {
+            judge.innerHTML = `
+                <div class="result-badge-icon">✗</div>
+                <div>INCORRECT</div>
+                <div class="result-badge-sub">正解条件に達していません</div>
+            `;
+        }
+        judge.className = "result-alert alert-danger";
+        
+        if(!reviewPool.some(item => item.questionHtml === q.questionHtml)) {
+            reviewPool.push(q);
+        }
+    }
+    sessionStorage.setItem('math_review_pool', JSON.stringify(reviewPool));
+    updateReviewBadge();
+}
+
+function checkWrittenAnswer() {
+    let q = currentQuestions[currentIndex];
+    let userInput = '';
+    let isCorrect = false;
+    
+    if (q.isSorting) {
+        userInput = trayWords.join(' ');
+        let cleanUser = userInput.toLowerCase().replace(/[^a-z0-9]/g, '');
+        isCorrect = q.matchKeywords.every(kw => cleanUser.includes(kw.toLowerCase().replace(/[^a-z0-9]/g, '')));
+    } else {
+        userInput = document.getElementById('userEnglishInput').value.trim();
+        if(q.type === "write") {
+            let cleanUser = userInput.toLowerCase().replace(/[^a-z0-9]/g, '');
+            isCorrect = q.matchKeywords.every(kw => cleanUser.includes(kw.toLowerCase().replace(/[^a-z0-9]/g, '')));
+        } else {
+            isCorrect = userInput.toLowerCase() === q.correctHtml.toLowerCase();
+        }
+    }
+    
+    selectAnswer(isCorrect, userInput);
+}
+
+function nextQuestion() {
+    if (currentMode === 'unit' && correctCount === 10) {
+        showScoreReport();
+        return;
+    }
+    
+    currentIndex++;
+    
+    if (currentMode !== 'unit' && currentIndex >= currentQuestions.length) {
+        showScoreReport();
+        return;
+    }
+    
+    showQuiz();
+}
+
+function showScoreReport() {
+    document.getElementById('screen-result').classList.add('hidden');
+    document.getElementById('screen-score').classList.remove('hidden');
+    setTopHomeButtonVisibility(false);
+    
+    let report = document.getElementById('score-report');
+    let comment = document.getElementById('score-comment');
+    
+    if (currentMode === 'unit' && correctCount === 10) {
+        crownRecords[`${currentUnitId}_${currentLevel}`] = true;
+        sessionStorage.setItem('math_clear_crowns', JSON.stringify(crownRecords));
+        updateCrownDisplays(); 
+        
+        report.innerText = `👑 完全制覇達成！`;
+        comment.innerHTML = `素晴らしい！1語補充から短文・並び替えまで完璧にクリアし、見事10問連続正解を達成しました！<br>該当メニューボタンが<strong>ゴールドクリア状態👑</strong>へ解放されました！`;
+    } else {
+        let score = (correctCount / currentQuestions.length) * 100;
+        report.innerText = `得点: ${score} 点`;
+        
+        if(currentMode === 'test') {
+            if(score >= 90) {
+                crownRecords[`test_${currentLevel}`] = true;
+                sessionStorage.setItem('math_clear_crowns', JSON.stringify(crownRecords));
+                updateCrownDisplays(); 
+                
+                comment.innerHTML = "🎉 <strong>見事合格！👑</strong><br>記述・一行問題の総合シミュレーションテストに合格しました！メニューのテストボタンにクリアの証として<strong>王冠ゴールドカラー👑</strong>が灯りました！";
+            } else {
+                comment.innerHTML = "⚠️ <strong>不合格です（合格ライン9割）</strong><br>記述問題での小さなミスは命取りになります。王冠獲得を目指して繰り返し反復演習をしましょう。";
+            }
+        } else {
+            comment.innerHTML = "復習お疲れ様でした！すべての弱点を克服していきましょう。";
+        }
+    }
+}
+
+function backToHome() {
+    document.getElementById('screen-quiz').classList.add('hidden');
+    document.getElementById('screen-result').classList.add('hidden');
+    document.getElementById('screen-score').classList.add('hidden');
+    document.getElementById('screen-home').classList.remove('hidden');
+    setTopHomeButtonVisibility(false);
+}
+</script>
+
+</body>
+</html>

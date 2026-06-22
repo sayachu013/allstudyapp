@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英検5級特訓 - Stoic Master Ultimate</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --accent: #deff9a;
+            --primary: #38bdf8;
+            --danger: #ff4757;
+            --success: #2ed573;
+            --text: #f8fafc;
+            --gold: #fbbf24;
+        }
+
+        * { box-sizing: border-box; font-family: 'Urbanist', 'Helvetica Neue', Arial, sans-serif; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .screen {
+            width: 100%;
+            max-width: 600px;
+            padding: 40px;
+            text-align: center;
+            display: none;
+        }
+
+        .screen.active { display: block; }
+
+        /* --- HOME SCREEN --- */
+        h1 { font-size: 2.5rem; margin-bottom: 5px; color: var(--accent); }
+        .subtitle { opacity: 0.7; margin-bottom: 25px; font-size: 0.9rem; }
+        
+        .mode-selector {
+            display: flex;
+            background: #020617;
+            padding: 6px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .mode-tab {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #64748b;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .mode-tab.active[data-mode="anki"] { background: var(--primary); color: #000; }
+        .mode-tab.active[data-mode="test"] { background: var(--danger); color: #fff; }
+
+        .section-title { text-align: left; font-size: 0.9rem; color: #94a3b8; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px;}
+
+        .unit-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .unit-btn {
+            background: var(--card);
+            border: 1px solid rgba(255,255,255,0.05);
+            color: var(--text);
+            padding: 16px;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        .unit-btn::after {
+            content: '→';
+            opacity: 0.5;
+            transition: transform 0.2s;
+        }
+        .unit-btn:hover { transform: translateX(4px); }
+        .unit-btn.mode-anki:hover { border-color: var(--primary); background: rgba(56, 189, 248, 0.05); }
+        .unit-btn.mode-test:hover { border-color: var(--danger); background: rgba(255, 71, 87, 0.05); }
+        .unit-btn:hover::after { transform: translateX(3px); opacity: 1; }
+
+        /* バッジ表示用の汎用スタイル */
+        .status-badges {
+            display: flex;
+            gap: 6px;
+            margin-right: auto;
+            margin-left: 15px;
+        }
+        .badge-clear-indicator {
+            font-size: 0.7rem;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 8px;
+        }
+        .badge-clear-anki {
+            color: var(--primary);
+            background: rgba(56, 189, 248, 0.15);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+        }
+        .badge-clear-test {
+            color: var(--success);
+            background: rgba(46, 213, 115, 0.15);
+            border: 1px solid rgba(46, 213, 115, 0.3);
+        }
+
+        /* テストクリア時の発光エフェクト */
+        .unit-btn.cleared-test {
+            border-color: var(--success) !important;
+            animation: pulse-glow 2s infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 5px rgba(46, 213, 115, 0.1); border-color: rgba(46, 213, 115, 0.4); }
+            100% { box-shadow: 0 0 12px rgba(46, 213, 115, 0.4); border-color: var(--success); }
+        }
+
+        /* 復習ボタン専用スタイル */
+        .review-btn {
+            background: #2e1015 !important;
+            border: 1px solid var(--danger) !important;
+            box-shadow: 0 0 10px rgba(255, 71, 87, 0.15);
+        }
+        .review-btn:hover {
+            background: #4c1d24 !important;
+        }
+
+        /* --- COMMON UI COMPONENTS --- */
+        .mode-badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-bottom: 15px; }
+        .badge-anki { background: rgba(56, 189, 248, 0.1); color: var(--primary); }
+        .badge-test { background: rgba(255, 71, 87, 0.1); color: var(--danger); }
+        .badge-review { background: rgba(255, 71, 87, 0.2); color: #fda4af; border: 1px solid var(--danger); }
+        
+        .progress-counter { font-size: 0.9rem; color: #94a3b8; font-weight: bold; background: #020617; padding: 4px 12px; border-radius: 10px; }
+
+        .word-display { font-size: 3.5rem; font-weight: 700; margin-bottom: 40px; min-height: 90px; display: flex; justify-content: center; align-items: center; letter-spacing: 1px; text-transform: none; }
+        
+        /* --- ANKI SCREEN --- */
+        .anki-meaning { font-size: 1.8rem; color: var(--accent); margin-bottom: 50px; min-height: 40px; visibility: hidden; }
+        
+        /* 暗記モード専用ボタングループ */
+        .anki-btn-container {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+        }
+        .anki-action-btn {
+            flex: 1; background: var(--card); border: 2px solid #334155; color: var(--text);
+            padding: 18px; border-radius: 12px; font-size: 1.2rem; cursor: pointer; transition: all 0.2s; font-weight: bold;
+        }
+        .anki-action-btn:hover { border-color: var(--primary); background: #334155; }
+        
+        /* 覚えた・不安ボタン用スタイル */
+        .anki-btn-success { border-color: var(--success); color: var(--success); }
+        .anki-btn-success:hover { background: rgba(46, 213, 115, 0.15); border-color: var(--success); }
+        .anki-btn-danger { border-color: var(--danger); color: var(--danger); }
+        .anki-btn-danger:hover { background: rgba(255, 71, 87, 0.15); border-color: var(--danger); }
+
+        /* --- TEST SCREEN --- */
+        .stats { display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: bold; align-items: center; }
+        .combo-count { color: var(--success); font-size: 1.5rem; }
+
+        .timer-track { width: 100%; height: 6px; background: #334155; border-radius: 3px; margin-bottom: 40px; }
+        .timer-bar { width: 100%; height: 100%; background: var(--danger); border-radius: 3px; transition: width 0.1s linear; }
+
+        .choice-grid { display: grid; gap: 12px; }
+        .choice-btn {
+            background: var(--card); border: 2px solid #334155; color: var(--text);
+            padding: 18px; border-radius: 12px; cursor: pointer; font-size: 1.1rem; transition: all 0.2s; text-align: left; padding-left: 20px;
+        }
+        .choice-btn:hover { border-color: var(--danger); background: #334155; }
+
+        /* --- OVERLAY / HEADER --- */
+        .nav-header { text-align: left; margin-bottom: 20px; }
+        .back-btn { background: none; border: none; color: #64748b; cursor: pointer; font-size: 1rem; padding: 0; }
+        .back-btn:hover { color: var(--text); }
+
+        .overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.98);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            visibility: hidden; opacity: 0; transition: 0.3s; z-index: 100; padding: 20px;
+        }
+        .overlay.show { visibility: visible; opacity: 1; }
+        
+        .overlay h2.gameover-title { color: var(--danger); font-size: 3rem; margin: 0 0 10px 0; }
+        .overlay h2.clear-title { color: var(--success); font-size: 3.5rem; margin: 0 0 10px 0; text-shadow: 0 0 20px rgba(46,213,115,0.4); }
+        
+        .overlay p { font-size: 1.2rem; margin: 10px 0; text-align: center; }
+        .retry-btn {
+            background: var(--text); color: #000; border: none; padding: 15px 40px;
+            font-size: 1.1rem; border-radius: 30px; cursor: pointer; font-weight: bold; margin-top: 20px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="home-screen" class="screen active">
+        <h1>英検5級 <span>Stoic</span></h1>
+        <p class="subtitle">単語特訓シリーズ</p>
+        
+        <div class="mode-selector">
+            <button class="mode-tab active" data-mode="anki" onclick="setMode('anki')">暗記モード</button>
+            <button class="mode-tab" data-mode="test" onclick="setMode('test')">テストモード</button>
+        </div>
+
+        <div class="section-title">チャレンジ単元を選択</div>
+        <div class="unit-grid" id="unit-buttons"></div>
+    </div>
+
+    <div id="anki-screen" class="screen">
+        <div class="nav-header">
+            <button class="back-btn" onclick="backToHome()">← ホームに戻る</button>
+        </div>
+        <div class="stats">
+            <div class="mode-badge badge-anki">暗記モード</div>
+            <div id="anki-unit-name" style="opacity: 0.6; font-size: 0.9rem;">PART</div>
+            <div id="anki-progress" class="progress-counter">残り 0 問</div>
+        </div>
+        <div id="anki-word" class="word-display">Word</div>
+        <div id="anki-pronunciation" style="font-size: 1.3rem; color: #94a3b8; margin-top: -30px; margin-bottom: 35px; letter-spacing: 1px;">[発音]</div>
+        <div id="anki-meaning" class="anki-meaning">意味</div>
+        
+        <div class="anki-btn-container" id="anki-controls">
+            <button id="anki-main-btn" class="anki-action-btn" onclick="handleAnkiShowAnswer()">答えを表示 (Space)</button>
+        </div>
+    </div>
+
+    <div id="challenge-screen" class="screen">
+        <div class="nav-header">
+            <button class="back-btn" onclick="backToHome()">← ギブアップ</button>
+        </div>
+        <div class="stats">
+            <div id="test-mode-badge" class="mode-badge badge-test">テストモード (5秒制限・一撃死)</div>
+            <div id="test-unit-name" style="opacity: 0.6; font-size: 0.9rem;">PART</div>
+            <div id="test-progress" class="progress-counter">残り 0 / 0 問</div>
+        </div>
+        <div class="stats" style="margin-bottom: 10px;">
+            <div>COMBO: <span id="combo" class="combo-count">0</span></div>
+        </div>
+        <div class="timer-track">
+            <div id="timer-bar" class="timer-bar"></div>
+        </div>
+        <div id="question-word" class="word-display">Word</div>
+        <div class="choice-grid">
+            <button class="choice-btn" onclick="handleAnswer(0)" id="c0">-</button>
+            <button class="choice-btn" onclick="handleAnswer(1)" id="c1">-</button>
+            <button class="choice-btn" onclick="handleAnswer(2)" id="c2">-</button>
+            <button class="choice-btn" onclick="handleAnswer(3)" id="c3">-</button>
+        </div>
+    </div>
+
+    <div id="gameover-overlay" class="overlay">
+        <h2 id="overlay-title" class="gameover-title">GAME OVER</h2>
+        <p id="gameover-msg">ミスまたはタイムアップです</p>
+        <div id="correct-info" style="margin-top: 10px; font-size: 1.4rem; color: var(--accent); font-weight: bold;"></div>
+        <div id="final-combo-info" style="margin-top: 10px; color: #64748b;"></div>
+        <button class="retry-btn" onclick="backToHome()">ホームに戻る</button>
+    </div>
+
+    <script>
+        // 単語データベース（第1弾: PART 1 〜 PART 3 全単語網羅）
+        const wordData = {
+            "PART 1: 基礎単語①": [
+                {en: "I", jp: "わたしは"}, {en: "my", jp: "わたしの"}, {en: "me", jp: "わたしを・に・が"}, {en: "mine", jp: "わたしの（もの）"},
+                {en: "you", jp: "あなたは"}, {en: "your", jp: "あなたの"}, {en: "he", jp: "彼は"}, {en: "his", jp: "彼の"},
+                {en: "she", jp: "彼女は"}, {en: "her", jp: "彼女の"}, {en: "it", jp: "それは"}, {en: "we", jp: "わたしたちは"},
+                {en: "what", jp: "何・どんな"}, {en: "which", jp: "どちら・どの"}, {en: "who", jp: "だれ"}, {en: "when", jp: "いつ"},
+                {en: "where", jp: "どこで"}, {en: "why", jp: "なぜ"}, {en: "how", jp: "どうやって・どのくらい"}, {en: "can", jp: "～できる"},
+                {en: "do", jp: "（助動詞）～ですか・～します"}, {en: "am", jp: "～です（Iの後ろに置く）"}, {en: "is", jp: "～です（単数の後ろに置く）"}, {en: "are", jp: "～です（youや複数の後ろに置く）"},
+                {en: "not", jp: "～でない"}, {en: "this", jp: "これ・この"}, {en: "that", jp: "あれ・あの"}, {en: "yes", jp: "はい"},
+                {en: "no", jp: "いいえ"}, {en: "oh", jp: "おや、まあ"}, {en: "please", jp: "どうぞ"}, {en: "thank you", jp: "ありがとう"},
+                {en: "welcome", jp: "ようこそ"}, {en: "here", jp: "ここに"}, {en: "there", jp: "そこに"}, {en: "look", jp: "見る、～に見える"}
+            ],
+            "PART 2: 基礎単語②": [
+                {en: "every", jp: "毎～"}, {en: "all", jp: "すべて"}, {en: "many", jp: "たくさんの"}, {en: "spring", jp: "春"},
+                {en: "summer", jp: "夏"}, {en: "autumn", jp: "秋"}, {en: "winter", jp: "冬"}, {en: "Sunday", jp: "日曜日"},
+                {en: "Monday", jp: "月曜日"}, {en: "Tuesday", jp: "火曜日"}, {en: "Wednesday", jp: "水曜日"}, {en: "Thursday", jp: "木曜日"},
+                {en: "Friday", jp: "金曜日"}, {en: "Saturday", jp: "土曜日"}, {en: "January", jp: "1月"}, {en: "February", jp: "2月"},
+                {en: "today", jp: "今日"}, {en: "tomorrow", jp: "明日"}, {en: "yesterday", jp: "昨日"}, {en: "time", jp: "時間"},
+                {en: "year", jp: "年、学年"}, {en: "month", jp: "（暦の）月"}, {en: "week", jp: "週"}, {en: "day", jp: "日、曜日"},
+                {en: "morning", jp: "朝、午前"}, {en: "afternoon", jp: "午後"}, {en: "evening", jp: "夕方、晩"}, {en: "night", jp: "夜"},
+                {en: "clock", jp: "時計"}, {en: "hour", jp: "～時間"}, {en: "o'clock", jp: "～時"}, {en: "now", jp: "今"},
+                {en: "then", jp: "その時、それから"}, {en: "often", jp: "よく、しばしば"}, {en: "sometimes", jp: "ときどき"}, {en: "always", jp: "いつも"},
+                {en: "usually", jp: "ふつう、たいてい"}, {en: "again", jp: "もう一度"}, {en: "ago", jp: "～前に"}, {en: "before", jp: "～の前に"}
+            ],
+            "PART 3: 動詞・名詞①": [
+                {en: "ask", jp: "たずねる、頼む"}, {en: "buy", jp: "買う"}, {en: "clean", jp: "そうじする"}, {en: "close", jp: "閉める、閉じる"},
+                {en: "cook", jp: "料理する"}, {en: "come", jp: "来る"}, {en: "dance", jp: "おどる"}, {en: "do", jp: "～をする"},
+                {en: "drink", jp: "飲む"}, {en: "eat", jp: "食べる"}, {en: "go", jp: "行く"}, {en: "have", jp: "持っている、食べる"},
+                {en: "know", jp: "知っている"}, {en: "like", jp: "好きだ"}, {en: "look", jp: "見る"}, {en: "make", jp: "作る"},
+                {en: "play", jp: "（スポーツ・楽器）をする、遊ぶ"}, {en: "read", jp: "読む"}, {en: "run", jp: "走る"}, {en: "write", jp: "書く"},
+                {en: "study", jp: "勉強する"}, {en: "speak", jp: "話す"}, {en: "talk", jp: "話す、しゃべる"}, {en: "sing", jp: "歌う"},
+                {en: "swim", jp: "泳ぐ"}, {en: "use", jp: "使う"}, {en: "wash", jp: "洗う"}, {en: "want", jp: "ほしい"},
+                {en: "help", jp: "手伝う、助ける"}, {en: "open", jp: "開ける、開く"}, {en: "listen", jp: "（じっと）聞く"}, {en: "see", jp: "見える、会う、わかる"},
+                {en: "watch", jp: "（じっと）見る、見守る"}, {en: "meet", jp: "会う"}, {en: "live", jp: "住む、生きる"}, {en: "work", jp: "働く、勉強する"},
+                {en: "walk", jp: "歩く"}, {en: "stop", jp: "止まる、やめる"}, {en: "stay", jp: "滞在する、とどまる"}, {en: "sit", jp: "すわる"},
+                {en: "stand", jp: "立つ"}, {en: "smile", jp: "ほほえむ"}, {en: "put", jp: "置く"}, {en: "take", jp: "連れて行く、（写真を）撮る、（時間が）かかる"},
+                {en: "bring", jp: "持ってくる"}, {en: "show", jp: "見せる、示す"}, {en: "tell", jp: "話す、教える"}, {en: "say", jp: "言う"},
+                {en: "find", jp: "見つける"}, {en: "teach", jp: "教える"}, {en: "learn", jp: "学ぶ、習う"}, {en: "enjoy", jp: "楽しむ"},
+                {en: "love", jp: "愛する、大好きだ"}, {en: "think", jp: "思う、考える"}, {en: "understand", jp: "理解する、わかる"}
+            ]
+            ,
+            "PART 4: 名詞②": [
+                {en: "house", jp: "家、住宅"}, {en: "room", jp: "部屋"}, {en: "door", jp: "ドア、戸"}, {en: "desk", jp: "机"},
+                {en: "chair", jp: "いす"}, {en: "computer", jp: "コンピューター"}, {en: "pen", jp: "ペン"}, {en: "pencil", jp: "えんぴつ"},
+                {en: "bag", jp: "かばん、バッグ"}, {en: "hat", jp: "（ふちのある）ぼうし"}, {en: "cap", jp: "（ふちのない）ぼうし"}, {en: "T-shirt", jp: "Tシャツ"},
+                {en: "shoes", jp: "くつ（ふつう複数形）"}, {en: "friend", jp: "友達"}, {en: "baby", jp: "赤ちゃん"}, {en: "teacher", jp: "先生、教師"},
+                {en: "doctor", jp: "医者"}, {en: "boy", jp: "男の子"}, {en: "girl", jp: "女の子"}, {en: "man", jp: "（大人の）男性"},
+                {en: "woman", jp: "（大人の）女性"}, {en: "child", jp: "子ども"}, {en: "people", jp: "人々"}, {en: "student", jp: "生徒、学生"},
+                {en: "father", jp: "父親"}, {en: "mother", jp: "母親"}, {en: "parent", jp: "親（片親）"}, {en: "parents", jp: "両親"},
+                {en: "brother", jp: "兄、弟、兄弟"}, {en: "sister", jp: "姉、妹、姉妹"}, {en: "family", jp: "家族"}, {en: "grandpa", jp: "おじいちゃん"},
+                {en: "grandma", jp: "おばあちゃん"}, {en: "city", jp: "市、都市"}, {en: "town", jp: "町"}, {en: "park", jp: "公園"},
+                {en: "station", jp: "駅"}, {en: "ticket", jp: "切符、チケット"}, {en: "store", jp: "店"}, {en: "shop", jp: "店"},
+                {en: "hospital", jp: "病院"}, {en: "library", jp: "図書館"}, {en: "museum", jp: "博物館、美術館"}, {en: "zoo", jp: "動物園"},
+                {en: "bed", jp: "ベッド"}, {en: "table", jp: "テーブル、食卓"}, {en: "cup", jp: "カップ、茶わん"}, {en: "dish", jp: "皿、料理"},
+                {en: "book", jp: "本"}, {en: "notebook", jp: "ノート"}, {en: "picture", jp: "写真、絵"}, {en: "camera", jp: "カメラ"},
+                {en: "bike", jp: "自転車"}, {en: "car", jp: "車、自動車"}, {en: "bus", jp: "バス"}, {en: "train", jp: "列車、電車"}
+            ],
+            "PART 5: 名詞③": [
+                {en: "animal", jp: "動物"}, {en: "panda", jp: "パンダ"}, {en: "pig", jp: "ぶた"}, {en: "horse", jp: "馬"},
+                {en: "cat", jp: "ねこ"}, {en: "dog", jp: "犬"}, {en: "bird", jp: "鳥"}, {en: "fish", jp: "魚"},
+                {en: "bear", jp: "クマ"}, {en: "elephant", jp: "ゾウ"}, {en: "monkey", jp: "サル"}, {en: "rabbit", jp: "ウサギ"},
+                {en: "lion", jp: "ライオン"}, {en: "tree", jp: "木"}, {en: "flower", jp: "花"}, {en: "nature", jp: "自然"},
+                {en: "school", jp: "学校"}, {en: "class", jp: "クラス、授業"}, {en: "classroom", jp: "教室"}, {en: "math", jp: "数学、算数"},
+                {en: "science", jp: "理科、科学"}, {en: "music", jp: "音楽"}, {en: "art", jp: "美術、芸術、図工"}, {en: "history", jp: "歴史"},
+                {en: "English", jp: "英語"}, {en: "japanese", jp: "日本語、日本人"}, {en: "homework", jp: "宿題"}, {en: "test", jp: "テスト、試験"},
+                {en: "lesson", jp: "レッスン、習い事、授業"}, {en: "club", jp: "クラブ、部活動"}, {en: "eye", jp: "目"}, {en: "ear", jp: "耳"},
+                {en: "mouth", jp: "口"}, {en: "hand", jp: "手"}, {en: "arm", jp: "腕"}, {en: "leg", jp: "脚（足首から太もも）"},
+                {en: "foot", jp: "足（足首から下）"}, {en: "head", jp: "頭"}, {en: "hair", jp: "髪の毛"}, {en: "face", jp: "顔"},
+                {en: "sport", jp: "スポーツ"}, {en: "soccer", jp: "サッカー"}, {en: "tennis", jp: "テニス"}, {en: "basketball", jp: "バスケットボール"},
+                {en: "baseball", jp: "野球"}, {en: "volleyball", jp: "バレーボール"}, {en: "swimming", jp: "水泳"}, {en: "running", jp: "走ること、ランニング"},
+                {en: "piano", jp: "ピアノ"}, {en: "guitar", jp: "ギター"}, {en: "song", jp: "歌"}, {en: "game", jp: "ゲーム、試合"},
+                {en: "food", jp: "食べ物"}, {en: "breakfast", jp: "朝食"}, {en: "lunch", jp: "昼食"}, {en: "dinner", jp: "夕食"}
+            ],
+            "PART 6: 形容詞・副詞①": [
+                {en: "sky", jp: "空"}, {en: "sea", jp: "海"}, {en: "weather", jp: "天気"}, {en: "world", jp: "世界"},
+                {en: "cold", jp: "寒い、冷たい"}, {en: "hot", jp: "暑い、熱い"}, {en: "warm", jp: "暖かい、温かい"}, {en: "cool", jp: "涼しい、かっこいい"},
+                {en: "sunny", jp: "晴れた、日の差す"}, {en: "rainy", jp: "雨の、雨降りの"}, {en: "cloudy", jp: "曇った、曇りの"}, {en: "snowy", jp: "雪の、雪の降る"},
+                {en: "fine", jp: "晴れた、元気な、すばらしい"}, {en: "good", jp: "良い、上手な"}, {en: "bad", jp: "悪い"}, {en: "nice", jp: "すてきな、親切な"},
+                {en: "great", jp: "すばらしい、偉大な"}, {en: "beautiful", jp: "美しい、きれいな"}, {en: "popular", jp: "人気のある"}, {en: "famous", jp: "有名な"},
+                {en: "favorite", jp: "お気に入りの、一番好きな"}, {en: "happy", jp: "幸せな、うれしい"}, {en: "sad", jp: "悲しい"}, {en: "tired", jp: "疲れた"},
+                {en: "busy", jp: "忙しい"}, {en: "hungry", jp: "お腹が空いた"}, {en: "thirsty", jp: "のどが渇いた"}, {en: "new", jp: "新しい"},
+                {en: "old", jp: "古い、～歳で"}, {en: "big", jp: "大きい"}, {en: "large", jp: "大きい、広い"}, {en: "small", jp: "小さい"},
+                {en: "little", jp: "小さい、かわいい、少しの"}, {en: "long", jp: "長い"}, {en: "short", jp: "短い、背が低い"}, {en: "tall", jp: "背が高い"},
+                {en: "high", jp: "高い"}, {en: "low", jp: "低い"}, {en: "fast", jp: "（速度が）速い、速く"}, {en: "slow", jp: "遅い、ゆっくりした"},
+                {en: "early", jp: "早い、早く"}, {en: "late", jp: "遅い、遅れて、遅くに"}, {en: "easy", jp: "簡単な、やさしい"}, {en: "difficult", jp: "難しい"},
+                {en: "hard", jp: "難しい、一生懸命に、硬い"}, {en: "kind", jp: "親切な、種類"}, {en: "interesting", jp: "おもしろい、興味深い"}, {en: "fun", jp: "楽しい、おもしろいこと"},
+                {en: "together", jp: "一緒に"}, {en: "well", jp: "上手に、よく、健康で"}, {en: "very", jp: "とても、非常に"}, {en: "much", jp: "とても、たいへん、多くの"},
+                {en: "too", jp: "～もまた、あまりに～すぎる"}, {en: "only", jp: "～だけ、たった～"}, {en: "really", jp: "本当に、実際に"}, {en: "maybe", jp: "もしかすると、たぶん"}
+            ],
+            "PART 7: 熟語・前置詞": [
+                {en: "and", jp: "そして、～と…"}, {en: "but", jp: "しかし"}, {en: "or", jp: "または、あるいは"}, {en: "so", jp: "だから、そのように、とても"},
+                {en: "because", jp: "～なので、なぜなら"}, {en: "about", jp: "～について、およそ"}, {en: "after", jp: "～の後で・に"}, {en: "around", jp: "～のまわりに、あちこち"},
+                {en: "at", jp: "（場所・時間の一点）～に、～で"}, {en: "by", jp: "～のそばに、～によって"}, {en: "for", jp: "～のために、～の間"}, {en: "from", jp: "～から、～出身で"},
+                {en: "in", jp: "（場所の中・期間）～の中に・で・に"}, {en: "of", jp: "～の（所有・所属・数量）"}, {en: "on", jp: "（接触して）～の上に、～に（曜日・日付）"}, {en: "to", jp: "～へ、～に（方向・到達点）"},
+                {en: "under", jp: "～の下に"}, {en: "with", jp: "～と一緒に、～を使って"}, {en: "near", jp: "～の近くに"}, {en: "between", jp: "（2つの）間に"},
+                {en: "come to ~", jp: "～に来る"}, {en: "come from ~", jp: "～出身である"}, {en: "go to ~", jp: "～に行く"}, {en: "go home", jp: "家に帰る"},
+                {en: "go to bed", jp: "寝る、就寝する"}, {en: "go out", jp: "外出する"}, {en: "get up", jp: "起きる、起床する"}, {en: "get to ~", jp: "～に到着する"},
+                {en: "listen to ~", jp: "～を聞く"}, {en: "look at ~", jp: "～を見る"}, {en: "look for ~", jp: "～を探す"}, {en: "take a picture", jp: "写真を撮る"},
+                {en: "talk with ~", jp: "～と話す"}, {en: "speak English", jp: "英語を話す"}, {en: "wash hands", jp: "手を洗う"}, {en: "do homework", jp: "宿題をする"},
+                {en: "play soccer", jp: "サッカーをする"}, {en: "play the piano", jp: "ピアノを弾く"}, {en: "of course", jp: "もちろん"}, {en: "good morning", jp: "おはよう"},
+                {en: "good afternoon", jp: "こんにちは（昼）"}, {en: "good evening", jp: "こんばんは"}, {en: "good bye", jp: "さようなら"}, {en: "pardon me", jp: "もう一度言ってください"},
+                {en: "excuse me", jp: "すみません、失礼します"}, {en: "you're welcome", jp: "どういたしまして"}, {en: "how are you?", jp: "お元気ですか"}, {en: "here you are", jp: "はい、どうぞ（物を渡すとき）"}
+            ]
+        };
+
+        let selectedMode = 'anki'; 
+        let currentPool = [];     
+        let originalPoolLength = 0; 
+        let currentQuestion = null;
+        let currentUnitKey = "";   
+        
+        // 状態管理用オブジェクト
+        let clearedAnkiUnits = []; // 暗記モードでクリアした単元リスト
+        let clearedUnits = [];     // テストモードでクリアした単元リスト
+        let reviewList = [];       // 間違えた問題を保存する復習リスト
+        let isReviewMode = false;  
+
+        // 暗記用状態
+        let isMeaningRevealed = false;
+
+        // テスト用状態
+        let combo = 0;
+        let timer = null;
+        const TIME_LIMIT = 5000;
+
+        // ホーム画面のボタン生成・更新関数
+        function renderUnitButtons() {
+            const unitContainer = document.getElementById('unit-buttons');
+            unitContainer.innerHTML = ""; 
+
+            // 1. 復習リストが1件以上あれば最上部に表示
+            if (reviewList.length > 0) {
+                const rBtn = document.createElement('button');
+                rBtn.className = 'unit-btn review-btn';
+                rBtn.innerHTML = `<span>🚨 【復習】間違えた問題 (${reviewList.length}語)</span>`;
+                rBtn.onclick = () => startReviewSession();
+                unitContainer.appendChild(rBtn);
+            }
+
+            // 2. 通常の単元ボタンを描写
+            Object.keys(wordData).forEach(key => {
+                const btn = document.createElement('button');
+                btn.id = `btn-${key}`;
+                btn.innerText = key;
+                
+                let classes = `unit-btn mode-${selectedMode}`;
+                
+                // テストモードクリア時は発光エフェクト
+                if (clearedUnits.includes(key)) {
+                    classes += ' cleared-test'; 
+                }
+                btn.className = classes;
+
+                // バッジ格納エリアの作成
+                const badgeContainer = document.createElement('div');
+                badgeContainer.className = 'status-badges';
+
+                if (clearedAnkiUnits.includes(key)) {
+                    const ankiBadge = document.createElement('span');
+                    ankiBadge.className = 'badge-clear-indicator badge-clear-anki';
+                    ankiBadge.innerText = '✓ ANKI';
+                    badgeContainer.appendChild(ankiBadge);
+                }
+                if (clearedUnits.includes(key)) {
+                    const testBadge = document.createElement('span');
+                    testBadge.className = 'badge-clear-indicator badge-clear-test';
+                    testBadge.innerText = '👑 TEST';
+                    badgeContainer.appendChild(testBadge);
+                }
+                btn.appendChild(badgeContainer);
+                
+                btn.onclick = () => startSession(key);
+                unitContainer.appendChild(btn);
+            });
+        }
+
+        // モード変更
+        function setMode(mode) {
+            selectedMode = mode;
+            document.querySelectorAll('.mode-tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`.mode-tab[data-mode="${mode}"]`).classList.add('active');
+            renderUnitButtons();
+        }
+
+        // 配列シャッフル関数
+        function shuffle(array) {
+            let shuffled = [...array];
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            return shuffled;
+        }
+
+        // セッション開始
+        function startSession(key) {
+            isReviewMode = false;
+            currentUnitKey = key;
+            currentPool = shuffle(wordData[key]);
+            originalPoolLength = currentPool.length;
+            
+            if (selectedMode === 'anki') {
+                document.getElementById('anki-unit-name').innerText = key;
+                showScreen('anki-screen');
+                initAnkiQuestion();
+            } else {
+                document.getElementById('test-unit-name').innerText = key;
+                document.getElementById('test-mode-badge').className = "mode-badge badge-test";
+                document.getElementById('test-mode-badge').innerText = "テストモード (5秒制限・一撃死)";
+                combo = 0;
+                document.getElementById('combo').innerText = combo;
+                showScreen('challenge-screen');
+                nextTestQuestion();
+            }
+        }
+
+        // 復習セッション開始
+        function startReviewSession() {
+            isReviewMode = true;
+            currentUnitKey = "REVIEW_LIST";
+            currentPool = shuffle(reviewList);
+            originalPoolLength = currentPool.length;
+
+            document.getElementById('test-unit-name').innerText = "弱点克服特訓";
+            document.getElementById('test-mode-badge').className = "mode-badge badge-review";
+            document.getElementById('test-mode-badge').innerText = "復習モード (5秒制限・一撃死)";
+            combo = 0;
+            document.getElementById('combo').innerText = combo;
+            showScreen('challenge-screen');
+            nextTestQuestion();
+        }
+
+        // 間違えた問題を復習リストに追加（重複なし）
+        function addToReviewList(wordObj) {
+            const exists = reviewList.some(item => item.en === wordObj.en);
+            if (!exists) {
+                reviewList.push(wordObj);
+            }
+        }
+
+        /* ==========================================
+           ▼ 暗記モード ロジック（修正・拡張部分）
+        ========================================== */
+        function initAnkiQuestion() {
+            // プールが空＝すべての問題で「覚えた」を選択できた場合のみクリア
+            if (currentPool.length === 0) {
+                if (!clearedAnkiUnits.includes(currentUnitKey)) {
+                    clearedAnkiUnits.push(currentUnitKey); 
+                }
+                showSessionClear("暗記モード完了！", "この単元の全単語をチェックしました。次はテストモードに挑戦してみましょう！");
+                return;
+            }
+
+            document.getElementById('anki-progress').innerText = `残り ${currentPool.length} 問`;
+
+            isMeaningRevealed = false;
+            // 配列の先頭から問題を1つ取り出す（「不安」で末尾に回した問題が後で綺麗に回ってくるようにするため shift を使用）
+            currentQuestion = currentPool.shift(); 
+            
+            document.getElementById('anki-word').innerText = currentQuestion.en;
+            
+            const meaning = document.getElementById('anki-meaning');
+            meaning.innerText = currentQuestion.jp;
+            meaning.style.visibility = 'hidden';
+            
+            // ボタンエリアを初期状態（答えを表示）に戻す
+            const controls = document.getElementById('anki-controls');
+            controls.innerHTML = `<button id="anki-main-btn" class="anki-action-btn" onclick="handleAnkiShowAnswer()">答えを表示 (Space)</button>`;
+        }
+
+        // 「答えを表示」を押したときの処理
+        function handleAnkiShowAnswer() {
+            document.getElementById('anki-meaning').style.visibility = 'visible';
+            isMeaningRevealed = true;
+
+            // ボタンエリアを「覚えた」「不安…」の2つに差し替える
+            const controls = document.getElementById('anki-controls');
+            controls.innerHTML = `
+                <button class="anki-action-btn anki-btn-danger" onclick="handleAnkiChoice(false)">不安… (Backspace)</button>
+                <button class="anki-action-btn anki-btn-success" onclick="handleAnkiChoice(true)">覚えた！ (Enter)</button>
+            `;
+        }
+
+        // 「覚えた（true）」または「不安（false）」を選んだときの処理
+        function handleAnkiChoice(isKnown) {
+            if (!isKnown) {
+                // 不安な場合は現在の問題プールの「末尾」に再度追加する
+                currentPool.push(currentQuestion);
+            }
+            // 次の問題へ
+            initAnkiQuestion();
+        }
+
+        /* ==========================================
+           ▼ テストモード ロジック
+        ========================================== */
+        function nextTestQuestion() {
+            if (timer) clearInterval(timer);
+            
+            if (currentPool.length === 0) {
+                if (!isReviewMode) {
+                    if (!clearedUnits.includes(currentUnitKey)) {
+                        clearedUnits.push(currentUnitKey); 
+                    }
+                    showSessionClear("COMPLETE!!", `おめでとうございます！<br>「${currentUnitKey}」の全 ${originalPoolLength} 問を完全制覇しました！`);
+                } else {
+                    reviewList = []; 
+                    showSessionClear("弱点克服成功！", "復習リストの間違えた問題をすべてクリアしました！");
+                }
+                return;
+            }
+
+            document.getElementById('test-progress').innerText = `残り ${currentPool.length} / ${originalPoolLength} 問`;
+
+            currentQuestion = currentPool.pop(); 
+            document.getElementById('question-word').innerText = currentQuestion.en;
+
+            let choices = [currentQuestion.jp];
+            
+            // --- 紛らわしさ極限カスタム ---
+            // 1. まず出題単語が本来どの単元（キー）に属しているかを特定
+            const originKey = Object.keys(wordData).find(key => 
+                wordData[key].some(item => item.en === currentQuestion.en)
+            ) || currentUnitKey;
+
+            // 2. その単元の全単語をベースにする
+            let basePool = wordData[originKey] || [];
+
+            // 3. 出題単語と「頭の2文字が同じ」または「文字数の差が±2以内」の紛らわしい単語を抽出
+            let visualMatches = basePool.filter(item => {
+                if (item.en === currentQuestion.en) return false; // 自分自身は除外
+                const sharePrefix = item.en.substring(0, 2).toLowerCase() === currentQuestion.en.substring(0, 2).toLowerCase();
+                const regularLength = Math.abs(item.en.length - currentQuestion.en.length) <= 2;
+                return sharePrefix || regularLength;
+            });
+
+            // シャッフルしてダミー候補（紛らわしい順）のリストを作成
+            visualMatches.sort(() => Math.random() - 0.5);
+            let dummyPool = visualMatches.concat(basePool.sort(() => Math.random() - 0.5));
+
+            // 4. 選択肢が4つになるまで詰め込む
+            let attempts = 0;
+            while (choices.length < 4 && attempts < dummyPool.length) {
+                let candidate = dummyPool[attempts].jp;
+                if (!choices.includes(candidate)) choices.push(candidate);
+                attempts++;
+            }
+
+            // 万が一足りない場合は全データから補填
+            if (choices.length < 4) {
+                const allWords = Object.values(wordData).flat();
+                allWords.sort(() => Math.random() - 0.5);
+                for (let item of allWords) {
+                    if (choices.length >= 4) break;
+                    if (!choices.includes(item.jp)) choices.push(item.jp);
+                }
+            }
+            // --- カスタムここまで ---
+            
+            choices.sort(() => Math.random() - 0.5);
+
+            for (let i = 0; i < 4; i++) {
+                const btn = document.getElementById(`c${i}`);
+                btn.innerText = choices[i];
+                btn.dataset.correct = (choices[i] === currentQuestion.jp);
+            }
+
+            const bar = document.getElementById('timer-bar');
+            let start = Date.now();
+            bar.style.width = '100%';
+
+            timer = setInterval(() => {
+                let passed = Date.now() - start;
+                let per = 100 - (passed / TIME_LIMIT * 100);
+                bar.style.width = per + '%';
+
+                if (passed >= TIME_LIMIT) {
+                    clearInterval(timer);
+                    addToReviewList(currentQuestion); 
+                    testGameOver("TIME UP!");
+                }
+            }, 50);
+        }
+
+        function handleAnswer(idx) {
+            const btn = document.getElementById(`c${idx}`);
+            if (btn.dataset.correct === "true") {
+                combo++;
+                document.getElementById('combo').innerText = combo;
+                nextTestQuestion();
+            } else {
+                addToReviewList(currentQuestion); 
+                testGameOver("WRONG!");
+            }
+        }
+
+        function testGameOver(reason) {
+            clearInterval(timer);
+            const titleEl = document.getElementById('overlay-title');
+            titleEl.className = "gameover-title";
+            titleEl.innerText = "GAME OVER";
+
+            document.getElementById('gameover-msg').innerText = reason === "TIME UP!" ? "時間切れです！" : "間違いです！";
+            document.getElementById('correct-info').innerText = `${currentQuestion.en} ＝ ${currentQuestion.jp}`;
+            document.getElementById('final-combo-info').innerText = `記録: ${combo} コンボ`;
+            document.getElementById('gameover-overlay').classList.add('show');
+        }
+
+        function showSessionClear(title, message) {
+            clearInterval(timer);
+            const titleEl = document.getElementById('overlay-title');
+            titleEl.className = "clear-title";
+            titleEl.innerText = title;
+
+            document.getElementById('gameover-msg').innerHTML = message;
+            document.getElementById('correct-info').innerText = "";
+            document.getElementById('final-combo-info').innerText = !isReviewMode && selectedMode === 'test' ? `達成コンボ: ${combo}!` : "";
+            document.getElementById('gameover-overlay').classList.add('show');
+        }
+
+        /* ==========================================
+           ▼ 共通・キーボード制御（修正部分）
+        ========================================== */
+        function backToHome() {
+            if (timer) clearInterval(timer);
+            document.getElementById('gameover-overlay').classList.remove('show');
+            showScreen('home-screen');
+            renderUnitButtons(); 
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        window.addEventListener('keydown', function(e) {
+            const ankiScreen = document.getElementById('anki-screen');
+            if (ankiScreen.classList.contains('active')) {
+                if (!isMeaningRevealed) {
+                    // 意味が表示されていないとき：Spaceで表示
+                    if (e.code === "Space") {
+                        e.preventDefault();
+                        handleAnkiShowAnswer();
+                    }
+                } else {
+                    // 意味が表示されているとき：Enterで「覚えた」、Backspaceで「不安」
+                    if (e.code === "Enter") {
+                        e.preventDefault();
+                        handleAnkiChoice(true);
+                    } else if (e.code === "Backspace") {
+                        e.preventDefault();
+                        handleAnkiChoice(false);
+                    }
+                }
+            }
+        });
+
+        renderUnitButtons();
+// ★【修正】暗記モードの画面更新処理（完全版）
+        const originalInitAnkiQuestion = initAnkiQuestion;
+        initAnkiQuestion = function() {
+            originalInitAnkiQuestion();
+            if (currentQuestion && document.getElementById('anki-pronunciation')) {
+                document.getElementById('anki-pronunciation').innerText = getKatakana(currentQuestion.en);
+            }
+        };
+
+        // ★【修正】全単語完全固定マッピング辞書（不自然さゼロ）
+        function getKatakana(en) {
+            let str = en.toLowerCase().trim().replace(/[~?]/g, '');
+            
+            const dictionary = {
+                // PART 1
+                "i": "アイ", "my": "マイ", "me": "ミー", "mine": "マイン",
+                "you": "ユー", "your": "ユア", "he": "ヒー", "his": "ヒズ",
+                "she": "シー", "her": "ハー", "it": "イット", "we": "ウィー",
+                "what": "ワット", "which": "ウィッチ", "who": "フー", "when": "ウェン",
+                "where": "ウェア", "why": "ワイ", "how": "ハウ", "can": "キャン",
+                "do": "ドゥー", "am": "アム", "is": "イズ", "are": "アー",
+                "not": "ノット", "this": "ディス", "that": "ザット", "yes": "イエス",
+                "no": "ノー", "oh": "オゥ", "please": "プリーズ", "thank you": "サンキュー",
+                "welcome": "ウェルカム", "here": "ヒア", "there": "ゼア", "look": "ルック",
+
+                // PART 2
+                "every": "エヴリ", "all": "オール", "many": "メニィ", "spring": "スプリング",
+                "summer": "サマー", "autumn": "オータム", "winter": "ウィンター", "sunday": "サンデイ",
+                "monday": "マンデイ", "tuesday": "チューズデイ", "wednesday": "ウェンズデイ", "thursday": "サーズデイ",
+                "friday": "フライデイ", "saturday": "サタデイ", "january": "ジャニュアリー", "february": "フェブラリー",
+                "today": "トゥデイ", "tomorrow": "トゥモロー", "yesterday": "イエスタデイ", "time": "タイム",
+                "year": "イヤー", "month": "マンス", "week": "ウィーク", "day": "デイ",
+                "morning": "モーニング", "afternoon": "アフタヌーン", "evening": "イヴニング", "night": "ナイト",
+                "clock": "クロック", "hour": "アワー", "o'clock": "オクロック", "now": "ナウ",
+                "then": "ゼン", "often": "オフン", "sometimes": "サムタイムズ", "always": "オールウェイズ",
+                "usually": "ユージュアリー", "again": "アゲイン", "ago": "アゴー", "before": "ビフォー",
+
+                // PART 3
+                "ask": "アスク", "buy": "バイ", "clean": "クリーン", "close": "クローズ",
+                "cook": "クック", "come": "カム", "dance": "ダンス", "drink": "ドリンク",
+                "eat": "イート", "go": "ゴー", "have": "ハヴ", "know": "ノウ",
+                "like": "ライク", "make": "メイク", "play": "プレイ", "read": "リード",
+                "run": "ラン", "write": "ライト", "study": "スタディ", "speak": "スピーク",
+                "talk": "トーク", "sing": "シング", "swim": "スイム", "use": "ユーズ",
+                "wash": "ウォッシュ", "want": "ウォント", "help": "ヘルプ", "open": "オープン",
+                "listen": "リスン", "see": "シー", "watch": "ウォッチ", "meet": "ミート",
+                "live": "リヴ", "work": "ワーク", "walk": "ウォーク", "stop": "ストップ",
+                "stay": "ステイ", "sit": "シット", "stand": "スタンド", "smile": "スマイル",
+                "put": "プット", "take": "テイク", "bring": "ブリング", "show": "ショウ",
+                "tell": "テル", "say": "セイ", "find": "ファインド", "teach": "チーチ",
+                "learn": "ラーン", "enjoy": "エンジョイ", "love": "ラヴ", "think": "シンク",
+                "understand": "アンダスタンド",
+
+                // PART 4
+                "house": "ハウス", "room": "ルーム", "door": "ドア", "desk": "デスク",
+                "chair": "チェアー", "computer": "コンピューター", "pen": "ペン", "pencil": "ペンシル",
+                "bag": "バッグ", "hat": "ハット", "cap": "キャップ", "t-shirt": "ティーシャツ",
+                "shoes": "シューズ", "friend": "フレンド", "baby": "ベイビー", "teacher": "ティーチャー",
+                "doctor": "ドクター", "boy": "ボーイ", "girl": "ガール", "man": "マン",
+                "woman": "ウーマン", "child": "チャイルド", "people": "ピープル", "student": "スチューデント",
+                "father": "ファザー", "mother": "マザー", "parent": "ペアレント", "parents": "ペアレンツ",
+                "brother": "ブラザー", "sister": "シスター", "family": "ファミリー", "grandpa": "グランパ",
+                "grandma": "グランマ", "city": "シティ", "town": "タウン", "park": "パーク",
+                "station": "ステーション", "ticket": "チケット", "store": "ストア", "shop": "ショップ",
+                "hospital": "ホスピタル", "library": "ライブラリー", "museum": "ミュージアム", "zoo": "ズー",
+                "bed": "ベッド", "table": "テーブル", "cup": "カップ", "dish": "ディッシュ",
+                "book": "ブック", "notebook": "ノートブック", "picture": "ピクチャー", "camera": "カメラ",
+                "bike": "バイク", "car": "カー", "bus": "バス", "train": "トレイン",
+
+                // PART 5
+                "animal": "アニマル", "panda": "パンダ", "pig": "ピッグ", "horse": "ホース",
+                "cat": "キャット", "dog": "ドッグ", "bird": "バード", "fish": "フィッシュ",
+                "bear": "ベアー", "elephant": "エレファント", "monkey": "モンキー", "rabbit": "ラビット",
+                "lion": "ライオン", "tree": "ツリー", "flower": "フラワー", "nature": "ネイチャー",
+                "school": "スクール", "class": "クラス", "classroom": "クラスルーム", "math": "マス",
+                "science": "サイエンス", "music": "ミュージック", "art": "アート", "history": "ヒストリー",
+                "english": "イングリッシュ", "japanese": "ジャパニーズ", "homework": "ホームワーク", "test": "テスト",
+                "lesson": "レッスン", "club": "クラブ", "eye": "アイ", "ear": "イヤー",
+                "mouth": "マウス", "hand": "ハンド", "arm": "アーム", "leg": "レッグ",
+                "foot": "フット", "head": "ヘッド", "hair": "ヘア", "face": "フェイス",
+                "sport": "スポーツ", "soccer": "サッカー", "tennis": "テニス", "basketball": "バスケットボール",
+                "baseball": "ベースボール", "volleyball": "バレーボール", "swimming": "スイミング", "running": "ランニング",
+                "piano": "ピアノ", "guitar": "ギター", "song": "ソング", "game": "ゲーム",
+                "food": "フード", "breakfast": "ブレックファスト", "lunch": "ランチ", "dinner": "ディナー",
+
+                // PART 6
+                "sky": "スカイ", "sea": "シー", "weather": "ウェザー", "world": "ワールド",
+                "cold": "コールド", "hot": "ホット", "warm": "ウォーム", "cool": "クール",
+                "sunny": "サニー", "rainy": "レイニー", "cloudy": "クラウディ", "snowy": "スノーウィ",
+                "fine": "ファイン", "good": "グッド", "bad": "バッド", "nice": "ナイス",
+                "great": "グレイト", "beautiful": "ビューティフル", "popular": "ポピュラー", "famous": "フェイマス",
+                "favorite": "フェイバリット", "happy": "ハッピー", "sad": "サド", "tired": "タイアード",
+                "busy": "ビズィー", "hungry": "ハングリー", "thirsty": "サースティ", "new": "ニュー",
+                "old": "オールド", "big": "ビッグ", "large": "ラージ", "small": "スモール",
+                "little": "リトル", "long": "ロング", "short": "ショート", "tall": "トール",
+                "high": "ハイ", "low": "ロー", "fast": "ファスト", "slow": "スロウ",
+                "early": "アーリー", "late": "レイト", "easy": "イージー", "difficult": "ディフィカルト",
+                "hard": "ハード", "kind": "カインド", "interesting": "インタレスティング", "fun": "ファン",
+                "together": "トゥギャザー", "well": "ウェル", "very": "ヴェリー", "much": "マッチ",
+                "too": "トゥー", "only": "オンリー", "really": "リアリー", "maybe": "メイビー",
+
+                // PART 7 (熟語・前置詞)
+                "and": "アンド", "but": "バット", "or": "オア", "so": "ソー", "because": "ビコーズ",
+                "about": "アバウト", "after": "アフター", "around": "アラウンド", "at": "アット",
+                "by": "バイ", "for": "フォー", "from": "フロム", "in": "イン", "of": "オブ",
+                "on": "オン", "to": "トゥー", "under": "アンダー", "with": "ウィズ", "near": "ニア",
+                "between": "ビトウィーン",
+                "come to": "カム トゥー", "come from": "カム フロム", "go to": "ゴー トゥー",
+                "go home": "ゴー ホーム", "go to bed": "ゴー トゥー ベッド", "go out": "ゴー アウト",
+                "get up": "ゲット アップ", "get to": "ゲット トゥー", "listen to": "リスン トゥー",
+                "look at": "ルック アット", "look for": "ルック フォー", "take a picture": "テイク ア ピクチャー",
+                "talk with": "トーク ウィズ", "speak English": "スピーク イングリーシュ", "wash hands": "ウォッシュ ハンズ",
+                "do homework": "ドゥー ホームワーク", "play soccer": "プレイ サッカー", "play the piano": "プレイ ザ ピアノ",
+                "of course": "オブ コース", "good morning": "グッド モーニング", "good afternoon": "グッド アフタヌーン",
+                "good evening": "グッド イーヴニング", "good bye": "グッド バイ", "pardon me": "パードゥン ミー",
+                "excuse me": "エクスキューズ ミー", "you're welcome": "ユーア ウェルカム", "how are you?": "ハウ アー ユー",
+                "here you are": "ヒア ユー アー"
+            };
+
+            // 完全一致するものがあればそれを返す
+            if (dictionary[str]) return dictionary[str];
+
+            // 熟語内の部分一致（大文字小文字の揺れ対策など）
+            let lowerEn = en.toLowerCase();
+            for (let key in dictionary) {
+                if (lowerEn.includes(key)) {
+                    return dictionary[key];
+                }
+            }
+
+            // 万が一見つからなかった場合の安全用
+            return en;
+        }
+    </script>
+</body>
+</html>

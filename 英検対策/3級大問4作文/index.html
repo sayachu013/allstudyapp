@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英検3級 ライティング完全制覇特訓マスター演習（新形式完全対応）</title>
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-hover: #45a049;
+            --bg: #f4f6f8;
+            --card-bg: #ffffff;
+            --text: #333;
+            --accent: #007BFF;
+            --accent-hover: #0056b3;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --purple: #9b59b6;
+            --dark-gold: #c5a059;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            max-width: 650px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            position: relative;
+        }
+
+        h1, h2 { text-align: center; margin-top: 0; color: #222; }
+
+        /* ホーム画面のメニュー */
+        .menu-section { display: block; }
+        .game-section { display: none; }
+        .essay-section { display: none; }
+
+        .menu-group {
+            margin-bottom: 25px;
+            background: #fafafa;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        .menu-group h3 {
+            border-left: 4px solid var(--accent);
+            padding-left: 10px;
+            margin-top: 0;
+            margin-bottom: 12px;
+            color: #444;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .study-flow-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .btn-lecture {
+            background: #fff;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+        .btn-lecture:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+        }
+        @media (max-width: 480px) {
+            .menu-grid { grid-template-columns: 1fr; }
+            .study-flow-box { flex-direction: column; }
+        }
+        .menu-btn {
+            background: #fff;
+            border: 2px solid #e0e0e0;
+            padding: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .menu-btn:hover {
+            border-color: var(--primary);
+            background-color: #f0fdf4;
+            transform: translateY(-2px);
+        }
+        .menu-btn .title { font-weight: bold; display: block; margin-bottom: 5px; padding-right: 24px; }
+        .menu-btn .desc { font-size: 0.8rem; color: #666; }
+        .crown-icon {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            font-size: 1.2rem;
+        }
+
+        /* 構造解説モーダル画面 */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-content {
+            background: #fff;
+            max-width: 580px;
+            width: 100%;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            animation: fadeIn 0.3s ease;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .modal-header {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 8px;
+            color: #222;
+        }
+        .modal-body {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            color: #444;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* 視覚的解説デザイン用の装飾 */
+        .visual-formula {
+            background: #eef3fc;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 1.05rem;
+            margin: 10px 0 15px 0;
+            border-left: 5px solid var(--accent);
+            font-family: monospace;
+            line-height: 1.8;
+        }
+        .tpl-fixed { color: var(--accent); font-weight: bold; }
+        .tpl-arrange { background: #fff3cd; color: #b78103; padding: 2px 6px; border-radius: 4px; font-weight: bold; border: 1px solid #ffb300; display: inline-block; line-height: 1.2; margin: 2px 0; }
+        .arrange-box {
+            background: #fff9e6;
+            border: 1px solid #ffeeba;
+            padding: 14px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        /* ゲーム画面ナビゲーション */
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .back-btn {
+            background: #e0e0e0;
+            border: none;
+            color: #333;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+        .back-btn:hover { background: #d0d0d0; }
+        
+        .miss-counter {
+            font-size: 0.9rem;
+            font-weight: bold;
+            color: var(--warning);
+            background: #fff3cd;
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        .question-box {
+            background-color: #eef9f0;
+            border-left: 5px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 25px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .instruction {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        /* 操作説明ガイドバッジ */
+        .guide-badges {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 12px;
+            font-size: 0.85rem;
+            background: #fdfdfd;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid #e9e9e9;
+        }
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-weight: bold;
+        }
+        .badge-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        /* 解答ワークスペース */
+        .sentence-workspace {
+            background: #fafafa;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            line-height: 2.5;
+            font-size: 1.1rem;
+        }
+
+        .slot-zone {
+            display: inline-flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+            min-width: 250px;
+            min-height: 42px;
+            background: #fff;
+            border: 2px dashed var(--primary);
+            border-radius: 6px;
+            vertical-align: middle;
+            padding: 4px 10px;
+            margin: 0 4px;
+        }
+
+        /* 単語ブロック */
+        .word-block {
+            background-color: #fff;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-size: 1rem;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s;
+            font-weight: 500;
+            display: inline-block;
+            line-height: 1.2;
+        }
+        .word-block:hover {
+            border-color: var(--primary);
+            background-color: #f0fdf4;
+        }
+        .word-block.selected {
+            opacity: 0.3;
+            background-color: #e0e0e0;
+            border-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .choice-pool {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 50px;
+        }
+
+        .btn-check {
+            display: block;
+            width: 100%;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 1.1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-check:hover { background-color: var(--primary-hover); }
+
+        /* 結果 ＆ 解説表示エリア */
+        .result-box {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+            line-height: 1.6;
+        }
+        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .force-show { background-color: #e2f0fe; color: #1a4a75; border: 1px solid #b8daff; }
+
+        .explanation-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            border-bottom: 2px solid dotted;
+            padding-bottom: 5px;
+        }
+        .explanation-body {
+            font-size: 0.95rem;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 12px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+        .explanation-body ul { margin: 5px 0; padding-left: 20px; }
+
+        /* 模擬テスト用インジケーター */
+        .test-progress {
+            font-size: 1rem;
+            font-weight: bold;
+            color: var(--purple);
+            background: #f3ebd6;
+            padding: 6px 15px;
+            border-radius: 6px;
+        }
+
+        /* 課題英作文エリア用の装飾 */
+        .notebook-guide {
+            background: #fff8e1;
+            border: 2px solid #ffe082;
+            padding: 15px;
+            border-radius: 8px;
+            color: #5d4037;
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="menuSection" class="menu-section">
+        <h1>英検3級 ライティング完全制覇特訓</h1>
+        
+        <div class="menu-group" style="border: 2px solid var(--dark-gold); background: #fffdf6;">
+            <h3 style="color: var(--dark-gold); border-left-color: var(--dark-gold);">💡 2問体制（ダブルライティング）の必勝攻略ガイド</h3>
+            <p style="font-size: 0.88rem; color: #555; margin-top:-5px; margin-bottom:12px;">現在の英検3級は「大問4（Eメール）」と「大問5（意見論述）」の2問に必ず解答する必要があります。それぞれの対策と合格ラインの裏側を解説。</p>
+            <button class="btn-check" style="background-color: var(--dark-gold);" onclick="openModal('strategy_guide')">
+                🔥 新形式ダブルライティング・必勝攻略ガイドを開く
+            </button>
+        </div>
+
+        <h2 style="text-align: left; font-size: 1.25rem; color: var(--accent); border-bottom: 2px solid var(--accent); padding-bottom: 5px; margin-top: 30px;">📬 大問4：Eメール返信 対策（語数目安：15〜25語）</h2>
+
+        <div class="menu-group">
+            <div class="study-flow-box">
+                <button class="btn-lecture" onclick="openModal('group1')">📖 ①の構造解説を確認する</button>
+            </div>
+            <h3>① 時期（When）と数量（How many）への回答型</h3>
+            <div class="menu-grid">
+                <button class="menu-btn" onclick="startQuiz('fun_sports')">
+                    <span class="title">「いつ植えた？」のお題 <span id="crown-fun_sports" class="crown-icon"></span></span>
+                    <span class="desc">When did you plant the tomatoes?</span>
+                </button>
+                <button class="menu-btn" onclick="startQuiz('fun_cooking')">
+                    <span class="title">「いくつ育ててる？」のお題 <span id="crown-fun_cooking" class="crown-icon"></span></span>
+                    <span class="desc">How many sunflowers are you growing?</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="menu-group">
+            <div class="study-flow-box">
+                <button class="btn-lecture" onclick="openModal('group2')">📖 ②の構造解説を確認する</button>
+            </div>
+            <h3>② 疑問詞（What / Where）へのズバリ回答型</h3>
+            <div class="menu-grid">
+                <button class="menu-btn" onclick="startQuiz('learn_foreign')">
+                    <span class="title">「何」を答えるお題 <span id="crown-learn_foreign" class="crown-icon"></span></span>
+                    <span class="desc">What subject do you like the best?</span>
+                </button>
+                <button class="menu-btn" onclick="startQuiz('learn_museum')">
+                    <span class="title">「どこで」を答えるお題 <span id="crown-learn_museum" class="crown-icon"></span></span>
+                    <span class="desc">Where do you usually buy books?</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="menu-group">
+            <div class="study-flow-box">
+                <button class="btn-lecture" onclick="openModal('group3')">📖 ③の構造解説を確認する</button>
+            </div>
+            <h3>③ 利便性・手軽さ・時短をアピールする型</h3>
+            <div class="menu-grid">
+                <button class="menu-btn" onclick="startQuiz('easy_shopping')">
+                    <span class="title">ネット買い物のお題 <span id="crown-easy_shopping" class="crown-icon"></span></span>
+                    <span class="desc">Do you like shopping on the Internet?</span>
+                </button>
+                <button class="menu-btn" onclick="startQuiz('easy_cooking')">
+                    <span class="title">外食・レストランのお題 <span id="crown-easy_cooking" class="crown-icon"></span></span>
+                    <span class="desc">Do you prefer eating at restaurants?</span>
+                </button>
+            </div>
+        </div>
+
+        <h2 style="text-align: left; font-size: 1.25rem; color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 5px; margin-top: 30px;">✍️ 大問5：意見論述 対策（語数目安：25〜35語）</h2>
+
+        <div class="menu-group">
+            <div class="study-flow-box">
+                <button class="btn-lecture" onclick="openModal('group4')">📖 ④の構造解説を確認する</button>
+            </div>
+            <h3>④ 習慣型「I often 〜 with friends（経験・日常系）」</h3>
+            <div class="menu-grid">
+                <button class="menu-btn" onclick="startQuiz('often_weekend')">
+                    <span class="title">週末の過ごし方 <span id="crown-often_weekend" class="crown-icon"></span></span>
+                    <span class="desc">What do you like to do on weekends?</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="menu-group">
+            <div class="study-flow-box">
+                <button class="btn-lecture" onclick="openModal('group5')">📖 ⑤の構造解説を確認する</button>
+            </div>
+            <h3>⑤ 習慣・頻度のライフスタイル構成型</h3>
+            <div class="menu-grid">
+                <button class="menu-btn" onclick="startQuiz('good_bicycle')">
+                    <span class="title">部屋の掃除・頻度のお題 <span id="crown-good_bicycle" class="crown-icon"></span></span>
+                    <span class="desc">How often do you clean your room?</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="menu-group" style="border: 2px dashed var(--purple); background: #fdfaff;">
+            <h3 style="color: var(--purple); border-left-color: var(--purple);">✏️ 実戦総合演習（ライティング表現ランダム模試）</h3>
+            <p style="font-size: 0.85rem; color:#555; margin-top:-5px; margin-bottom:15px;">大問4・5の表現からランダムに5問連続出題。妥協なしの合格ライン：<b>4問以上正解 / 全5問中</b></p>
+            <button class="btn-check" style="background-color: var(--purple);" onclick="startMockTest()">
+                模擬テスト(5問連続)に挑戦する <span id="crown-mock_test"></span>
+            </button>
+        </div>
+
+        <div class="menu-group" style="border: 2px solid var(--primary); background: #fafffa;">
+            <h3 style="color: var(--primary); border-left-color: var(--primary);">📝 最終関門：本番想定フル作文課題（ノート演習）</h3>
+            <p style="font-size: 0.85rem; color:#444; margin-top:-5px; margin-bottom:15px;">お題を見て手元のノートに全文記述した actor、ワンタップで模範解答と解説を確認！</p>
+            <div class="menu-grid">
+                <button class="menu-btn" style="border-color: var(--primary);" onclick="startEssayExercise('essay1')">
+                    <span class="title">【大問4】Eメール返信演習 <span id="crown-essay1" class="crown-icon"></span></span>
+                    <span class="desc">Alexからのトマト・ひまわりメールへの返信</span>
+                </button>
+                <button class="menu-btn" style="border-color: var(--primary);" onclick="startEssayExercise('essay2')">
+                    <span class="title">【大問5】2択選択型 <span id="crown-essay2" class="crown-icon"></span></span>
+                    <span class="desc">Which do you prefer, hot weather or cold weather?</span>
+                </button>
+            </div>
+            <button class="btn-check" style="background-color: var(--primary); margin-top:12px;" onclick="startEssayExercise('essay3')">
+                【大問5】疑問詞自由回答型（最難関） <span id="crown-essay3"></span>
+            </button>
+        </div>
+    </div>
+
+    <div id="gameSection" class="game-section">
+        <div class="nav-header">
+            <button class="back-btn" onclick="exitToMenu()">← メニューに戻る</button>
+            <div class="miss-counter" id="missCounter">あと 3 回ミスで解答表示</div>
+            <div class="test-progress" id="testProgress" style="display:none;">第 1 問 / 全 5 問</div>
+        </div>
+        
+        <div class="question-box" id="question"></div>
+        <div class="instruction">【英文を完成させてください】</div>
+        
+        <div class="guide-badges">
+            <span class="badge"><span class="badge-dot" style="background: var(--primary);"></span> 🟢 点線枠：下の単語ブロックを正しい順序で並べて、指定された質問に正しく回答してください。</span>
+        </div>
+        
+        <div class="sentence-workspace">
+            <span id="prefixText">Hi, Alex! Thank you for your e-mail. </span> 
+            <div class="slot-zone" id="slotZone" onclick="clearBlocks()" title="クリックでブロックをリセット"></div>
+        </div>
+
+        <div class="instruction">【単語ブロック】（枠内の配置済みブロックを押すと個別に外せます）</div>
+        <div class="choice-pool" id="choicePool"></div>
+
+        <button class="btn-check" id="checkBtn" onclick="checkAnswer()">答え合わせ</button>
+        <div class="result-box" id="resultBox"></div>
+    </div>
+
+    <div id="essaySection" class="essay-section">
+        <div class="nav-header">
+            <button class="back-btn" onclick="showMenu()">← メニューに戻る</button>
+            <div style="font-size: 0.9rem; font-weight: bold; color: var(--primary);">🎯 本番記述シミュレーター</div>
+        </div>
+        
+        <div class="instruction">【作文問題（本番形式）】</div>
+        <div class="question-box" id="essayQuestion" style="background-color: #f0f4f8; border-left-color: var(--accent); white-space: pre-wrap;"></div>
+        
+        <div class="notebook-guide">
+            ✏️ <b>手元のノートとペンを用意してください。</b><br>
+            このお題に対する完全な作文（大問4なら15〜25語、大問5なら25〜35語が目安）をノートに実際に書き出してください。書き終わったら、下のボタンを押して答え合わせに進みましょう。
+        </div>
+        
+        <button class="btn-check" style="background-color: var(--accent);" onclick="submitEssay()">ノートに書き終えたので模範解答を確認する</button>
+        <div class="result-box" id="essayResultBox"></div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="lectureModal">
+    <div class="modal-content">
+        <div class="modal-header" id="modalTitle">構造解説</div>
+        <div class="modal-body" id="modalBody">解説内容</div>
+        <div class="modal-footer">
+            <button class="back-btn" onclick="closeModal()">閉じる</button>
+            <button class="btn-check" id="modalStartBtn" style="width:auto; padding:8px 20px; font-size:0.95rem;">この単元の特訓を始める</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ポップアップ用データベース（元の親切な解説・公式ボックス・装飾レイアウトを徹底復元）
+const lectureDatabase = {
+    strategy_guide: {
+        title: "🔥 新形式ダブルライティング・必勝攻略ガイド（学習の目的）",
+        body: `<h3>1. 「大問4」と「大問5」で何でもかんでも同じ型を使ってはダメ！</h3>
+               <p>英検3級のライティングは、全く異なる2つの形式にそれぞれ別個に解答する義務があります。採点基準の裏側を理解し、頭を瞬時に切り替える必要があります。</p>
+               <div class="visual-formula">
+                  <b>【大問4：Eメール形式】</b>（語数目安：15〜25語）<br>
+                  印刷済みの挨拶に続き、メールの2つの質問へそれぞれ1文ずつ、合計2文でズバリ答える！<br>
+                  ❌ 理由並列用の「First,」「Second,」をここに書くと流れが不自然になり<b>即減点</b>されます！<br><br>
+                  <b>【大問5：意見論述形式】</b>（語数目安：25〜35語）<br>
+                  1文目で自分の明確な意見を述べ、2文目以降を固定の構成パーツで固める！<br>
+                  1文目：<b>[自分の意見宣言]</b>.<br>
+                  2文目：<span class="tpl-fixed">First,</span> <b>[理由の1つ目]</b>.<br>
+                  3文目：<span class="tpl-fixed">Second,</span> <b>[理由の2つ目]</b>.
+               </div>
+               <p>大問5では「First, / Second,」を入れるだけで、採点基準の<b>「構成点（文章の流れ）」で確実に満点（4/4）</b>がもらえます。悩む時間をゼロにするための必須戦略です。</p>
+               
+               <h3>2. 5大テンプレートを本番でどうハメ込むかのイメージ</h3>
+               <p>本番でどんな変化球のお題が来ても、自分が覚えた型の中に<b>「お題の側を引きずり込んでハメる」</b>のが短期間マスターのコツです。</p>
+               <div class="arrange-box">
+                  <ul>
+                     <li><b>「〇〇はいつ・どこで・何個した？」など具体的な事実</b><br> ➔ 大問4の型①・②を使い、時制（過去形や進行形）を質問文と100%連動させてハメ込む！</li>
+                     <li><b>「〇〇は好き？」「〇〇に行くべき？」などメリットを語る系</b><br> ➔ 大問5の型③・④を使って <span class="tpl-fixed">it is fun for me to [〇〇する].</span> や <span class="tpl-fixed">I often [〇〇する] with my friends.</span> にハメる！</li>
+                     <li><b>「スマホ・買い物・掃除・ライフスタイル」など現代生活・日常系</b><br> ➔ 大問5の型⑤を使って正確な頻度（<span class="tpl-fixed">twice a week</span> など）をはめ込み、文法エラーゼロで押し切る！</li>
+                  </ul>
+               </div>
+               <p style="font-size:0.9rem; color:var(--primary); font-weight:bold;">簡単なお決まりの型を「文法エラーゼロ」で書ききること。これが満点を取る唯一のロードマップです！</p>`,
+        targetQuiz: null
+    },
+    group1: {
+        title: "👑 攻略の型①「時期（When）」と「数量（How many）」対応構文",
+        body: `<p>大問4（Eメール）の最頻出項目。相手の具体的な事実に、時制（過去形や現在進行形）を合わせてピンポイント回答する型です。</p>
+               <div class="instruction">▼ 覚えるべき固定のテンプレート（型）</div>
+               <div class="visual-formula">
+                   <span class="tpl-fixed">I planted them</span> <span class="tpl-arrange">[ 期間 ] ago</span>. / <span class="tpl-fixed">I am growing</span> <span class="tpl-arrange">[ 数字 ]</span> <span class="tpl-arrange">[ 名詞の複数形 ]</span>.
+               </div>
+               <div class="arrange-box">
+                   <strong>💡 本番でのアレンジのやり方（例文）：</strong>
+                   <ul style="margin: 5px 0 0 0; padding-left: 20px; font-size: 0.9rem;">
+                       <li><b>いつ植えた？（過去形）：</b> 「〜前」は ago を使って <span class="tpl-arrange">four months ago</span>。2文目は動名詞主語 <span class="tpl-arrange">Growing them is easy.</span> で固定補強！</li>
+                       <li><b>何個育ててる？（現在進行形）：</b> be動詞+~ing を揃えて <span class="tpl-arrange">I am growing five sunflowers</span> と配置！</li>
+                   </ul>
+               </div>
+               <p style="margin-top:15px; font-size:0.85rem; color:var(--danger); background:#fff0f0; padding:8px; border-radius:4px; font-weight:bold;">
+                  ⚠️ 絶対厳守！：過去の質問に before を使うのは完全な誤りです。「〜前」は 100% [期間 + ago] の形で記述してください。
+               </p>`,
+        targetQuiz: "fun_sports"
+    },
+    group2: {
+        title: "👑 攻略の型② 疑問詞「何（What）」「どこで（Where）」対応構文",
+        body: `<p>Eメール問題で必ず飛んでくる「何が一番好き？」「どこでいつも何々する？」という質問を、文法ミスゼロで撃破するテンプレートです。</p>
+               <div class="instruction">▼ 覚えるべき固定のテンプレート（型）</div>
+               <div class="visual-formula">
+                   <span class="tpl-fixed">I like</span> <span class="tpl-arrange">[ 対象の名詞 ]</span> <span class="tpl-fixed">the best.</span> / <span class="tpl-fixed">I usually buy them at</span> <span class="tpl-arrange">[ 特定の場所 ]</span>.
+               </div>
+               <div class="arrange-box">
+                   <strong>💡 本番でのアレンジのやり方（例文）：</strong>
+                   <ul style="margin: 5px 0 0 0; padding-left: 20px; font-size: 0.9rem;">
+                       <li><b>好きな教科は？：</b> 名詞の場所に <span class="tpl-arrange">math</span>（数学）を配置。because で理由を1文に繋ぐとさらに強力！</li>
+                       <li><b>本をどこで買う？：</b> 場所を示す前置詞 at の後ろに <span class="tpl-arrange">the bookstore</span>（本屋）をドッキング。</li>
+                   </ul>
+               </div>
+               <p style="margin-top:15px; font-size:0.85rem; color:var(--accent); background:#edf5ff; padding:8px; border-radius:4px; font-weight:bold;">
+                  ✨ 得点テク：名詞の重複を避けるために、2回目に登場する物は「them」や「it」などの代名詞にしっかりと置き換えましょう。表現の加点対象になります！
+               </p>`,
+        targetQuiz: "learn_foreign"
+    },
+    group3: {
+        title: "👑 攻略の型③「〜は簡単・時短になる」利便性構文",
+        body: `<p>インターネット、買い物、外食など、主に大問5の意見論述で<b>利便性や現代生活の効率の良さをアピールする</b>ときに無双できる型です。</p>
+               <div class="instruction">▼ 覚えるべき固定のテンプレート（型）</div>
+               <div class="visual-formula">
+                   <span class="tpl-fixed">It is easy for me to</span> <span class="tpl-arrange">[ 動詞の原形 ]</span> <span class="tpl-arrange">[ 対象の言葉 ]</span>. <span class="tpl-fixed">It saves time.</span>
+               </div>
+               <div class="arrange-box">
+                   <strong>💡 本番でのアレンジのやり方（例文）：</strong>
+                   <ul style="margin: 5px 0 0 0; padding-left: 20px; font-size: 0.9rem;">
+                       <li><b>ネット通販なら：</b> to の後ろに <span class="tpl-arrange">buy things</span> を配置。2文目は <span class="tpl-fixed">It saves time.</span>（時間の節約になる）で締める。</li>
+                       <li><b>レストラン外食なら：</b> to の後ろに <span class="tpl-arrange">eat dinner</span> を配置。2文目は <span class="tpl-fixed">It is convenient.</span>（便利だ）で締める。</li>
+                   </ul>
+               </div>
+               <p style="margin-top:15px; font-size:0.85rem; color:var(--warning); background:#fffafd; padding:8px; border-radius:4px; font-weight:bold;">
+                  ⚠️ 三単現トラップ：2文目の It saves time. の「s」を絶対に忘れないでください。save time だと文法項目で即減点されます！
+               </p>`,
+        targetQuiz: "easy_shopping"
+    },
+    group4: {
+        title: "👑 攻略の型④「よく〜と一緒に何々する」習慣・日常生活構文",
+        body: `<p>週末の過ごし方、放課後の行動、趣味など、大問5で<b>「具体的な日常のライフスタイル・経験」</b>を問われた時の最強テンプレートです。</p>
+               <div class="instruction">▼ 覚えるべき固定のテンプレート（型）</div>
+               <div class="visual-formula">
+                   <span class="tpl-fixed">First, I often</span> <span class="tpl-arrange">[ 動詞の原形 ]</span> <span class="tpl-arrange">[ 対象の言葉 ]</span> <span class="tpl-fixed">with my friends.</span> <span class="tpl-arrange">[ 感情フレーズ ]</span>
+               </div>
+               <div class="arrange-box">
+                   <strong>💡 本番でのアレンジのやり方（例文）：</strong>
+                   <ul style="margin: 5px 0 0 0; padding-left: 20px; font-size: 0.9rem;">
+                       <li><b>週末の過ごし方なら：</b> often の後ろに <span class="tpl-arrange">play video games</span> を置く。末尾の with my friends と綺麗に繋がり、2文目に <span class="tpl-arrange">It is very fun.</span> を置いて完成。</li>
+                   </ul>
+               </div>`,
+        targetQuiz: "often_weekend"
+    },
+    group5: {
+        title: "👑 攻略の型⑤「自分の習慣・回数・頻度」の明示構文",
+        body: `<p>部屋の掃除、手伝い、スポーツの実施頻度など、回数を具体的に答えることで説得力のある日常生活を記述する型です。</p>
+               <div class="instruction">▼ 覚えるべき固定のテンプレート（型）</div>
+               <div class="visual-formula">
+                   <span class="tpl-fixed">First, I clean my room</span> <span class="tpl-arrange">[ 回数 ] a week</span>. <span class="tpl-arrange">[ 2文目のポジティブ感情補強フレーズ ]</span>
+               </div>
+               <div class="arrange-box">
+                   <strong>💡 本番でのアレンジのやり方（例文）：</strong>
+                   <ul style="margin: 5px 0 0 0; padding-left: 20px; font-size: 0.9rem;">
+                       <li><b>部屋の掃除なら：</b> 回数の部分に <span class="tpl-arrange">twice</span>（2回）を配置。2文目は重複を避けて <span class="tpl-arrange">It makes me happy.</span> をドッキングさせて完成！</li>
+                   </ul>
+               </div>
+               <p style="margin-top:15px; font-size:0.85rem; color:var(--danger); background:#fff0f0; padding:8px; border-radius:4px; font-weight:bold;">
+                  ⚠️ 品詞・単語の重複に注意！：前文で動詞の clean を使っているため、2文目に形容詞の clean を使って It is clean. と近距離で重複させると、表現力が幼稚とみなされ減点されます！
+               </p>`,
+        targetQuiz: "good_bicycle"
+    }
+};
+
+// 全8問の並び替え用データベース（バグとなる重複代替フレーズを排除、純粋な文法ダミーのみへ最適化）
+const quizDatabase = {
+    fun_sports: {
+        question: "【大問4 Eメール】Alexからの質問：When did you plant the tomatoes?",
+        correctGroups: [
+            ["I planted", "them", "four months", "ago.", "Growing", "them", "is", "easy."]
+        ],
+        dummyBlocks: ["before four months", "plant", "it was easy"],
+        grammarTip: "「〜前」を表す時は <b>【期間 ＋ ago】</b> を使います。<i>before four months</i> は誤りです。",
+        expPoints: ["tomatoes は複数形なので、代名詞で受ける時は it ではなく <b>them</b> を使います。", "2文目は動名詞を主語にした <b>Growing them is easy.</b>（それらを育てることは簡単です）とすることで代名詞の指す内容が明確になります。"]
+    },
+    fun_cooking: {
+        question: "【大問4 Eメール】Alexからの質問：And how many sunflowers are you growing?",
+        correctGroups: [
+            ["I am", "growing", "five", "sunflowers", "in my yard."]
+        ],
+        dummyBlocks: ["sunflowers is", "grow", "grown", "there are"],
+        grammarTip: "現在進行形 <b>【are you growing?】</b> の質問には、同じ時制の <b>【I am growing】</b> で答えます。",
+        expPoints: ["sunflowers は複数形なので、動詞の組み合わせや名詞の形（sの有無）に注意します。", "ダミーの <i>sunflowers is</i> は主辞と動詞の一致が壊れたエラーブロックです。"]
+    },
+    learn_foreign: {
+        question: "【大問4 Eメール】友達からの質問：What subject do you like the best?",
+        correctGroups: [
+            ["I like", "math", "the best", "because", "it is", "fun."]
+        ],
+        dummyBlocks: ["best math", "more than", "most", "subject"],
+        grammarTip: "「何が一番好き？」には <b>【I like ＋ 名詞 ＋ the best】</b> の語順で答えます。",
+        expPoints: ["the best は文末に置くのが最も自然です。"]
+    },
+    learn_museum: {
+        question: "【大問4 Eメール】友達からの質問：Where do you usually buy books?",
+        correctGroups: [
+            ["I usually", "buy", "them", "at", "the bookstore.", "It is near my house."]
+        ],
+        dummyBlocks: ["to the bookstore", "by bookstore", "buying", "at bookstore"],
+        grammarTip: "場所をピンポイントで示す前置詞 <b>【at】</b> を正しく使います。",
+        expPoints: ["本屋という特定の場所を指すため <b>at the bookstore</b> とします。前置詞の付け忘れに注意。"]
+    },
+    easy_shopping: {
+        question: "【大問5 意見論述】Do you like shopping on the Internet?",
+        correctGroups: [
+            ["it is", "easy", "for me", "to", "buy", "things.", "It saves time."]
+        ],
+        dummyBlocks: ["is it", "buying", "to buying", "for my", "save time"],
+        grammarTip: "便利さをアピールする大問5の定番型 <b>【It is easy for me to ＋ 動詞原形】</b> です。",
+        expPoints: ["2文目には『時間の節約（It saves time.）』を正しく繋げます。"]
+    },
+    easy_cooking: {
+        question: "【大問5 意見論述】Do you prefer eating at restaurants?",
+        correctGroups: [
+            ["it is", "easy", "for me", "to", "eat", "dinner.", "It saves time."]
+        ],
+        dummyBlocks: ["is it", "eating", "to eating", "for my", "save time"],
+        grammarTip: "外食のメリットを「手軽さ」「時短」にハメ込んで理由を構成するパターンです。",
+        expPoints: ["to の後ろは必ず原形の <b>eat</b> です。"]
+    },
+    often_weekend: {
+        question: "【大問5 意見論述】What do you like to do on weekends?",
+        correctGroups: [
+            ["I often", "play", "video games", "with my", "friends.", "It is very fun."]
+        ],
+        dummyBlocks: ["I am often", "playing", "with mine", "friends with", "very fun"],
+        grammarTip: "日常エピソードを展開する <b>【I often ＋ 動詞原形 ＋ with my friends】</b> 構文です。",
+        expPoints: ["often は一般動詞の前に入ります。"]
+    },
+    good_bicycle: {
+        question: "【大問5 意見論述】How often do you clean your room?",
+        correctGroups: [
+            ["I clean", "my room", "twice", "a week.", "It makes me happy."]
+        ],
+        dummyBlocks: ["is it clean", "twice week", "once week", "clean my room", "cleaning"],
+        grammarTip: "頻度を具体的に表現する <b>【twice a week】</b>（週に2回）の語順のルールです。",
+        expPoints: ["同じ文脈で動詞 <i>clean</i> と 形容詞 <i>clean</i> を極端に近距離で重複させると、表現力の減点対象になります。", "2文目は <b>It makes me happy.</b> で美しくまとめましょう。"]
+    }
+};
+
+// 本番形式フルライティング課題データベース
+const essayDatabase = {
+    essay1: {
+        question: "【大問4：Eメール問題（オリジナル予想問題）】\n外国人の友達 (Alex) から以下のEメールを受け取りました。下線部の質問に対応する内容を書きなさい。\n\n--- Alexからのメール ---\nYour brother told me that you are growing tomatoes and sunflowers in your yard. I want to know about them.\n[下線部A] When did you plant the tomatoes? \nAnd [下線部B] how many sunflowers are you growing?",
+        sample: "I planted them four months ago. I am growing five sunflowers in my yard.",
+        tip: "新形式の大問4です！解答欄にはすでに「Hi, Alex! Thank you for your e-mail.」と「Best wishes,」が印刷されているため、あなたは下線部に対する答え（目安：15〜25語）を中身に記述するだけです。過去形（planted / ago）と現在進行形（am growing）の時制の一致が完璧な減点ゼロ解答例です。"
+    },
+    essay2: {
+        question: "【大問5：意見論述問題】\nあなたの意見と、その理由を2つ書きなさい（目安：25〜35語）。\n\nWhich do you prefer, hot weather or cold weather?",
+        sample: "I prefer hot weather.\nFirst, I often play sports with my friends outside.\nSecond, it is very good for my health.",
+        tip: "大問5の意見論述です。1文目でどちらが好きかハッキリ宣言（I prefer hot weather.）し、後ろに「First,」「Second,」のテンプレートを使って理由を2つ並べます。合計26語で合格確定です。"
+    },
+    essay3: {
+        question: "【大問5：意見論述問題】\nあなたの意見と、その理由を2つ書きなさい（目安：25〜35語）。\n\nDo you like studying English?",
+        sample: "I like studying English.\nFirst, it is fun for me to learn a lot of things about foreign cultures.\nSecond, it is useful for my future.",
+        tip: "大問5のYes/No型です。1文目で質問のオウム返し（I like studying English.）を行い、後ろに覚えたお決まりのメリットフレーズを2つぶち込むことで完璧な29語の作文が完成します。"
+    }
+};
+
+let currentKey = '';
+let selectedBlocks = [];
+let missCount = 0;
+const MAX_MISSES = 3;
+let isForcedSolution = false; 
+
+let isTestMode = false;
+let testQuestions = [];
+let testCurrentIndex = 0;
+let testCorrectCount = 0;
+const TEST_TOTAL_COUNT = 5; 
+const TEST_PASS_LINE = 4;   
+
+let currentEssayKey = '';
+
+window.onload = function() {
+    updateCrownsDisplay();
+};
+
+function openModal(groupId) {
+    const data = lectureDatabase[groupId];
+    document.getElementById('modalTitle').innerText = data.title;
+    document.getElementById('modalBody').innerHTML = data.body;
+    
+    const startBtn = document.getElementById('modalStartBtn');
+    if (data.targetQuiz) {
+        startBtn.style.display = 'block';
+        startBtn.onclick = function() {
+            closeModal();
+            startQuiz(data.targetQuiz);
+        };
+    } else {
+        startBtn.style.display = 'none';
+    }
+    document.getElementById('lectureModal').style.display = 'flex';
+}
+
+function closeModal() {
+    document.getElementById('lectureModal').style.display = 'none';
+}
+
+function startQuiz(key) {
+    isTestMode = false;
+    document.getElementById('testProgress').style.display = 'none';
+    setupQuizRound(key);
+}
+
+function startMockTest() {
+    isTestMode = true;
+    testCurrentIndex = 0;
+    testCorrectCount = 0;
+    testQuestions = Object.keys(quizDatabase).sort(() => Math.random() - 0.5).slice(0, TEST_TOTAL_COUNT);
+    
+    document.getElementById('testProgress').style.display = 'block';
+    setupQuizRound(testQuestions[testCurrentIndex]);
+}
+
+function setupQuizRound(key) {
+    currentKey = key;
+    selectedBlocks = [];
+    missCount = 0;
+    isForcedSolution = false;
+    
+    document.getElementById('menuSection').style.display = 'none';
+    document.getElementById('gameSection').style.display = 'block';
+    document.getElementById('essaySection').style.display = 'none';
+    document.getElementById('resultBox').style.display = 'none';
+    document.getElementById('checkBtn').style.display = 'block';
+    
+    if (isTestMode) {
+        document.getElementById('testProgress').innerText = `本番模試: 第 ${testCurrentIndex + 1} 問 / 全 ${TEST_TOTAL_COUNT} 問`;
+    }
+    
+    updateMissCounter();
+
+    const data = quizDatabase[key];
+    document.getElementById('question').innerText = data.question;
+
+    // 大問4のクイズ（前半4つ）の場合はprefixTextをAlex向けに変更
+    const prefixEl = document.getElementById('prefixText');
+    if (key === 'fun_sports' || key === 'fun_cooking' || key === 'learn_foreign' || key === 'learn_museum') {
+        prefixEl.innerText = "Hi, Alex! Thank you for your e-mail. ";
+    } else {
+        prefixEl.innerText = "First, ";
+    }
+
+    const poolSet = new Set();
+    data.correctGroups.forEach(group => {
+        group.forEach(word => poolSet.add(word));
+    });
+    data.dummyBlocks.forEach(word => poolSet.add(word));
+    
+    const allBlocks = Array.from(poolSet);
+    allBlocks.sort(() => Math.random() - 0.5);
+
+    renderChoices(allBlocks);
+    renderSlots();
+}
+
+function updateMissCounter() {
+    const counterEl = document.getElementById('missCounter');
+    const remaining = MAX_MISSES - missCount;
+    counterEl.innerText = `あと ${remaining} 回ミスで解答表示`;
+    if (remaining === 1) {
+        counterEl.style.background = "#f8d7da";
+        counterEl.style.color = "var(--danger)";
+    } else {
+        counterEl.style.background = "#fff3cd";
+        counterEl.style.color = "var(--warning)";
+    }
+}
+
+function exitToMenu() {
+    if (isTestMode) {
+        if (!confirm("模試の途中ですがメニューに戻りますか？（進行度はリセットされます）")) {
+            return;
+        }
+    }
+    showMenu();
+}
+
+function showMenu() {
+    document.getElementById('menuSection').style.display = 'block';
+    document.getElementById('gameSection').style.display = 'none';
+    document.getElementById('essaySection').style.display = 'none';
+    updateCrownsDisplay();
+}
+
+function updateCrownsDisplay() {
+    Object.keys(quizDatabase).forEach(key => {
+        const hasCrown = sessionStorage.getItem(`crown_${key}`) === 'true';
+        const el = document.getElementById(`crown-${key}`);
+        if (el) el.innerText = hasCrown ? '👑' : '';
+    });
+    Object.keys(essayDatabase).forEach(key => {
+        const hasCrown = sessionStorage.getItem(`crown_${key}`) === 'true';
+        const el = document.getElementById(`crown-${key}`);
+        if (el) el.innerText = hasCrown ? '👑' : '';
+    });
+    const testCrown = sessionStorage.getItem('crown_mock_test') === 'true';
+    if(document.getElementById('crown-mock_test')) document.getElementById('crown-mock_test').innerText = testCrown ? '👑' : '';
+}
+
+function renderChoices(blocks) {
+    const pool = document.getElementById('choicePool');
+    pool.innerHTML = '';
+    
+    blocks.forEach((word, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'word-block';
+        btn.innerText = word;
+        btn.id = `block-${index}`;
+        
+        btn.onclick = () => {
+            if (document.getElementById('checkBtn').style.display === 'none') return;
+            if (!btn.classList.contains('selected')) {
+                btn.classList.add('selected');
+                selectedBlocks.push({ word: word, id: `block-${index}` });
+                renderSlots();
+            }
+        };
+        pool.appendChild(btn);
+    });
+}
+
+function renderSlots() {
+    const slotZone = document.getElementById('slotZone');
+    slotZone.innerHTML = '';
+    
+    if (selectedBlocks.length === 0) {
+        slotZone.innerHTML = '<span style="color:#aaa; font-size:0.85rem; margin:auto;">ここにブロックが入る</span>';
+        return;
+    }
+
+    selectedBlocks.forEach((item, index) => {
+        const span = document.createElement('span');
+        span.className = 'word-block';
+        span.innerText = item.word;
+        span.onclick = (e) => {
+            if (document.getElementById('checkBtn').style.display === 'none') return;
+            e.stopPropagation();
+            document.getElementById(item.id).classList.remove('selected');
+            selectedBlocks.splice(index, 1);
+            renderSlots();
+        };
+        slotZone.appendChild(span);
+    });
+}
+
+function clearBlocks() {
+    if (document.getElementById('checkBtn').style.display === 'none') return;
+    selectedBlocks.forEach(item => {
+        const el = document.getElementById(item.id);
+        if(el) el.classList.remove('selected');
+    });
+    selectedBlocks = [];
+    renderSlots();
+}
+
+function checkAnswer() {
+    const data = quizDatabase[currentKey];
+    const resultBox = document.getElementById('resultBox');
+    const userBlockWords = selectedBlocks.map(item => item.word);
+    
+    const isAnyGroupCorrect = data.correctGroups.some(group => JSON.stringify(userBlockWords) === JSON.stringify(group));
+
+    resultBox.style.display = 'block';
+
+    if (isAnyGroupCorrect) {
+        if (!isForcedSolution) {
+            if (!isTestMode) {
+                sessionStorage.setItem(`crown_${currentKey}`, 'true'); 
+            } else {
+                testCorrectCount++; 
+            }
+        }
+        
+        resultBox.className = 'result-box success';
+        showFinalExplanation(resultBox, `🎉 素晴らしい！大正解です！`, userBlockWords.join(' '));
+        document.getElementById('checkBtn').style.display = 'none';
+    } else {
+        missCount++;
+        if (missCount >= MAX_MISSES) {
+            isForcedSolution = true; 
+            resultBox.className = 'result-box force-show';
+            
+            const representativeAnswer = data.correctGroups[0];
+            showFinalExplanation(resultBox, `💡 3回トライしたため代表的な解答例を表示します。正しい表現構造をインプットしましょう！`, representativeAnswer.join(' '));
+            document.getElementById('checkBtn').style.display = 'none';
+            document.getElementById('missCounter').innerText = `解答表示済み`;
+            
+            document.getElementById('slotZone').innerHTML = representativeAnswer.map(w => `<span class='word-block' style='cursor:default; border-color:var(--accent);'>${w}</span>`).join(' ');
+        } else {
+            resultBox.className = 'result-box error';
+            updateMissCounter();
+            let errorMsg = `❌ おっと、どこか違うようです。（あと ${MAX_MISSES - missCount} 回で解答が表示されます）<br><br>`;
+            errorMsg += `・<b>単語の並び順</b>、またはパーツの組み合わせが違います。構造を意識してみましょう。<br><small>※上の点線枠の中のブロックを押すと個別に外せます。</small>`;
+            resultBox.innerHTML = errorMsg;
+        }
+    }
+}
+
+function showFinalExplanation(targetElement, statusMessage, finalSentence) {
+    const data = quizDatabase[currentKey];
+    let pointsHtml = '';
+    data.expPoints.forEach(pt => {
+        pointsHtml += `<li>${pt}</li>`;
+    });
+
+    let footerButtonHtml = '';
+    if (isTestMode) {
+        if (testCurrentIndex < testQuestions.length - 1) {
+            footerButtonHtml = `<button class="back-btn" onclick="goToNextTestQuestion()" style="width:100%; margin-top:15px; background:var(--purple); color:#fff;">次の模試問題へ ➔</button>`;
+        } else {
+            footerButtonHtml = `<button class="back-btn" onclick="showTestResult()" style="width:100%; margin-top:15px; background:var(--purple); color:#fff;">🎉 模試の最終結果を確認する</button>`;
+        }
+    } else {
+        footerButtonHtml = `<button class="back-btn" onclick="showMenu()" style="width:100%; margin-top:15px; background:var(--accent); color:#fff;">他のお題も特訓する</button>`;
+    }
+
+    const prefixStr = document.getElementById('prefixText').innerText;
+
+    targetElement.innerHTML = `
+        ${statusMessage}
+        <div style="margin: 15px 0; font-size: 1.15rem; background:#fff; padding:10px; border-radius:6px; border-left:4px solid var(--accent);">
+            <b>あなたが完成させた合格完成文：</b><br>
+            <span style="font-family: monospace;">${prefixStr}<span style="color:var(--primary); font-weight:bold;">${finalSentence}</span></span>
+        </div>
+        
+        <div class="explanation-title">📝 この問題の「完璧対策」解説</div>
+        <div class="explanation-body">
+            <p>${data.grammarTip}</p>
+            <strong>⚠️ ライティングで減点を防ぐチェックポイント：</strong>
+            <ul>
+                ${pointsHtml}
+            </ul>
+        </div>
+        ${footerButtonHtml}
+    `;
+}
+
+function goToNextTestQuestion() {
+    testCurrentIndex++;
+    setupQuizRound(testQuestions[testCurrentIndex]);
+}
+
+function showTestResult() {
+    const isPassed = testCorrectCount >= TEST_PASS_LINE; 
+    if (isPassed) {
+        sessionStorage.setItem('crown_mock_test', 'true'); 
+    }
+
+    document.getElementById('gameSection').style.display = 'none';
+    document.getElementById('menuSection').style.display = 'block';
+    
+    let resultMsg = `【実戦総合演習・本番模試結果】\n`;
+    resultMsg += `正解数: ${testCorrectCount} / ${TEST_TOTAL_COUNT} 問\n\n`;
+    if (isPassed) {
+        resultMsg += `🎉 【超優秀・合格】最高峰のラインをクリアしました！本番のダブルライティングは自信を持って挑んでください！メニューにゴールドクラウン👑が刻まれました！`;
+    } else {
+        resultMsg += `❌ 【不合格】（合格ラインは ${TEST_PASS_LINE} 問以上正解）。妥協せず構造をもう一度確認し、満点クリアを目指してリトライしましょう！`;
+    }
+    alert(resultMsg);
+    
+    updateCrownsDisplay();
+}
+
+// ================= フル作文課題演習用（自己完結ノート型）制御ロジック =================
+function startEssayExercise(key) {
+    currentEssayKey = key;
+    document.getElementById('menuSection').style.display = 'none';
+    document.getElementById('gameSection').style.display = 'none';
+    document.getElementById('essaySection').style.display = 'block';
+    document.getElementById('essayResultBox').style.display = 'none';
+    
+    const data = essayDatabase[key];
+    document.getElementById('essayQuestion').innerText = data.question;
+}
+
+function submitEssay() {
+    const data = essayDatabase[currentEssayKey];
+    const resBox = document.getElementById('essayResultBox');
+    
+    resBox.style.display = 'block';
+    
+    // ノート演習完了をトリガーに王冠データを保存
+    sessionStorage.setItem(`crown_${currentEssayKey}`, 'true');
+    
+    // 大問4か大問5かでチェックリストの表記を動的に変更
+    let wordCountGuide = currentEssayKey === 'essay1' ? "新形式・大問4の指定範囲である <b>15語〜25語の範囲内</b>" : "大問5の指定範囲である <b>25語〜35語の範囲内</b>";
+    let styleCheckItem = currentEssayKey === 'essay1' 
+        ? "<li><input type='checkbox'> 解答欄に初めから印刷されている「Hi, Alex!」「Best wishes,」の間に挟むように本文だけを書けているか？</li>" 
+        : "<li><input type='checkbox'> 2文目の文頭に <b>First,</b>、3文目の文頭に <b>Second,</b> を正しく使えているか？</li>";
+    
+    resBox.innerHTML = `
+        <h3 style='color:var(--primary); margin-top:0;'>🎉 ノートチェック完了！王冠👑を獲得しました！</h3>
+        
+        <div class="explanation-title" style="color:var(--accent);">📋 減点をゼロにするためのセルフ採点基準</div>
+        <div class="explanation-body" style="background:#f9f9f9; border-left:4px solid var(--accent);">
+            <ul style="margin:0; padding-left:20px;">
+                <li><input type="checkbox"> お題の質問（大問4なら2つの質問、大問5ならテーマ）に対して噛み合う内容を宣言できているか？</li>
+                ${styleCheckItem}
+                <li><input type="checkbox"> 不定詞の <b>to</b> や助動詞 <b>can</b> の後ろが、すべて「動詞の原形」になっているか？</li>
+                <li><input type="checkbox"> 時制（過去形、現在進行形、現在形など）は質問の聞き方と一致しているか？</li>
+                <li><input type="checkbox"> 単語数の合計が、${wordCountGuide} にしっかりと収まっているか？</li>
+                <li><input type="checkbox"> 文頭は大文字、文末はピリオド（.）で終わっているか？</li>
+            </ul>
+        </div>
+        
+        <div class="explanation-title" style="color:var(--purple); margin-top:15px;">💡 この課題の模範合格解答例</div>
+        <div style="background:#fff; border:2px solid var(--purple); padding:12px; border-radius:6px; font-family:monospace; font-size:1.05rem; line-height:1.6; margin-bottom:10px; white-space: pre-wrap;">${data.sample}</div>
+        <div class="explanation-body" style="background:#fbf7ff;">
+            <strong>📝 テンプレート活用のコツ・脳内イメージ：</strong><br>${data.tip}
+        </div>
+        <button class="back-btn" onclick="showMenu()" style="width:100%; margin-top:15px; background:var(--primary); color:#fff;">メニューに戻る</button>
+    `;
+    
+    updateCrownsDisplay();
+}
+</script>
+
+</body>
+</html>

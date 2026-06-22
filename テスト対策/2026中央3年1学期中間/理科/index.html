@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中3理科 実力テスト（化学変化とイオン）</title>
+    <style>
+        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f0f2f5; color: #333; }
+        .page { display: none; }
+        .active { display: block; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        h1 { color: #2c5282; text-align: center; border-bottom: 3px solid #2c5282; padding-bottom: 10px; }
+        #timer-bar, #score-bar { position: sticky; top: 0; background: #c53030; color: white; padding: 10px; text-align: center; font-weight: bold; border-radius: 5px; z-index: 1000; font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        #score-bar { background: #2f855a; top: 50px; display: none; }
+        .question-item { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #cbd5e0; }
+        .q-num { font-weight: bold; color: #2b6cb0; margin-right: 10px; }
+        .q-type { font-size: 0.8em; background: #edf2f7; padding: 2px 8px; border-radius: 4px; margin-left: 10px; color: #4a5568; }
+        .options-container { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .option-item { background: #fff; border: 1px solid #2b6cb0; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; color: #2b6cb0; }
+        .btn { display: block; width: 100%; padding: 15px; background: #2b6cb0; color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; text-align: center; margin-top: 20px; text-decoration: none; }
+        .btn:hover { background: #2c5282; }
+        .scoring-btns { margin-top: 10px; display: flex; gap: 10px; }
+        .score-btn { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-correct { background: #e6fffa; color: #234e52; border: 1px solid #38b2ac; }
+        .btn-correct.selected { background: #38b2ac; color: white; }
+        .btn-wrong { background: #fff5f5; color: #742a2a; border: 1px solid #f56565; }
+        .btn-wrong.selected { background: #f56565; color: white; }
+        .ans-item { margin-bottom: 20px; padding: 15px; background: #f7fafc; border-left: 4px solid #2f855a; }
+        .ans-q-text { font-size: 0.95em; color: #4a5568; margin: 10px 0; border-bottom: 1px solid #e2e880; padding-bottom: 10px; }
+        .ans-correct { font-weight: bold; color: #2f855a; font-size: 1.1em; }
+        .ans-explanation { font-size: 0.9em; color: #4a5568; margin-top: 5px; background: #fff; padding: 10px; border-radius: 4px; }
+        .category-header { background: #4a5568; color: white; padding: 8px 15px; margin: 30px 0 15px 0; border-radius: 5px; font-size: 1em; }
+    </style>
+</head>
+<body>
+
+<div id="test-page" class="page active">
+    <div id="timer-bar">残り時間: <span id="timer">30:00</span></div>
+    <h1>理科 定期テスト対策（化学変化とイオン）</h1>
+    <div class="card">
+        <p>※ノートに解答を記入し、最後に「採点ページへ」を押して確認してください。</p>
+        <div id="test-container">
+            <div class="category-header">第1ブロック：記号選択（10問）</div>
+            <div id="questions-container-1"></div>
+            <div class="category-header">第2ブロック：頻出イオン式（10問）</div>
+            <div id="questions-container-2"></div>
+            <div class="category-header">第3ブロック：一問一答（20問）</div>
+            <div id="questions-container-3"></div>
+            <div class="category-header">第4ブロック：記述問題（10問）</div>
+            <div id="questions-container-4"></div>
+            <div class="category-header">第5ブロック：発展・応用（10問）</div>
+            <div id="questions-container-5"></div>
+        </div>
+        <button class="btn" onclick="showAnswers()">テストを終了して採点ページへ</button>
+    </div>
+</div>
+
+<div id="answer-page" class="page">
+    <div id="score-bar">正答率: <span id="score-val">0</span>% (<span id="correct-count">0</span>/60問)</div>
+    <h1>解答・解説一覧</h1>
+    <div class="card" id="answers-container"></div>
+    <button class="btn" onclick="location.reload()">テストTOPに戻る</button>
+</div>
+
+<script>
+const questions = [
+    // 第1ブロック：記号選択 (1-10)
+    { id: 1, type: "記号選択", cat: 1, q: "精製水ではなく水道水を使って水溶液をつくってはいけない理由は何か。", options: ["水道水は電流が流れすぎるから", "塩素などの物質がとけているから", "水道水は酸性だから", "電極が腐食するから"], a: "塩素などの物質がとけているから", e: "水道水には塩素などの不純物が含まれているため、実験では純粋な精製水を使用します。" },
+    { id: 2, type: "記号選択", cat: 1, q: "次のうち、非電解質はどれか。", options: ["塩化銅", "砂糖", "塩化ナトリウム", "塩化水素"], a: "砂糖", e: "水にとかしても電流が流れない物質を非電解質と呼びます。" },
+    { id: 3, type: "記号選択", cat: 1, q: "原子核を構成する粒子のうち、電気をもっていないものはどれか。", options: ["電子", "中性子", "陽子", "原子"], a: "中性子", e: "原子核は、陽の電気をもつ陽子と、電気をもたない中性子で構成されています。" },
+    { id: 4, type: "記号選択", cat: 1, q: "塩化銅水溶液の電気分解で、陽極から発生する気体の特徴として正しいものはどれか。", options: ["石灰水を白く濁らせる", "鼻をさすようなにおいがある", "火を近づけると爆発する", "無色無臭である"], a: "鼻をさすようなにおいがある", e: "陽極から発生する塩素は特有の刺激臭をもち、漂白作用があります。" },
+    { id: 5, type: "記号選択", cat: 1, q: "酸性の水溶液に共通してふくまれているイオンはどれか。", options: ["水酸化物イオン", "塩化物イオン", "水素イオン", "ナトリウムイオン"], a: "水素イオン", e: "酸とは、電離して水素イオン(H<sup>+</sup>)を生じる化合物のことです。" },
+    { id: 6, type: "記号選択", cat: 1, q: "緑色のBTB溶液を青色に変える水溶液の性質は何か。", options: ["酸性", "中性", "アルカリ性", "混合物"], a: "アルカリ性", e: "BTB溶液の色変化は、酸性が黄色、中性が緑色、アルカリ性が青色です。" },
+    { id: 7, type: "記号選択", cat: 1, q: "pHの値が7より小さいときの水溶液の性質は何か。", options: ["酸性", "中性", "アルカリ性", "強塩基"], a: "酸性", e: "pHが7より小さいほど酸性が強く、7より大きいほどアルカリ性が強くなります。" },
+    { id: 8, type: "記号選択", cat: 1, q: "中和反応において、酸の陰イオンとアルカリの陽イオンが結びついてできた物質を何というか。", options: ["水", "塩", "基", "酸"], a: "塩", e: "中和によって水とともに生成される物質を「塩（えん）」と呼びます。" },
+    { id: 9, type: "記号選択", cat: 1, q: "塩酸の電気分解で、陰極から発生する気体はどれか。", options: ["酸素", "塩素", "水素", "二酸化炭素"], a: "水素", e: "塩酸の分解では陰極に水素、陽極に塩素が発生します。" },
+    { id: 10, type: "記号選択", cat: 1, q: "フェノールフタレイン溶液が赤色に反応する水溶液はどれか。", options: ["塩酸", "食塩水", "石灰水", "レモン汁"], a: "石灰水", e: "フェノールフタレインはアルカリ性の水溶液でのみ赤色に変化します。" },
+
+    // 第2ブロック：イオン式 (11-20)
+    { id: 11, type: "イオン式", cat: 2, q: "水素イオン", a: "H<sup>+</sup>", e: "水素原子が電子を1個失った陽イオンです。" },
+    { id: 12, type: "イオン式", cat: 2, q: "ナトリウムイオン", a: "Na<sup>+</sup>", e: "ナトリウム原子が電子を1個失った陽イオンです。" },
+    { id: 13, type: "イオン式", cat: 2, q: "銅イオン", a: "Cu<sup>2+</sup>", e: "銅原子が電子を2個失った陽イオンです。" },
+    { id: 14, type: "イオン式", cat: 2, q: "マグネシウムイオン", a: "Mg<sup>2+</sup>", e: "マグネシウム原子が電子を2個失ったものです。" },
+    { id: 15, type: "イオン式", cat: 2, q: "亜鉛イオン", a: "Zn<sup>2+</sup>", e: "亜鉛原子が電子を2個失った陽イオンです。" },
+    { id: 16, type: "イオン式", cat: 2, q: "塩化物イオン", a: "Cl<sup>-</sup>", e: "塩素原子が電子を1個受け取った陰イオンです。" },
+    { id: 17, type: "イオン式", cat: 2, q: "水酸化物イオン", a: "OH<sup>-</sup>", e: "OHの集団が電子を1個受け取った陰イオンです。" },
+    { id: 18, type: "イオン式", cat: 2, q: "硫酸イオン", a: "SO<sub>4</sub><sup>2-</sup>", e: "原子の集団が電子を2個受け取った陰イオンです。" },
+    { id: 19, type: "イオン式", cat: 2, q: "バリウムイオン", a: "Ba<sup>2+</sup>", e: "硫酸バリウムの沈殿反応などに関わる陽イオンです。" },
+    { id: 20, type: "イオン式", cat: 2, q: "アンモニウムイオン", a: "NH<sub>4</sub><sup>+</sup>", e: "代表的な多原子の陽イオンです。" },
+
+    // 第3ブロック：一問一答 (21-40)
+    { id: 21, type: "一問一答", cat: 3, q: "原子が電気を帯びた粒子を何というか。", a: "イオン", e: "電子のやりとりによって生じます。" },
+    { id: 22, type: "一問一答", cat: 3, q: "電解質が水にとけて陽イオンと陰イオンに分かれることを何というか。", a: "電離", e: "電解質特有の現象です。" },
+    { id: 23, type: "一問一答", cat: 3, q: "塩化水素の水溶液を何というか。", a: "塩酸", e: "気体は塩化水素、水溶液は塩酸と呼びます。" },
+    { id: 24, type: "一問一答", cat: 3, q: "原子の中心にあり、陽子と中性子からなる部分を何というか。", a: "原子核", e: "原子の質量の大半を占めます。" },
+    { id: 25, type: "一問一答", cat: 3, q: "水酸化ナトリウムの化学式を書け。", a: "NaOH", e: "電離して水酸化物イオンを放出します。" },
+    { id: 26, type: "一問一答", cat: 3, q: "物質に電流を流して分解することを何というか。", a: "電気分解", e: "化学エネルギーを電気エネルギーで変化させます。" },
+    { id: 27, type: "一問一答", cat: 3, q: "硫酸の化学式を書け。", a: "H<sub>2</sub>SO<sub>4</sub>", e: "強い酸性を示す化合物です。" },
+    { id: 28, type: "一問一答", cat: 3, q: "pHの値が7の状態を何というか。", a: "中性", e: "酸とアルカリが打ち消し合った状態です。" },
+    { id: 29, type: "一問一答", cat: 3, q: "塩化銅の化学式を書け。", a: "CuCl<sub>2</sub>", e: "銅原子と塩素原子が1:2で構成されます。" },
+    { id: 30, type: "一問一答", cat: 3, q: "水素イオンと水酸化物イオンが結びついて水をつくる反応を何というか。", a: "中和", e: "互いの性質を消失させます。" },
+    { id: 31, type: "一問一答", cat: 3, q: "精製水は電流を流すか、ほとんど流さないか。", a: "ほとんど流さない", e: "電解質を含まないためです。" },
+    { id: 32, type: "一問一答", cat: 3, q: "原子が電子を失って陽の電気を帯びたものを何というか。", a: "陽イオン", e: "電子は負の電気をもつためです。" },
+    { id: 33, type: "一問一答", cat: 3, q: "塩酸と水酸化ナトリウムが中和した時にできる塩の名称を書け。", a: "塩化ナトリウム", e: "結晶は規則正しい形をしています。" },
+    { id: 34, type: "一問一答", cat: 3, q: "水溶液にしたとき、電離して水酸化物イオンを生じる化合物を何というか。", a: "アルカリ", e: "水酸化物イオンが共通の性質を与えます。" },
+    { id: 35, type: "一問一答", cat: 3, q: "塩化銅水溶液の色は何色をしているか。", a: "青色", e: "銅イオンによる発色です。" },
+    { id: 36, type: "一問一答", cat: 3, q: "電子は陽(+)と陰(ー)のどちらの電気をもっているか。", a: "ー", e: "負の電荷をもつ粒子です。" },
+    { id: 37, type: "一問一答", cat: 3, q: "アンモニア水は何性を示すか。", a: "アルカリ性", e: "水酸化物イオンを含むためです。" },
+    { id: 38, type: "一問一答", cat: 3, q: "マグネシウムリボンに塩酸をかけると発生する気体は何か。", a: "水素", e: "金属と酸の反応です。" },
+    { id: 39, type: "一問一答", cat: 3, q: "硫酸バリウムの沈殿の色は何色か。", a: "白色", e: "不溶性の塩です。" },
+    { id: 40, type: "一問一答", cat: 3, q: "pHの値が7より小さくなるほど、酸性は強くなるか、弱くなるか。", a: "強くなる", e: "数値が小さいほど強酸です。" },
+
+    // 第4ブロック：記述問題 (41-50)
+    { id: 41, type: "記述", cat: 4, q: "電解質の水溶液に電流が流れる理由を、「イオン」の言葉を使って説明せよ。", a: "水溶液中にイオンが存在し、それが電気を運ぶはたらきをするから。", e: "イオンが電荷の運び手となります。" },
+    { id: 42, type: "記述", cat: 4, q: "塩化銅水溶液の電気分解で、陽極から発生した気体が塩素であることを確かめる方法を一つ書け。", a: "鼻をさすようなにおいを確認するか、赤インクに滴下して色が消えるのを確認する。", e: "塩素の漂白作用を利用した手法です。" },
+    { id: 43, type: "記述", cat: 4, q: "塩酸の電気分解で、陰極付近の気体にマッチの火を近づけるとどうなるか。", a: "音を立てて燃える。", e: "水素の可燃性によります。" },
+    { id: 44, type: "記述", cat: 4, q: "酸性の水溶液に電圧を加えたとき、水素イオンは陰極側に移動する理由を書け。", a: "水素イオンは陽の電気をもっており、負の電気をもつ陰極に引き寄せられるから。", e: "異なる種類の電気は引き合います。" },
+    { id: 45, type: "記述", cat: 4, q: "中和とはどのような反応か、「水素イオン」と「水酸化物イオン」の言葉を使って説明せよ。", a: "水素イオンと水酸化物イオンが結びついて水をつくり、たがいの性質を打ち消し合う反応。", e: "イオンレベルでの反応機構です。" },
+    { id: 46, type: "記述", cat: 4, q: "塩酸に水酸化ナトリウム水溶液を加えていく際、数が最初から最後まで変化しないイオンの化学式を書け。", a: "Cl<sup>-</sup>", e: "反応に関与しないためです。" },
+    { id: 47, type: "記述", cat: 4, q: "「塩（えん）」とはどのような物質のことか、説明せよ。", a: "中和が起こるときに、酸の陰イオンとアルカリの陽イオンが結びついてできた物質。", e: "代表的な生成物です。" },
+    { id: 48, type: "記述", cat: 4, q: "スポーツドリンクに電流が流れる理由を、成分に触れて説明せよ。", a: "果汁（クエン酸）や食塩（塩化ナトリウム）などの電解質がイオンとなって溶けているから。", e: "複数の電解質が溶質となっています。" },
+    { id: 49, type: "記述", cat: 4, q: "金属めっきをしたい物を陰極にして電気分解を行うと、なぜ表面がめっきされるのか。", a: "陽の電気をもった金属の原子のもとが陰極に引かれ、金属の原子となって付着するから。", e: "電気的な引きつけを利用しています。" },
+    { id: 50, type: "記述", cat: 4, q: "酸性の水溶液に青色のリトマス紙をつけると、何色に変化するか。", a: "赤色", e: "酸性の基本性質です。" },
+
+    // 第5ブロック：発展・応用 (51-60)
+    { id: 51, type: "発展", cat: 5, q: "硫酸と水酸化バリウムを過不足なく反応させたとき、電流がほとんど流れなくなる理由を書け。", a: "すべてのイオンが反応して水と不溶性の塩（硫酸バリウム）になり、水溶液中のイオンがなくなるから。", e: "イオンが沈殿することで、電荷を運ぶものが不在になります。" },
+    { id: 52, type: "発展", cat: 5, q: "塩酸に水酸化ナトリウムを加えていくと、ナトリウムイオンの数はどう変化するか。", a: "増え続ける。", e: "反応せずに蓄積されるためです。" },
+    { id: 53, type: "発展", cat: 5, q: "リトマス紙の中央に塩酸をつけ電圧をかけると、赤色の部分はどちらの極へ動くか。", a: "陰極側", e: "水素イオンが陽イオンであるためです。" },
+    { id: 54, type: "発展", cat: 5, q: "中性になった塩酸と水酸化ナトリウムの混合液を蒸発させると残る結晶は何か。名称を書け。", a: "塩化ナトリウム", e: "結晶の規則性が特徴です。" },
+    { id: 55, type: "発展", cat: 5, q: "アンモニア水にフェノールフタレイン溶液を入れると何色になるか。", a: "赤色", e: "アルカリ性の証拠です。" },
+    { id: 56, type: "発展", cat: 5, q: "塩酸を電気分解した際、発生する水素と塩素のうち、集まる量が少なくなるのはどちらか。理由も書け。", a: "塩素。塩素は水にとけやすいため。", e: "溶解度の違いによります。" },
+    { id: 57, type: "発展", cat: 5, q: "原子の性質として誤っているものを次から選べ。（ア：分割できない イ：種類により質量や大きさが決まっている ウ：化学変化により他の原子に変わる エ：新しくできることはない）", a: "ウ", e: "原子は種類が変わることはありません。" },
+    { id: 58, type: "発展", cat: 5, q: "石灰水に二酸化炭素を吹き込むと白く濁る際、できる水にとけない塩の名称を書け。", a: "炭酸カルシウム", e: "中和によって生じる不溶性の塩です。" },
+    { id: 59, type: "発展", cat: 5, q: "銅原子(Cu)が銅イオン(Cu<sup>2+</sup>)になる変化を、電子 e<sup>-</sup> を用いて式で表せ。", a: "Cu → Cu<sup>2+</sup> + 2e<sup>-</sup>", e: "電子を失う過程です。" },
+    { id: 60, type: "発展", cat: 5, q: "pH3の水溶液を水でうすめていくと、pHの値はどう変化していくか。", a: "7に近づいていく（大きくなっていく）。", e: "希釈によるpHの変化です。" }
+];
+
+let timeLeft = 30 * 60;
+const timerDisplay = document.getElementById('timer');
+const userScores = new Array(questions.length).fill(null);
+
+function generateQuestions() {
+    questions.forEach(q => {
+        const container = document.getElementById(`questions-container-${q.cat}`);
+        const div = document.createElement('div');
+        div.className = 'question-item';
+        let content = `<span class="q-num">問${q.id}</span> <span class="q-type">${q.type}</span><br>${q.q}`;
+        
+        if (q.type === "記号選択" && q.options) {
+            content += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                content += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            content += `</div>`;
+        }
+        
+        div.innerHTML = content;
+        container.appendChild(div);
+    });
+}
+
+function showAnswers() {
+    clearInterval(countdown);
+    document.getElementById('test-page').classList.remove('active');
+    document.getElementById('answer-page').classList.add('active');
+    document.getElementById('score-bar').style.display = 'block';
+    
+    const container = document.getElementById('answers-container');
+    questions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'ans-item';
+        div.id = `ans-item-${idx}`;
+        
+        let qContent = `<div class="ans-q-text"><span class="q-num">問${q.id}</span> [${q.type}] ${q.q}`;
+        if (q.type === "記号選択" && q.options) {
+            qContent += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                qContent += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            qContent += `</div>`;
+        }
+        qContent += `</div>`;
+
+        div.innerHTML = `
+            ${qContent}
+            <div><span class="ans-correct">正解：${q.a}</span></div>
+            <div class="ans-explanation"><strong>解説:</strong> ${q.e}</div>
+            <div class="scoring-btns">
+                <button class="score-btn btn-correct" id="btn-c-${idx}" onclick="setScore(${idx}, true)">○ 正解</button>
+                <button class="score-btn btn-wrong" id="btn-w-${idx}" onclick="setScore(${idx}, false)">× 不正解</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+    window.scrollTo(0, 0);
+}
+
+const countdown = setInterval(() => {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+    timerDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    if (timeLeft <= 0) {
+        clearInterval(countdown);
+        alert('時間終了です！採点ページへ移ります。');
+        showAnswers();
+    }
+    timeLeft--;
+}, 1000);
+
+function setScore(idx, isCorrect) {
+    userScores[idx] = isCorrect;
+    document.getElementById(`btn-c-${idx}`).classList.toggle('selected', isCorrect);
+    document.getElementById(`btn-w-${idx}`).classList.toggle('selected', !isCorrect);
+    updateScore();
+}
+
+function updateScore() {
+    const correctCount = userScores.filter(s => s === true).length;
+    document.getElementById('correct-count').innerText = correctCount;
+    document.getElementById('score-val').innerText = Math.round((correctCount / questions.length) * 100);
+}
+
+generateQuestions();
+</script>
+
+</body>
+</html>

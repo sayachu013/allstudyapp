@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学総復習 MASTERPIECE</title>
+    <style>
+        :root {
+            --bg-color: #020617;
+            --card-bg: #0f172a;
+            --border-color: #1e293b;
+            --text-color: #f8fafc;
+            --accent-color: #38bdf8;
+            --gold-color: #fbbf24;
+            --danger-color: #ef4444;
+            --correct-color: #22c55e;
+            --locked-color: #1e293b;
+            --locked-text: #475569;
+        }
+
+        body {
+            font-family: 'Consolas', 'Courier New', 'Helvetica Neue', Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        .quit-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: auto;
+            margin: 0;
+            padding: 6px 12px;
+            font-size: 12px;
+            background-color: #1e293b;
+            border: 1px solid var(--border-color);
+            color: #64748b;
+            text-align: center;
+        }
+        .quit-btn:hover {
+            background-color: var(--danger-color);
+            color: #fff;
+            border-color: var(--danger-color);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 28px;
+            letter-spacing: 2px;
+            color: var(--text-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-top: 0;
+        }
+
+        .screen { display: none; }
+        .active { display: block; }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            margin: 14px 0;
+            background-color: #1e293b;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            text-align: left;
+        }
+
+        button:hover {
+            background-color: #334155;
+            border-color: var(--accent-color);
+            transform: translateY(-1px);
+        }
+
+        .choice-btn {
+            font-size: 18px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .action-btn {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            text-align: center;
+            font-size: 18px;
+        }
+        .action-btn:hover {
+            background-color: #7dd3fc;
+        }
+
+        .collection-section {
+            margin: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+        .collection-title {
+            font-size: 13px;
+            color: #64748b;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .badge-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .badge {
+            padding: 15px 10px;
+            text-align: center;
+            background-color: #020617;
+            border-radius: 8px;
+            font-size: 13px;
+            border: 2px dashed var(--locked-color);
+            color: var(--locked-text);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            line-height: 1.4;
+        }
+
+        .badge.clear-unlocked {
+            color: #4ade80;
+            border: 2px solid #22c55e;
+            background: linear-gradient(145deg, #064e3b, #020617);
+            font-weight: bold;
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.25);
+            text-shadow: 0 0 8px rgba(74, 222, 128, 0.4);
+        }
+
+        .badge.s-unlocked {
+            color: #fef08a;
+            border: 2px solid var(--gold-color);
+            background: linear-gradient(145deg, #78350f, #020617);
+            font-weight: bold;
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.35);
+            text-shadow: 0 0 10px rgba(254, 240, 138, 0.5);
+            animation: pulse-aura 2s infinite alternate;
+        }
+
+        .badge.speed-unlocked {
+            color: #a7f3d0;
+            border: 2px solid #06b6d4;
+            background: linear-gradient(145deg, #164e63, #020617);
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.3);
+            text-shadow: 0 0 8px rgba(167, 243, 208, 0.4);
+        }
+
+        .badge.iron-unlocked {
+            color: #e9d5ff;
+            border: 2px solid #a855f7;
+            background: linear-gradient(145deg, #581c87, #020617);
+            font-weight: bold;
+            box-shadow: 0 0 15px rgba(168, 85, 247, 0.3);
+            text-shadow: 0 0 8px rgba(233, 213, 213, 0.4);
+        }
+
+        @keyframes pulse-aura {
+            0% { box-shadow: 0 0 12px rgba(251, 191, 36, 0.25); }
+            100% { box-shadow: 0 0 25px rgba(251, 191, 36, 0.5); }
+        }
+
+        .status-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .wave-indicator {
+            background-color: #312e81;
+            color: #a5b4fc;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .question-box {
+            font-size: 26px;
+            font-weight: 700;
+            text-align: center;
+            margin: 50px 0;
+            min-height: 100px;
+            line-height: 1.6;
+            letter-spacing: 1px;
+            white-space: pre-line;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 4px;
+        }
+
+        .hidden-mask {
+            color: #334155;
+            font-style: italic;
+            font-size: 16px;
+            letter-spacing: 0px;
+        }
+
+        .fraction {
+            display: inline-flex;
+            flex-direction: column;
+            vertical-align: middle;
+            text-align: center;
+            font-size: 22px;
+            line-height: 1;
+            padding: 0 4px;
+        }
+        .numerator {
+            padding-bottom: 3px;
+        }
+        .denominator {
+            border-top: 2px solid var(--text-color);
+            padding-top: 4px;
+        }
+        button .denominator, .feedback-box .denominator {
+            border-top-color: var(--text-color);
+        }
+
+        sup {
+            font-size: 16px;
+            font-weight: bold;
+            vertical-align: super;
+            line-height: 0;
+            margin-left: 1px;
+            color: var(--accent-color);
+        }
+        button sup, .feedback-box sup {
+            color: inherit;
+        }
+
+        .feedback-box {
+            background-color: #020617;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .feedback-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .rank-large {
+            font-size: 96px;
+            font-weight: 900;
+            text-align: center;
+            margin: 10px 0;
+            font-family: 'Arial Black', sans-serif;
+        }
+        
+        .result-detail {
+            background-color: #020617;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin: 25px 0;
+        }
+        
+        .result-line {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="screen-home" class="screen active">
+        <h1>数学総復習 MASTERPIECE</h1>
+        <p style="text-align: center; color: #64748b; font-size: 13px; margin-top: 8px;">※共有端末対応：タブを閉じると全記録が即時完全消去されます</p>
+        
+        <h3 style="margin-top: 35px; font-size: 15px; color: #94a3b8; border-left: 3px solid var(--accent-color); padding-left: 8px;">COLLECTION</h3>
+        
+        <div class="collection-section">
+            <div class="collection-title">CHAPTER 1: 正の数・負の数</div>
+            <div class="badge-grid">
+                <div id="badge-stage1-clear" class="badge">🔒 正負の旅人<br><span style="font-size:11px;">(正答率90%以上)</span></div>
+                <div id="badge-stage1-s" class="badge">🔒 正負の支配者<br><span style="font-size:11px;">(完璧なSランク)</span></div>
+                <div id="badge-stage1-speed" class="badge">🔒 ゼロ・グラビティ<br><span style="font-size:11px;">(140秒以内クリア)</span></div>
+                <div id="badge-stage1-iron" class="badge">🔒 鉄の意思<br><span style="font-size:11px;">(ノーリターン全正解)</span></div>
+            </div>
+        </div>
+
+        <div class="collection-section">
+            <div class="collection-title">CHAPTER 2: 文字の式</div>
+            <div class="badge-grid">
+                <div id="badge-stage2-clear" class="badge">🔒 式の開拓者<br><span style="font-size:11px;">(正答率90%以上)</span></div>
+                <div id="badge-stage2-s" class="badge">🔒 同類項の統治者<br><span style="font-size:11px;">(完璧なSランク)</span></div>
+                <div id="badge-stage2-speed" class="badge">🔒 電光石火の分配<br><span style="font-size:11px;">(140秒以内クリア)</span></div>
+                <div id="badge-stage2-iron" class="badge">🔒 孤高の代入<br><span style="font-size:11px;">(ノーリターン全正解)</span></div>
+            </div>
+        </div>
+
+        <div class="collection-section">
+            <div class="collection-title">CHAPTER 3: 方程式</div>
+            <div class="badge-grid">
+                <div id="badge-stage3-clear" class="badge">🔒 天秤の調律師<br><span style="font-size:11px;">(正答率90%以上)</span></div>
+                <div id="badge-stage3-s" class="badge">🔒 方程式の覇者<br><span style="font-size:11px;">(完璧なSランク)</span></div>
+                <div id="badge-stage3-speed" class="badge">🔒 音速の移項<br><span style="font-size:11px;">(140秒以内クリア)</span></div>
+                <div id="badge-stage3-iron" class="badge">🔒 完全なる均衡<br><span style="font-size:11px;">(ノーリターン全正解)</span></div>
+            </div>
+        </div>
+
+        <div class="collection-section">
+            <div class="collection-title">CHAPTER 4: 変化と対応</div>
+            <div class="badge-grid">
+                <div id="badge-stage4-clear" class="badge">🔒 関数の旅人<br><span style="font-size:11px;">(正答率90%以上)</span></div>
+                <div id="badge-stage4-s" class="badge">🔒 変化の統治者<br><span style="font-size:11px;">(完璧なSランク)</span></div>
+                <div id="badge-stage4-speed" class="badge">🔒 神速の座標<br><span style="font-size:11px;">(140秒以内クリア)</span></div>
+                <div id="badge-stage4-iron" class="badge">🔒 不動の直線<br><span style="font-size:11px;">(ノーリターン全正解)</span></div>
+            </div>
+        </div>
+
+        <h3 style="margin-top: 40px; font-size: 15px; color: #94a3b8; border-left: 3px solid var(--accent-color); padding-left: 8px;">STAGE SELECT</h3>
+        <button id="stage-1-select-btn" onclick="startExam(1)" style="border-left: 4px solid var(--accent-color); margin-bottom: 14px;">
+            <span style="font-size: 18px; color: #fff;">第1章：正の数・負の数（全10問）</span><br>
+            <span style="font-size: 12px; color: #64748b;">収録プール: 50問 / ランダムウェーブ制 / クリア基準: 90%以上</span>
+        </button>
+        <button id="stage-2-select-btn" onclick="startExam(2)" style="border-left: 4px solid var(--accent-color); margin-bottom: 14px;">
+            <span style="font-size: 18px; color: #fff;">第2章：文字の式（全10問）</span><br>
+            <span style="font-size: 12px; color: #64748b;">収録プール: 50問 / ランダムウェーブ制 / クリア基準: 90%以上</span>
+        </button>
+        <button id="stage-3-select-btn" onclick="startExam(3)" style="border-left: 4px solid var(--accent-color); margin-bottom: 14px;">
+            <span style="font-size: 18px; color: #fff;">第3章：方程式（全10問）</span><br>
+            <span style="font-size: 12px; color: #64748b;">収録プール: 50問 / ランダムウェーブ制 / クリア基準: 90%以上</span>
+        </button>
+        <button id="stage-4-select-btn" onclick="startExam(4)" style="border-left: 4px solid var(--accent-color); margin-bottom: 14px;">
+            <span style="font-size: 18px; color: #fff;">第4章：変化と対応（全10問）</span><br>
+            <span style="font-size: 12px; color: #64748b;">収録プール: 50問 / ランダムウェーブ制 / クリア基準: 90%以上</span>
+        </button>
+    </div>
+
+    <div id="screen-think" class="screen">
+        <button class="quit-btn" onclick="abortToHome()">✕ 中断</button>
+        <div class="status-header">
+            <div>PROGRESS: <span id="think-progress" style="color: #fff; font-weight:bold;">1 / 10</span></div>
+            <div id="think-wave" class="wave-indicator">WAVE 1: BASIC</div>
+            <div>TIME: <span id="think-timer" style="color: var(--accent-color); font-weight:bold;">0.0s</span></div>
+        </div>
+        <div style="text-align: center; color: #64748b; font-size: 12px; margin-bottom:-20px;">
+            Sランク防衛ライン: 残り合計 <span id="s-limit-timer" style="font-weight:bold; color:var(--gold-color);">140.0s</span>
+        </div>
+        <div id="question-display" class="question-box"></div>
+        <button class="action-btn" onclick="transitionToAnswer()">ノートに解いた ➔ 選択肢を表示</button>
+    </div>
+
+    <div id="screen-answer" class="screen">
+        <button class="quit-btn" onclick="abortToHome()">✕ 中断</button>
+        <div class="status-header">
+            <div>PROGRESS: <span id="answer-progress" style="color: #fff; font-weight:bold;">1 / 10</span></div>
+            <div>TIME: <span id="answer-timer" style="color: var(--accent-color); font-weight:bold;">0.0s</span></div>
+        </div>
+        <div class="question-box hidden-mask">
+            【 思考終了：問題文はブラインドされました 】
+        </div>
+        <div id="choice-area"></div>
+        <button onclick="returnToQuestion()" style="background-color: transparent; border-color: #334155; text-align: center; font-size: 14px; color: #64748b; margin-top:20px;">✕ 問題文をもう一度確認する（時間ペナルティあり）</button>
+    </div>
+
+    <div id="screen-explain" class="screen">
+        <h1>解説確認</h1>
+        <div class="feedback-box">
+            <div id="explain-result-title" class="feedback-title"></div>
+            <div style="font-size:14px; color:#64748b; margin-bottom:15px;">
+                問題: <span id="explain-q-text" style="color:#f8fafc; font-weight:bold;"></span>
+            </div>
+            <div style="font-size:16px; margin-bottom:10px; display:flex; align-items:center; gap:4px;">
+                正解: <span id="explain-correct-ans" style="color:var(--correct-color); font-weight:bold;"></span>
+            </div>
+            <div id="explain-body" style="font-size:15px; color:#94a3b8; line-height:1.6; border-top:1px solid #1e293b; padding-top:15px;"></div>
+        </div>
+        <button class="action-btn" onclick="proceedAfterExplanation()">次の問題へ</button>
+    </div>
+
+    <div id="screen-result" class="screen">
+        <h1>EXAM RESULT</h1>
+        <div id="result-rank" class="rank-large">A</div>
+        <div id="result-status-text" style="text-align: center; font-weight: bold; font-size: 18px; margin-bottom: 20px;"></div>
+        
+        <div class="result-detail">
+            <div class="result-line"><span>正答率 (Accuracy)</span><span id="res-accuracy" style="font-weight: bold;">0%</span></div>
+            <div class="result-line"><span>総思考時間 (Total Time)</span><span id="res-time" style="color: var(--accent-color);">0s</span></div>
+            <div class="result-line"><span>平均レスポンス (Avg Speed)</span><span id="res-avg-speed">0s/問</span></div>
+            <div class="result-line"><span>問題確認戻り回数 (Returns)</span><span id="res-returns" style="color: var(--danger-color);">0回</span></div>
+        </div>
+        
+        <button class="action-btn" onclick="exitToHome()">リザルトを確定してホームに戻る</button>
+    </div>
+</div>
+
+<script>
+    function parseMathText(text) {
+        let parsed = text;
+        const fracRegex = /\[F\]([\s\S]*?)\/([\s\S]*?)\[F\]/g;
+        parsed = parsed.replace(fracRegex, '<span class="fraction"><span class="numerator">$1</span><span class="denominator">$2</span></span>');
+        const powRegex = /\[P\]([\s\S]*?)\[P\]/g;
+        parsed = parsed.replace(powRegex, '<sup>$1</sup>');
+        return parsed;
+    }
+
+    // 各章50問、総数200問の超巨大完全問題データベース (1章, 2章, 3章, 4章完全格納ビルド)
+    const all_stages_pool = {
+        1: [
+            { wave: 1, q: "7-11", ans: "-4", c: ["4", "-4", "-18", "18"], exp: { "-4": "正解。異符号の計算です。絶対値の大きい11の符号（マイナス）を残します。", "4": "符号ミス。引く数の絶対値の方が大きいため、結果は負になります。", "-18": "加算エラー。符号が異なるため、絶対値の和ではなく差を求めます。", "18": "符号および計算ミスです。" } },
+            { wave: 1, q: "-8-4", ans: "-12", c: ["-4", "4", "-12", "12"], exp: { "-12": "正解。同符号の負の数を合わせるため、絶対値を足してマイナスを付けます。", "-4": "引き算の混同。負の数からさらに引くため、値はより小さな負の数になります。", "4": "符号違い。負の数に負の数を合わせても正にはなりません。", "12": "符号ミスです。" } },
+            { wave: 1, q: "(-4)+(-4)", ans: "-8", c: ["0", "-8", "8", "-16"], exp: { "-8": "正解。負の数同士の純粋な和です。", "0": "符号違いの打ち消し合い（-4 + 4）と混同しています。", "8": "符号ミス。負の数同士を足しても正にはなりません。", "-16": "乗算との混同。4×4ではなく4+4です。" } },
+            { wave: 1, q: "(-9)-(-9)", ans: "0", c: ["-18", "18", "0", "-9"], exp: { "0": "正解。後ろの項が -(-9) = +9 となり、-9 + 9 = 0 となります。", "-18": "符号ミス。引く数のマイナス処理が正しく行われていません。", "18": "符号ミスです。", "-9": "計算ミスです。" } },
+            { wave: 1, q: "絶対値が3より小さい整数は全部でいくつありますか。", ans: "5", c: ["2", "3", "4", "5"], exp: { "5": "正解。対象は -2, -1, 0, 1, 2 の5つです。0を含める点に注意。", "2": "正の整数のみをカウントしたミスです。", "3": "「3以下」との混同、あるいは0の数え忘れです。", "4": "0をカウントしていない典型的なミスです。" } },
+            { wave: 1, q: "0÷(-7)", ans: "0", c: ["0", "-7", "7", "不能"], exp: { "0": "正解。0をどんな数（0以外）で割っても答えは0です。", "-7": "割る数の値がそのまま残るエラーです。", "7": "符号および計算のミスです。", "不能": "「0で割る計算（不能）」との混同です。0を割ることは可能です。" } },
+            { wave: 1, q: "-15+9", ans: "-6", c: ["6", "-6", "-24", "24"], exp: { "-6": "正解。絶対値の大きい15の符号（負）が残ります。", "6": "符号ミス。負の絶対値の方が大きいため、正にはなりません。", "-24": "同符号の和として計算してしまったミスです。", "24": "符号および計算のミスです。" } },
+            { wave: 1, q: "-3-(-5)", ans: "2", c: ["-8", "8", "-2", "2"], exp: { "2": "正解。-3 + 5 となり、5 - 3 = 2 となります。", "-8": "マイナス処理のミス。-3 - 5 として計算されています。", "8": "符号ミスです。", "-2": "符号の取り違え。絶対値は5（正の項）の方が大きくなります。" } },
+            { wave: 1, q: "(-6)×(-2)", ans: "12", c: ["-12", "12", "-8", "8"], exp: { "12": "正解。負の数同士の乗算は正になります。", "-12": "符号ミス。負×負は正になります。", "-8": "加算との混同です。", "8": "計算ミスです。" } },
+            { wave: 1, q: "-18÷6", ans: "-3", c: ["3", "-3", "-12", "12"], exp: { "-3": "正解。異符号の除算のため、結果は負になります。", "3": "符号ミス。負÷正は負になります。", "-12": "減算との混同です。", "12": "計算ミスです。" } },
+            { wave: 1, q: "-5+(-7)", ans: "-12", c: ["2", "-2", "-12", "12"], exp: { "-12": "正解。負の数に負の数を加えるため、絶対値の和にマイナスを付けます。", "2": "異符号の加算（-5 + 7）との混同です。", "-2": "計算ミスです。", "12": "符号ミスです。" } },
+            { wave: 1, q: "13-20", ans: "-7", c: ["7", "-7", "33", "-33"], exp: { "-7": "正解。小さい数から大きい数を引くため、結果は負になります。", "7": "順序を逆にして引いてしまった符号ミスです。", "33": "加算エラーです。", "-33": "計算ミスです。" } },
+            { wave: 1, q: "(-1)×(-1)×(-1)", ans: "-1", c: ["1", "-1", "3", "-3"], exp: { "-1": "正解。負の符号が奇数個（3個）あるため、結果は負になります。", "1": "符号ミス。負の数が奇数個あるため、正にはなりません。", "3": "足し算との混同、または累乗の意味の誤解です。", "-3": "足し算との混同です。" } },
+            { wave: 1, q: "絶対値が5である数をすべて答えなさい。", ans: "5, -5", c: ["5", "-5", "5, -5", "25"], exp: { "5, -5": "正解。原点からの距離が5である数は、正と負の両方に存在します。", "5": "正の数しか視野に入っていない片手落ちのミスです。", "-5": "負の数しか視野に入っていない片手落ちのミスです。", "25": "平方数との混同です。" } },
+            { wave: 1, q: "-12÷(-4)", ans: "3", c: ["-3", "3", "-16", "-8"], exp: { "3": "正解。負÷負は正になります。", "-3": "符号ミス。同符号の除算は正になります。", "-16": "加算エラーです。", "-8": "減算エラーです。" } },
+            { wave: 1, q: "(-8)×0", ans: "0", c: ["-8", "0", "8", "なし"], exp: { "0": "正解。どんな数に0を掛けても、積は必ず0になります。", "-8": "掛けられた数がそのまま残るエラーです。", "8": "符号および計算のミスです。", "なし": "概念の誤解です。" } },
+            { wave: 1, q: "-2+2", ans: "0", c: ["-4", "4", "0", "2"], exp: { "0": "正解。絶対値が等しい異符号の和は0になります。", "-4": "同符号の加算（-2 - 2）との混同です。", "4": "符号ミスです。", "2": "計算ミスです。" } },
+            { wave: 1, q: "7-(-3)", ans: "10", c: ["4", "-4", "10", "-10"], exp: { "10": "正解。7 + 3 となり、絶対値の和になります。", "4": "引き算のまま処理したミス（7 - 3）です。", "-4": "符号および計算のミスです。", "-10": "符号ミスです。" } },
+            { wave: 1, q: "(-24)÷8", ans: "-3", c: ["3", "-3", "16", "-16"], exp: { "-3": "正解。異符号の除算です。", "3": "符号ミス。負÷正は負になります。", "16": "加算・減算との混同です。", "-16": "計算ミスです。" } },
+            { wave: 1, q: "-10-5", ans: "-15", c: ["-5", "5", "-15", "15"], exp: { "-15": "正解。-10 からさらに 5 減じるため、-15 となります。", "-5": "異符号の加算（-10 + 5）との混同です。", "5": "符号および引き算の混同です。", "15": "符号ミスです。" } },
+
+            { wave: 2, q: "-6.9+10", ans: "3.1", c: ["4.1", "3.1", "-3.1", "-16.9"], exp: { "3.1": "正解。10.0 - 6.9 の計算に帰結します。", "4.1": "繰り下がり処理のミスです。", "-3.1": "符号の取り違え。絶対値は10（正）の方が大きいです。", "-16.9": "同符号の和として足してしまったエラーです。" } },
+            { wave: 2, q: "2.6+(-3.6)", ans: "-1", c: ["1", "-1", "6.2", "-6.2"], exp: { "-1": "正解。2.6 - 3.6 = -1 となります。", "1": "符号ミス。引く数の絶対値の方が大きいため、負になります。", "6.2": "加算エラーです。", "-6.2": "符号および小数の加算エラーです。" } },
+            { wave: 2, q: "(-2)×5×(-3)", ans: "30", c: ["-30", "30", "-10", "13"], exp: { "30": "正解。負の数が2個（偶数個）あるため、符号は正になります。", "-30": "符号ミス。全体の負の符号の個数を数え間違えています。", "-10": "後半の乗算（×(-3)）を忘れたか、部分的な計算エラーです。", "13": "加減算との混同です。" } },
+            { wave: 2, q: "(-24)÷(-4)÷(-2)", ans: "-3", c: ["12", "-12", "3", "-3"], exp: { "-3": "正解。左から順に計算します。6 ÷ (-2) = -3 です。", "12": "一気に後ろを掛け算した（(-4)÷(-2)＝2とし、-24÷2＝-12）などの順序ミスです。", "-12": "計算順序、または符号のミスです。", "3": "符号ミス。負の数が3個（奇数個）あるため、結果は負になります。" } },
+            { wave: 2, q: "-2.7+6.2-1.3", ans: "2.2", c: ["4.8", "2.2", "3.2", "-2.2"], exp: { "2.2": "正解。同符号をまとめると -4.0 + 6.2 = 2.2 となります。", "4.8": "計算順序、または符号の処理ミスです。", "3.2": "加減算のミスです。", "-2.2": "符号の取り違えです。" } },
+            { wave: 2, q: "9-17+21", ans: "13", c: ["-13", "13", "-25", "25"], exp: { "13": "正解。9 + 21 - 17 = 30 - 17 = 13 です。", "-13": "符号のミスです。", "-25": "計算ミスです。", "25": "部分的な加減エラーです。" } },
+            { wave: 2, q: "(-3)[P]2[P]", ans: "9", c: ["-9", "9", "-6", "6"], exp: { "9": "正解。カッコごと2乗するため、(-3) × (-3) = 9 となります。", "-9": "累乗の対象の誤解。-3[P]2[P]（カッコなし）との混同です。", "-6": "指数を「掛ける2」と勘違いした典型的なミスです。", "6": "指数を「掛ける2」とし、さらに符号も間違えたミスです。" } },
+            { wave: 2, q: "-5[P]2[P]", ans: "-25", c: ["-25", "25", "-10", "10"], exp: { "-25": "正解。2乗の対象は5のみなので、-(5×5) = -25 となります。", "25": "カッコ付きの (-5)[P]2[P] と混同しています。マイナスは2乗されません。", "-10": "5×2 と勘違いしたミスです。", "10": "5×2 とし、さらにマイナスを消失させたミスです。" } },
+            { wave: 2, q: "(-1)[P]4[P]", ans: "1", c: ["-1", "1", "-4", "4"], exp: { "1": "正解。負の数を偶数回（4回）掛けるため、正の1になります。", "-1": "符号ミス。4回掛けると符号は正になります。", "-4": "1×4 と勘違いしたミスです。", "4": "1×4 とし、符号を正にしたミスです。" } },
+            { wave: 2, q: "[F]2/3[F]+(-[F]1/2[F])", ans: "[F]1/6[F]", c: ["-[F]1/6[F]", "[F]1/6[F]", "[F]5/6[F]", "[F]7/6[F]"], exp: { "[F]1/6[F]": "正解。通分して 4/6 - 3/6 = 1/6 となります。", "-[F]1/6[F]": "通分後の分子の引き算（4 - 3）の符号ミスです。", "[F]5/6[F]": "通分後に引き算すべきところを足し算（4/6 + 1/6など）してしまったミスです。", "[F]7/6[F]": "異符号の加算を同符号の加算（4/6 + 3/6）として処理したミスです。" } },
+            { wave: 2, q: "(-[F]3/4[F])×(-[F]8/9[F])", ans: "[F]2/3[F]", c: ["-[F]2/3[F]", "[F]2/3[F]", "[F]1/3[F]", "[F]4/3[F]"], exp: { "[F]2/3[F]": "正解。符号は正になり、約分して 2/3 となります。", "-[F]2/3[F]": "符号ミス。負×負は正になります。", "[F]1/3[F]": "約分時の計算エラーです。", "[F]4/3[F]": "約分の手順が狂ってしまった際の計算ミスです。" } },
+            { wave: 2, q: "(-[F]5/6[F])÷[F]5/3[F]", ans: "-[F]1/2[F]", c: ["-[F]1/2[F]", "[F]1/2[F]", "-[F]3/2[F]", "[F]3/2[F]"], exp: { "-[F]1/2[F]": "正解。割る数を逆数にして掛け算します。(-5/6) × (3/5) = -1/2 です。", "[F]1/2[F]": "符号ミスです。負÷正は負になります。", "-[F]3/2[F]": "逆数にせずそのまま約分して分母と分子を誤認したミスです。", "[F]3/2[F]": "分母分子の誤認および全体の符号ミスです。" } },
+            { wave: 2, q: "0.25×(-2)[P]3[P]", ans: "-2", c: ["-2", "2", "-8", "8"], exp: { "-2": "正解。0.25 × (-8) = -2 となります。まず累乗の処理が先です。", "2": "累乗の符号ミス。(-2)[P]3[P] = -8 なので、結果は負になります。", "-8": "0.25（1/4）の乗算処理が反映されていないミスです。", "8": "乗算処理の失念および累乗の符号ミスです。" } },
+            { wave: 2, q: "(-[F]1/3[F])÷(-[F]1/6[F])[P]2[P]", ans: "-12", c: ["12", "-12", "-36", "36"], exp: { "-12": "正解。累乗を先に処理して (-1/3) ÷ (1/36) = (-1/3) × 36 = -12 となります。", "12": "符号の処理ミスです。", "-36": "計算プロセスの途中で約分を忘れてしまったミスです。", "36": "約分ミスおよび全体の符号ミスです。" } },
+            { wave: 2, q: "-3×(-2.5)", ans: "7.5", c: ["-7.5", "7.5", "-6.5", "6.5"], exp: { "7.5": "正解。負×負は正になります。3 × 2.5 = 7.5 です。", "-7.5": "符号ミス。負×負は正になります。", "-6.5": "計算エラーです。", "6.5": "計算エラーです。" } },
+            { wave: 2, q: "(-[F]1/2[F])[P]3[P]", ans: "-[F]1/8[F]", c: ["-[F]1/8[F]", "[F]1/8[F]", "-[F]3/8[F]", "[F]3/8[F]"], exp: { "-[F]1/8[F]": "正解。(-1/2)を3回掛けるため、-1/8 となります。", "[F]1/8[F]": "奇数乗における符号のミスです。負の奇数乗は負のままです。", "-[F]3/8[F]": "分子の1を3倍（1×3=3）にしてしまったミスです。", "[F]3/8[F]": "分子の掛け算の誤認識および符号ミスです。" } },
+            { wave: 2, q: "-0.1×(-10)[P]2[P]", ans: "-10", c: ["10", "-10", "100", "-100"], exp: { "-10": "正解。累乗が先で、-0.1 × 100 = -10 です。", "10": "符号ミス。-0.1のマイナスが考慮されていません。", "100": "乗算の桁数処理および符号ミスです。", "-100": "乗算の桁数処理（小数点の移動忘れ）のミスです。" } },
+            { wave: 2, q: "[F]5/2[F]-[F]7/2[F]÷(-2)", ans: "[F]17/4[F]", c: ["-[F]17/4[F]", "[F]17/4[F]", "-[F]3/4[F]", "[F]3/4[F]"], exp: { "[F]17/4[F]": "正解。除算が先です。5/2 - (-7/4) = 10/4 + 7/4 = 17/4 となります。", "-[F]17/4[F]": "通分後の最終加減算における符号ミスです。", "-[F]3/4[F]": "除算時の符号（マイナス）の処理を忘れ、10/4 - 7/4 = 3/4 とした順序ミスです。", "[F]3/4[F]": "符号の処理が歪んでしまった形の計算ミスです。" } },
+            { wave: 2, q: "(-2)×3-(-4)×(-2)", ans: "-14", c: ["-14", "2", "-2", "14"], exp: { "-14": "正解。-6 - (+8) = -14 となります。", "2": "後半の符号処理ミス。-6 - (-8) = 2 と誤認した形です。", "-2": "計算ミスです。", "14": "全体の符号処理ミスです。" } },
+            { wave: 2, q: "10-6×(-2)[P]2[P]", ans: "-14", c: ["16", "-14", "14", "-16"], exp: { "-14": "正解。累乗➔乗算➔減算の順です。10 - 6 × 4 = 10 - 24 = -14 です。", "16": "左から順に引いてしまった（4 × 4 = 16）致命的な順序ミスです。", "14": "減算の符号ミス（10 - (-24) = 34 など）を誘発した計算ミスです。", "-16": "計算ミスです。" } },
+
+            { wave: 3, q: "(-3)×7+(-84)÷(-21)", ans: "-17", c: ["-17", "-25", "25", "1"], exp: { "-17": "正解。-21 + (+4) = -17 となります。", "-25": "後半の除算の符号をマイナスと誤認したミス（-21 - 4）です。", "25": "前半と後半両方の符号処理ミスです。", "1": "四則演算の優先順位、または計算のミスです。" } },
+            { wave: 3, q: "72÷(-9)+(-13)×(-5)", ans: "57", c: ["73", "57", "-73", "-57"], exp: { "57": "正解。-8 + 65 = 57 となります。", "73": "同符号の加算（8 + 65）にしてしまったミスです。", "-73": "全体の符号ミスです。", "-57": "符号の反転ミスです。" } },
+            { wave: 3, q: "36-(-3)×(-14-32)", ans: "-102", c: ["174", "-102", "102", "0"], exp: { "-102": "正解。カッコ内を先に処理して 36 - (-3) × (-46) = 36 - 138 = -102 となります。", "174": "乗算の引き算の符号を足し算に誤認したミス（36 + 138）です。", "102": "符号の反転ミスです。", "0": "計算ミスです。" } },
+            { wave: 3, q: "-2[P]2[P]-(-0.2)[P]2[P]", ans: "-4.04", c: ["-3.96", "3.96", "-4.04", "4.04"], exp: { "-4.04": "正解。-4 - 0.04 = -4.04 となります。", "-3.96": "後ろの項を -0.04 として、-4 - (-0.04) = -3.96 と誤認した符号ミスです。", "3.96": "符号ミスです。", "4.04": "全体の符号を正に反転させてしまったミスです。" } },
+            { wave: 3, q: "28にできるだけ小さい自然数をかけて、その積がある自然数の2乗になるようにしたい。かけるべき自然数を求めなさい。", ans: "7", c: ["2", "7", "14", "28"], exp: { "7": "正解。28を素因数分解すると 2[P]2[P] × 7 です。指数を偶数にするために7が必要です。", "2": "すでに2乗されている2の因数を重ねてしまったミスです。", "14": "素因数のペア構成の誤解です。", "28": "元の数をそのまま掛けるという非効率な解答です（間違いではないが「できるだけ小さい」を満たしません）。" } },
+            { wave: 3, q: "【入試問題改】4月4日の最高気温が20℃、前日(4月3日)との差が+2℃、4月3日の前日(4月2日)との差が-3℃のとき、4月2日の最高気温を求めなさい。", ans: "21℃", c: ["15℃", "19℃", "21℃", "25℃"], exp: { "21℃": "正解。4月3日は 20 - 2 = 18℃。4月2日は 18 - (-3) = 21℃ と時間を遡って逆算します。", "15℃": "前日との差の正負の方向をすべて足し算で進めてしまったミス（20 - 2 - 3）です。", "19℃": "逆算のステップにおける符号ミスです。", "25℃": "計算ミスです。" } },
+            { wave: 3, q: "16-(-11-(9-12)×7)", ans: "6", c: ["26", "6", "-6", "38"], exp: { "6": "正解。最も内側のカッコから順に処理します。16 - (-11 - (-3)×7) = 16 - (-11 + 21) = 16 - 10 = 6 です。", "26": "カッコ内の乗算符号処理のミスです。", "-6": "最後の減算における符号ミスです。", "38": "計算途中の符号ミスです。" } },
+            { wave: 3, q: "450をできるだけ小さい自然数でわって、その商がある自然数の2乗になるようにしたい。どんな数でわればよいですか。", ans: "2", c: ["2", "5", "18", "50"], exp: { "2": "正解。450を素因数分解すると 2 × 3[P]2[P] × 5[P]2[P] です。余分な因数は2のみです。", "5": "すでにペアができている5の因数で割ってしまうミスです。", "18": "3[P]2[P] × 2 = 18 と計算したミスです。", "50": "5[P]2[P] × 2 = 50 と計算したミスです。" } },
+            { wave: 3, q: "【階段じゃんけん】Aの段から出発し、勝ったら+2、負けたら-1移動するルール。かりんさんが7回中2回勝ち、5回負けたとき、対戦相手のけいたさんはAから何段目にいますか。", ans: "8段上", c: ["1段上", "1段下", "8段上", "Aの段"], exp: { "8段上": "正解。かりんさんの2勝5敗は、けいたさん視点では「5勝2敗」になります。よって 5×(+2) + 2×(-1) = 10 - 2 = +8段上（Aの段を基準）となります。", "1段上": "勝敗数の引き算を誤認したミスです。", "1段下": "かりんさんの最終位置（-1）と誤認したミスです。", "Aの段": "計算エラーです。" } },
+            { wave: 3, q: "おもりA, B, Cと120gのおもりDがある。A, B, Cの順に50gずつ重くなっており、4つの合計は540gである。おもりCの重さを求めなさい。", ans: "190g", c: ["90g", "140g", "190g", "240g"], exp: { "190g": "正解。A+B+C = 540 - 120 = 420g。Aを基準とすると A + (A+50) + (A+100) = 420 ➔ 3A + 150 = 420 ➔ 3A = 270 ➔ A=90g。求めたいCは A+100 なので 190g です。", "90g": "最も軽いおもりAの重さをそのまま答えてしまった、問題文の読み落としミスです。", "140g": "中央のおもりBの重さを答えてしまったミスです。", "240g": "計算途中のスライドミスです。" } }
+        ],
+        2: [
+            { wave: 1, q: "次の数量を表す式を書きなさい。50円硬貨 a 枚と 10円硬貨1枚の合計金額", ans: "50a + 10", c: ["60a", "50a + 10", "10a + 50", "50a + 1"], exp: { "50a + 10": "正解。50円がa枚で50a円。それに10円をそのまま加算します。", "60a": "文字式の結合ミス。aの付いていない定数項10を勝手に合算することはできません。", "10a + 50": "枚数の取り違えミス。10円硬貨がa枚になってしまっています。", "50a + 1": "金額ではなく硬貨の「枚数」を足してしまったミスです。" } },
+            { wave: 1, q: "次の数量を表す式を書きなさい。家から a m 離れた駅へ分速80mで歩いたときにかかった時間", ans: "[F]a/80[F]", c: ["[F]80/a[F]", "[F]a/80[F]", "80a", "a - 80"], exp: { "[F]a/80[F]": "正解。時間 ＝ 道のり ÷ 速さ の公式に従い、a / 80 となります。", "[F]80/a[F]": "公式の上下逆転ミス。速さ ÷ 道のり になってしまっています。", "80a": "速さ × 道のり という存在しない計算プロセスによるミスです。" } },
+            { wave: 1, q: "7a-1-4a+6を計算しなさい。", ans: "3a + 5", c: ["3a - 7", "3a + 5", "11a + 5", "3a + 7"], exp: { "3a + 5": "正解。同類項をまとめします。(7a - 4a) + (-1 + 6) = 3a + 5 となります。", "3a - 7": "定数項の符号ミス。-1 - 6 と計算してしまっています。", "11a + 5": "文字の項の加減ミス。7a + 4a と足し算してしまっています。" } },
+            { wave: 1, q: "4x+(-3+7x)を計算しなさい。", ans: "11x - 3", c: ["11x - 3", "11x + 3", "3x - 3", "-3x - 3"], exp: { "11x - 3": "正解。カッコの前の符号が正なのでそのまま外し、4x + 7x - 3 = 11x - 3 となります。", "11x + 3": "定数項の符号ミスです。", "3x - 3": "文字の項の加減ミス。4x - 7x と引き算してしまっています。" } },
+            { wave: 1, q: "(6x-27)÷(-3)を計算しなさい。", ans: "-2x + 9", c: ["-2x - 9", "-2x + 9", "2x - 9", "2x + 9"], exp: { "-2x + 9": "正解。両方の項を-3で割るため、-27 ÷ (-3) = +9 と符号が反転します。", "-2x - 9": "後ろの項の符号処理ミス。負の数で割った際の反転が漏れています。", "2x - 9": "すべての項の符号が逆転してしまっている計算ミスです。" } },
+            { wave: 1, q: "3a-5aを計算しなさい。", ans: "-2a", c: ["2a", "-2a", "-2", "2"], exp: { "-2a": "正解。係数の計算 3 - 5 = -2 に文字aを添えます。", "-2": "文字の消失ミス。同類項の計算では文字aを残す必要があります。" } },
+            { wave: 1, q: "-4x×(-5)を計算しなさい。", ans: "20x", c: ["-20x", "20x", "-9x", "9x"], exp: { "20x": "正解。負 × 負は正になります。4 × 5 = 20 に文字xを掛けます。", "-20x": "符号ミス。負の数を偶数回掛けているため、結果は正になります。", "-9x": "乗算を加算（-4 - 5）と混同してしまったミスです。" } },
+            { wave: 1, q: "8x÷4を計算しなさい。", ans: "2x", c: ["4x", "2x", "32x", "2"], exp: { "2x": "正解。係数の8を4で除算して 2x となります。", "32x": "除算を乗算（8 × 4）と勘違いしてしまったミスです。" } },
+            { wave: 1, q: "-6a-aを計算しなさい。", ans: "-7a", c: ["-5a", "-7a", "-6", "-6a"], exp: { "-7a": "正解。-a は -1a を意味するため、-6 - 1 = -7a となります。", "-5a": "係数の勘違い。-6 - (-1) として計算してしまったミスです。" } },
+            { wave: 1, q: "5x-3-8xを計算しなさい。", ans: "-3x - 3", c: ["3x - 3", "-3x - 3", "-3x + 3", "-6x"], exp: { "-3x - 3": "正解。5x - 8x = -3x となり、定数項の-3をそのまま並べます。" } },
+            { wave: 1, q: "a×(-1)×bを文字式のルールに従って表しなさい。", ans: "-ab", c: ["-1ab", "-ab", "ab", "-ba"], exp: { "-ab": "正解。1は省略し、マイナスを先頭に出してアルファベット順に並べます。", "-1ab": "文字式のルールミス。係数の1は省略しなければなりません。", "-ba": "アルファベット順のルールが守られていないミスです。" } },
+            { wave: 1, q: "x÷y÷zを文字式のルールに従って表しなさい。", ans: "[F]x/yz[F]", c: ["[F]xz/y[F]", "[F]x/yz[F]", "[F]xyz/1[F]", "[F]1/xyz[F]"], exp: { "[F]x/yz[F]": "正解。連続する除算は、割る数がすべて分母に回ります。", "[F]xz/y[F]": "後半の ÷ z を × z と混同して分子に乗せてしまったミスです。" } },
+            { wave: 1, q: "4a-(2a-3)を計算しなさい。", ans: "2a + 3", c: ["2a - 3", "2a + 3", "6a - 3", "2a + 0"], exp: { "2a + 3": "正解。カッコの前のマイナスを分配するため、中の-3が+3に反転します。", "2a - 3": "カッコ内の符号反転漏れ。最も多い典型的なミスです。" } },
+            { wave: 1, q: "3x×4の計算結果を選びなさい。", ans: "12x", c: ["7x", "12x", "12", "7"], exp: { "12x": "正解。数字の係数同士を掛け算します。", "7x": "乗算を加算（3 + 4）と混同してしまったミスです。" } },
+            { wave: 1, q: "次の数量の関係を等式で表しなさい。兄は a 円、弟は b 円持っていたが、兄が弟に c 円渡したので2人の所持金は等しくなった。", ans: "a - c = b + c", c: ["a - c = b + c", "a + c = b - c", "a - c = b", "a = b + c"], exp: { "a - c = b + c": "正解。兄はc円減り、弟はc円増えてイコールになります。", "a + c = b - c": "お金の移動方向が完全に逆転してしまっているミスです。" } },
+            { wave: 1, q: "-9a+9-8aを計算しなさい。", ans: "-17a + 9", c: ["-a + 9", "-17a + 9", "-17a - 9", "17a + 9"], exp: { "-17a + 9": "正解。文字項同士をまとめて -9a - 8a = -17a となります。" } },
+            { wave: 1, q: "次の数量の関係を不等式で表しなさい。2人の得点がそれぞれ a 点、b 点であるとき、2人の平均点は c 点より大きい。", ans: "[F](a+b)/2[F] > c", c: ["[F](a+b)/2[F] < c", "[F](a+b)/2[F] > c", "a + b > c", "[F](a+b)/2[F] >= c"], exp: { "[F](a+b)/2[F] > c": "正解。平均点は和を2で割ったもの。「より大きい」は等号を含みません。", "[F](a+b)/2[F] >= c": "「以上」と混同して等号を付けてしまっているミスです。" } },
+            { wave: 1, q: "1辺に n 個の碁石を並べて正方形を作るとき、全体の碁石の数を n の式で表しなさい(nは2以上)。", ans: "4n - 4", c: ["4n", "4n - 4", "4n - 2", "4(n-1)"], exp: { "4n - 4": "正解。4つの角の碁石が重複してカウントされるため、4を引く必要があります。", "4n": "角の重複カウントに気づいていないミスです。" } },
+            { wave: 1, q: "x = -4 のとき、-x[P]2[P]の値を求めなさい。", ans: "-16", c: ["16", "-16", "8", "-8"], exp: { "-16": "正解。先に代入して累乗します。 -(-4)[P]2[P] = -(16) = -16 です。", "16": "先頭のマイナスと代入するマイナスを先に掛け算してしまった順序ミスです。" } },
+            { wave: 1, q: "a = 3, b = -2 のとき、2a+4bの値を求めなさい。", ans: "-2", c: ["14", "-2", "2", "-14"], exp: { "-2": "正解。2(3) + 4(-2) = 6 - 8 = -2 となります。" } },
+
+            { wave: 2, q: "6(1-2x)+3(x-2)を計算しなさい。", ans: "-9x", c: ["-9x + 12", "-9x", "-15x", "-15x + 12"], exp: { "-9x": "正解。展開すると 6 - 12x + 3x - 6 となり、定数項の6が相殺されて消えます。", "-9x + 12": "後半の分配で 3 × (-2) を +6 と符号誤認して加算したミスです。" } },
+            { wave: 2, q: "x = -4, y = 6 のとき、5x+4yの値を求めなさい。", ans: "4", c: ["-4", "4", "44", "-44"], exp: { "4": "正解。5(-4) + 4(6) = -20 + 24 = 4 となります。" } },
+            { wave: 2, q: "[F]2/3[F]x-[F]1/2[F]xを計算しなさい。", ans: "[F]1/6[F]x", c: ["-[F]1/6[F]x", "[F]1/6[F]x", "[F]5/6[F]x", "[F]1/5[F]x"], exp: { "[F]1/6[F]x": "正解。通分して分母を6に揃えます。 4/6 x - 3/6 x = 1/6 x です。", "-[F]1/6[F]x": "通分後の引き算の向き、または符号の取り違えミスです。" } },
+            { wave: 2, q: "2(x+1)-4(x-8)を計算しなさい。", ans: "-2x + 34", c: ["-2x - 30", "-2x + 34", "-2x - 6", "-2x + 10"], exp: { "-2x + 34": "正解。後半を展開する際、 -4 × (-8) = +32 となるため、2 + 32 = 34 です。", "-2x - 30": "後ろの分配での符号ミス。-4 × (-8) = -32 として計算されています。" } },
+            { wave: 2, q: "-a-4a-(2a-3)+5を計算しなさい。", ans: "-7a + 8", c: ["-7a + 2", "-7a + 8", "-5a + 8", "-5a + 2"], exp: { "-7a + 8": "正解。カッコを外すと -a - 4a - 2a + 3 + 5 となり、項をまとめします。" } },
+            { wave: 2, q: "([F]2/3[F]x-9)-([F]3/2[F]x-4)を計算しなさい。", ans: "-[F]5/6[F]x - 5", c: ["-[F]5/6[F]x - 13", "-[F]5/6[F]x - 5", "[F]5/6[F]x - 5", "-[F]1/5[F]x - 5"], exp: { "-[F]5/6[F]x - 5": "正解。通分して (4/6 - 9/6)x - 9 + 4 = -5/6 x - 5 となります。" } },
+            { wave: 2, q: "次の数量の関係を不等式で表しなさい。a円の品物を3個、b円の品物を4個買い、1000円札を出したらおつりがあった。", ans: "3a + 4b < 1000", c: ["3a + 4b <= 1000", "3a + 4b < 1000", "3a + 4b > 1000", "3a + 4b = 1000"], exp: { "3a + 4b < 1000": "正解。「おつりがある」ということは、合計代金が1000円より安い（未満）ということです。" } },
+            { wave: 2, q: "縦 acm, 横 bcm, 高さ ccm の直方体がある。4(a+b+c)は何の数量を表していますか。", ans: "すべての辺の長さの和", c: ["直方体の表面積", "すべての辺の長さの和", "直方体の体積", "対角線の長さ"], exp: { "すべての辺の長さの和": "正解。直方体には縦・横・高さの辺がそれぞれ4本ずつ存在するため、その総和です。" } },
+            { wave: 2, q: "縦 acm, 横 bcm, 高さ ccm の直方体がある。abc < 120 はどんな関係を表していますか。", ans: "体積が120cm[P]3[P]未満", c: ["表面積が120cm[P]2[P]未満", "体積が120cm[P]3[P]未満", "辺の長さの和が120cm未満", "体積が120cm[P]3[P]以下"], exp: { "体積が120cm[P]3[P]未満": "正解。abcは縦×横×高さで体積を表します。不等号に等号がないので未満です。" } },
+            { wave: 2, q: "[F]3a/4[F]を記号×,÷を使って正しく表した式を選びなさい。", ans: "3 × a ÷ 4", c: ["3 ÷ a × 4", "3 × a ÷ 4", "a ÷ 3 × 4", "3 × 4 ÷ a"], exp: { "3 × a ÷ 4": "正解。分子にある3とaは乗算、分母にある4は除算の対象です。" } },
+            { wave: 2, q: "x = 3 のとき、x[P]2[P]-4xの値を求めなさい。", ans: "-3", c: ["3", "-3", "-5", "21"], exp: { "-3": "正解。代入すると 3[P]2[P] - 4(3) = 9 - 12 = -3 となります。" } },
+            { wave: 2, q: "-3(2x-4.5)を計算しなさい。", ans: "-6x + 13.5", c: ["-6x - 13.5", "-6x + 13.5", "-6x + 4.5", "6x - 13.5"], exp: { "-6x + 13.5": "正解。-3を分配するため、後ろの項は -3 × (-4.5) = +13.5 になります。" } },
+            { wave: 2, q: "-6x-(-2x+5)を計算しなさい。", ans: "-4x - 5", c: ["-8x - 5", "-4x - 5", "-4x + 5", "-8x + 5"], exp: { "-4x - 5": "正解。カッコを外すと -6x + 2x - 5 = -4x - 5 となります。" } },
+            { wave: 2, q: "[F]1/2[F](4x-6)-[F]1/3[F](9x+3)を計算しなさい。", ans: "-x - 4", c: ["-x - 2", "-x - 4", "5x - 4", "5x - 2"], exp: { "-x - 4": "正解。分配して (2x - 3) - (3x + 1) = 2x - 3 - 3x - 1 = -x - 4 です。" } },
+            { wave: 2, q: "a = -2 のとき、a[P]3[P]の値を求めなさい。", ans: "-8", c: ["8", "-8", "-6", "6"], exp: { "-8": "正解。(-2) × (-2) × (-2) = -8 です。負の数の奇数乗は負になります。" } },
+            { wave: 2, q: "2x-5-2x+5を計算しなさい。", ans: "0", c: ["4x", "-10", "0", "4x - 10"], exp: { "0": "正解。2x - 2x = 0, -5 + 5 = 0 となり、すべての項が相殺されます。" } },
+            { wave: 2, q: "[F]x/4[F]を別の表現で正しく表した式を選びなさい。", ans: "[F]1/4[F]x", c: ["4x", "[F]1/4[F]x", "[F]4/x[F]", "x - 4"], exp: { "[F]1/4[F]x": "正解。4で割ることは、1/4を掛けることと完全に同じ意味です。" } },
+            { wave: 2, q: "-8(a-0.5)を計算しなさい。", ans: "-8a + 4", c: ["-8a - 4", "-8a + 4", "-8a - 4.5", "-8a + 4.5"], exp: { "-8a + 4": "正解。分配法則により、 -8 × (-0.5) = +4 となります。" } },
+            { wave: 2, q: "a = 5 のとき、[F](2a-1)/3[F]の値を求めなさい。", ans: "3", c: ["4", "3", "9", "2"], exp: { "3": "正解。分子に代入して (2(5) - 1)/3 = 9/3 = 3 です。" } },
+            { wave: 2, q: "5x+3y-x-4yを計算しなさい。", ans: "4x - y", c: ["4x + y", "4x - y", "6x - 7y", "3x"], exp: { "4x - y": "正解。5x - x = 4x, 3y - 4y = -y と同類項ごとにまとめます。" } },
+
+            { wave: 3, q: "長方形ABCDで、AB=5cm, BC=8cm, BE=acm, DF=2cmのとき、色のついた三角形AEFの面積をaを使って表しなさい。", ans: "20 - [F]3a/2[F]", c: ["20 - 3a", "20 - [F]3a/2[F]", "40 - [F]3a/2[F]", "20 + [F]3a/2[F]"], exp: { "20 - [F]3a/2[F]": "正解。全体(40)から3つの白い直角三角形（5a/2, 8, 3(8-a)/2）を引いて整理します。" } },
+            { wave: 3, q: "[F](2x-1)/3[F]-[F](x-1)/2[F]", ans: "[F](x + 1)/6[F]", c: ["-[F](x - 5)/6[F]", "[F](x + 1)/6[F]", "[F](x - 1)/6[F]", "[F](3x - 5)/6[F]"], exp: { "[F](x + 1)/6[F]": "正解。分子を分子全体の塊として扱い、マイナスを分配します。{2(2x-1) - 3(x-1)}/6 = (4x - 2 - 3x + 3)/6 = (x + 1)/6 です。", "[F](x - 5)/6[F]": "後ろの分子へのマイナス分配漏れミス。 -3 × (-1) = +3 にする必要があります。" } },
+            { wave: 3, q: "[F](3x-9)/4[F]-[F](x-2)/3[F]", ans: "[F](5x - 19)/12[F]", c: ["-[F](5x - 35)/12[F]", "[F](5x - 19)/12[F]", "[F](5x - 11)/12[F]", "[F](x - 19)/12[F]"], exp: { "[F](5x - 19)/12[F]": "正解。12で通分して分子を引きます。{3(3x-9) - 4(x-2)}/12 = (9x - 27 - 4x + 8)/12 = (5x - 19)/12 です。" } },
+            { wave: 3, q: "【入試問題】昨年度の参加者は男子 a 人、女子 b 人。今年度は昨年度と比べ、男子は9%増え、女子は7%減った。今年度の男女の総参加者数を a, b の式で表しなさい。", ans: "1.09a + 0.93b", c: ["1.09a + 0.93b", "0.09a - 0.07b", "1.09a - 0.93b", "1.9a + 0.7b"], exp: { "1.09a + 0.93b": "正解。男子は 1.09a 人、女子は (1 - 0.07)b = 0.93b 人となり、その合計を表します。" } },
+            { wave: 3, q: "1辺に n 個 of 碁石を並べて正方形を作る。図2のように「L字型に(n-1)個の塊が4つある」と捉えたけいたさんの考えを表す式を選びなさい。", ans: "(n - 1) × 4", c: ["n × 4 - 4", "(n - 1) × 4", "n × 2 + (n - 2) × 2", "(n - 2) × 4 + 4"], exp: { "(n - 1) × 4": "正解。(n-1)個ずつのL字の塊が、正方形の4辺を過不足なく構成しているためこの式になります。" } },
+            { wave: 3, q: "x = -2, y = [F]1/3[F] のとき、-3x-9y[P]2[P]の値を求めなさい。", ans: "5", c: ["7", "5", "3", "1"], exp: { "5": "正解。慎重に代入します。 -3(-2) - 9([F]1/3[F])[P]2[P] = 6 - 9([F]1/9[F]) = 6 - 1 = 5 となります。" } },
+            { wave: 3, q: "[F]1/2[F](x-4)-[F]2/3[F](3x-6)の計算結果を選びなさい。", ans: "-[F]3/2[F]x + 2", c: ["-[F]3/2[F]x - 2", "-[F]3/2[F]x + 2", "-[F]5/2[F]x + 2", "-[F]3/2[F]x + 6"], exp: { "-[F]3/2[F]x + 2": "正解。分配してまとめします。([F]1/2[F]x - 2) - (2x - 4) = -[F]3/2[F]x + 2 です。" } },
+            { wave: 3, q: "【入試問題改】昨年度のボランティア総参加者は M 人。今年度は男子が5%増え、女子が5%減ったため、全体の人数に変化があった。今年度の総人数を M と男子の数 x を使って表しなさい。", ans: "M + 0.1x - 0.05M", c: ["変化なし", "M + 0.1x - 0.05M", "1.05M", "0.95M"], exp: { "M + 0.1x - 0.05M": "正解。男子増分 0.05x、女子減分 -0.05(M-x)。これを元のMに加算して整理するとこの式になります。" } },
+            { wave: 3, q: "3(2a-b)-2(3a-4b)を計算しなさい。", ans: "5b", c: ["12a + 5b", "5b", "-5b", "12a - 11b"], exp: { "5b": "正解。分配して展開すると 6a - 3b - 6a + 8b = 5b となり、文字aの項は綺麗に消去されます。" } },
+            { wave: 3, q: "底面が半径 r cmの円、高さが h cmの円錐の体積を文字式のルールに従って表しなさい。", ans: "[F]πr[P]2[P]h/3[F]", c: ["πr[P]2[P]h", "[F]πr[P]2[P]h/3[F]", "[F]2πrh/3[F]", "3πr[P]2[P]h"], exp: { "[F]πr[P]2[P]h/3[F]": "正解。円錐の体積は、底面積(πr[P]2[P]) × 高さ(h) × [F]1/3[F] で求められます。" } }
+        ],
+        3: [
+            { wave: 1, q: "方程式を解きなさい。x + 4 = 1", ans: "x = -3", c: ["x = 5", "x = -3", "x = 3", "x = -5"], exp: { "x = -3": "正解。左辺の+4を右辺に移項して 1 - 4 = -3 となります。", "x = 5": "移項時の符号変え忘れミス（1 + 4 = 5）です。", "x = 3": "計算ミスです。", "x = -5": "計算ミスです。" } },
+            { wave: 1, q: "方程式を解きなさい。7x = 4x + 6", ans: "x = 2", c: ["x = -2", "x = 2", "x = [F]6/11[F]", "x = 6"], exp: { "x = 2": "正解。4xを左辺に移項して 3x = 6 ➔ 両辺を3で割って x = 2 です。", "x = -2": "符号ミスです。", "x = [F]6/11[F]": "移項時の符号ミス、または加算エラーです。", "x = 6": "計算ミスです。" } },
+            { wave: 1, q: "方程式を解きなさい。4x - 3 = 2x + 1", ans: "x = 2", c: ["x = -1", "x = 2", "x = -2", "x = 1"], exp: { "x = 2": "正解。文字項と定数項をそれぞれ移項して 2x = 4 ➔ x = 2 となります。", "x = -1": "計算ミスです。", "x = -2": "符号ミスです。", "x = 1": "計算ミスです。" } },
+            { wave: 1, q: "方程式を解きなさい。-5 - 8x = -5", ans: "x = 0", c: ["x = -1.25", "x = 0", "x = [F]5/4[F]", "x = 不能"], exp: { "x = 0": "正解。左辺の-5を右辺に移項すると -8x = 0 となるため、解は x = 0 です。", "x = -1.25": "計算ミスです。", "x = [F]5/4[F]": "計算ミスです。", "x = 不能": "「0で割る計算（不能）」との混同です。0を割ることは可能です。" } },
+            { wave: 1, q: "方程式を解きなさい。2x + 15 = 1 - 6x", ans: "x = -[F]7/4[F]", c: ["-[F]7/4[F]", "[F]7/4[F]", "-[F]2/1[F]", "-[F]7/2[F]"], exp: { "-[F]7/4[F]": "正解。移項してまとめると 8x = -14 となり、x = -14/8 = -7/4 となります。", "[F]7/4[F]": "符号ミス。移項時の符号処理が正しくありません。", "-[F]2/1[F]": "計算ミスです。", "-[F]7/2[F]": "約分ミスです。" } },
+            { wave: 1, q: "方程式を解きなさい。6x - 21 = 4x + 7", ans: "x = 14", c: ["x = -7", "x = 14", "x = 7", "x = -14"], exp: { "x = 14": "正解。移項して 2x = 28 ➔ 両辺を2で割って x = 14 です。", "x = -7": "計算ミスです。", "x = 7": "計算ミスです。", "x = -14": "符号ミスです。" } },
+            { wave: 1, q: "-7x + 8 = -x - 7", ans: "x = [F]5/2[F]", c: ["-[F]5/2[F]", "[F]5/2[F]", "-[F]1/2[F]", "[F]15/8[F]"], exp: { "[F]5/2[F]": "正解。移項して -6x = -15 となり、x = -15/-6 = 5/2 となります。", "-[F]5/2[F]": "符号ミス。同符号の除算は正になります。", "-[F]1/2[F]": "計算ミスです。", "[F]15/8[F]": "移項および計算のミスです。" } },
+            { wave: 1, q: "比例式を解きなさい。16 : x = 4 : 5", ans: "x = 20", c: ["x = [F]4/5[F]", "x = 20", "x = 80", "x = 15"], exp: { "x = 20": "正解。「内項の積＝外項の積」より、 4x = 80 ➔ x = 20 となります。", "x = [F]4/5[F]": "比の性質の誤解です。", "x = 80": "外項の積のみを計算したミスです。", "x = 15": "計算ミスです。" } },
+            { wave: 1, q: "比例式を解きなさい。9 : 6 = x : 8", ans: "x = 12", c: ["x = 3", "x = 12", "x = 16", "x = 54"], exp: { "x = 12": "正解。 6x = 72 ➔ x = 72/6 = 12 となります。", "x = 3": "計算ミスです。", "x = 16": "比の計算ミスです。", "x = 54": "計算ミスです。" } },
+            { wave: 1, q: "方程式を解きなさい。3x = -15", ans: "x = -5", c: ["x = 5", "x = -5", "x = -12", "x = -18"], exp: { "x = -5": "正解。両辺を3で除算します。", "x = 5": "符号ミスです。", "x = -12": "減算との混同です。", "x = -18": "加算との混同です。" } },
+            { wave: 1, q: "方程式を解きなさい。-x = 8", ans: "x = -8", c: ["x = 8", "x = -8", "x = [F]1/8[F]", "-[F]1/8[F]"], exp: { "x = -8": "正解。両辺に-1を掛け算します。", "x = 8": "符号変え忘れミスです。", "x = [F]1/8[F]": "逆数にしてしまうミスです。", "-[F]1/8[F]": "逆数および符号のミスです。" } },
+            { wave: 1, q: "[F]x/5[F] = -2", ans: "x = -10", c: ["x = -3", "x = -10", "x = 10", "-[F]2/5[F]"], exp: { "x = -10": "正解。分母を払うために両辺に5を掛けます。", "x = -3": "加算との混同です。", "x = 10": "符号ミスです。", "-[F]2/5[F]": "除算の混同ミスです。" } },
+            { wave: 1, q: "方程式を解きなさい. 5x + 2 = 12", ans: "x = 2", c: ["x = -2", "x = 2", "[F]14/5[F]", "[F]2/5[F]"], exp: { "x = 2": "正解。5x = 10 ➔ x = 2 です。", "x = -2": "符号ミスです。", "[F]14/5[F]": "移項時の符号ミス（12 + 2）です。", "[F]2/5[F]": "計算ミスです。" } },
+            { wave: 1, q: "方程式を解きなさい。3 - x = 7", ans: "x = -4", c: ["x = 4", "x = -4", "x = 10", "x = -10"], exp: { "x = -4": "正解。-x = 4 ➔ x = -4 となります。", "x = 4": "符号ミスです。", "x = 10": "加算エラーです。", "x = -10": "計算ミスです。" } },
+            { wave: 1, q: "方程式を解きなさい。2x = x - 3", ans: "x = -3", c: ["x = 3", "x = -3", "x = -1.5", "x = -4"], exp: { "x = -3": "正解。xを左辺に移項して 2x - x = -3 ➔ x = -3 です。", "x = 3": "符号ミスです。", "x = -1.5": "除算の混同ミスです。", "x = -4": "計算ミスです。" } },
+            { wave: 1, q: "方程式を解きなさい。-3x + 1 = 10", ans: "x = -3", c: ["x = 3", "x = -3", "-[F]11/3[F]", "[F]11/3[F]"], exp: { "x = -3": "正解。-3x = 9 ➔ x = -3 です。", "x = 3": "符号ミスです。", "-[F]11/3[F]": "移項時の符号ミス（10 + 1）です。", "[F]11/3[F]": "移項時の符号ミスおよび全体の符号ミスです。" } },
+            { wave: 1, q: "方程式を解きなさい。8x - 5 = 3x", ans: "x = 1", c: ["x = -1", "x = 1", "[F]5/11[F]", "[F]5/5[F]"], exp: { "x = 1": "正解。移項して 5x = 5 ➔ x = 1 です。", "x = -1": "符号ミスです。", "[F]5/11[F]": "移項時の符号ミス、または加算エラーです。", "[F]5/5[F]": "表記ミス、または計算エラーです。" } },
+            { wave: 1, q: "方程式を解きなさい。2x - 7 = -3", ans: "x = 2", c: ["x = -2", "x = 2", "x = 5", "x = -5"], exp: { "x = 2": "正解。2x = 4 ➔ x = 2 となります。", "x = -2": "符号ミスです。", "x = 5": "移項時の加算ミスです。", "x = -5": "計算ミスです。" } },
+            { wave: 1, q: "方程式を解きなさい。-5x = 20", ans: "x = -4", c: ["x = 4", "x = -4", "x = -15", "x = -25"], exp: { "x = -4": "正解。両辺を-5で割ります。", "x = 4": "符号ミスです。", "x = -15": "減算との混同です。", "x = -25": "加算との混同です。" } },
+            { wave: 1, q: "方程式 5x = 2x - 5 ➔ 5x - 2x = -5 への変形が正しいとされる理由を選びなさい。", ans: "等式の性質（移項）", c: ["等式の性質（移項）", "分配法則の適用", "分母の払合", "比例式の基本性質"], exp: { "等式の性質（移項）": "正解。符号を反転させて逆の辺に項を移動する、等式の基本性質です。", "分配法則の適用": "誤り。分配法則はカッコを展開する際に使用する規則です。", "分母の払合": "誤り。分数の方程式で分母を消去する操作のことです。", "比例式の基本性質": "誤り。内項の積と外項の積に関する性質です。" } },
+
+            // --- WAVE 2 ---
+            { wave: 2, q: "方程式を解きなさい。2(3x-1)=3x+5", ans: "x = [F]7/3[F]", c: ["x = -[F]7/3[F]", "x = [F]7/3[F]", "x = 1", "x = 2"], exp: { "x = [F]7/3[F]": "正解。分配して 6x - 2 = 3x + 5 ➔ 3x = 7 ➔ x = 7/3 となります。", "x = -[F]7/3[F]": "移項にともなう符号ミスです。", "x = 1": "計算ミスです。", "x = 2": "計算ミスです。" } },
+            { wave: 2, q: "方程式を解きなさい。3(x-2)-(1+x)=13", ans: "x = 10", c: ["x = 5", "x = 10", "x = 8", "x = -10"], exp: { "x = 10": "正解。展開して 3x - 6 - 1 - x = 13 ➔ 2x - 7 = 13 ➔ 2x = 20 ➔ x = 10 です。", "x = 5": "カッコの外し方、または符号のミスです。", "x = 8": "計算ミスです。", "x = -10": "最終的な符号ミスです。" } },
+            { wave: 2, q: "方程式を解きなさい。3x-2(4x-3)=-24", ans: "x = 6", c: ["x = -6", "x = 6", "x = [F]18/5[F]", "x = -[F]18/5[F]"], exp: { "x = 6": "正解。展開時の符号注意。 3x - 8x + 6 = -24 ➔ -5x = -30 ➔ x = 6 です。", "x = -6": "符号のミス。負÷負は正になります。", "x = [F]18/5[F]": "分配法則時の符号ミス（-2×(-3)を-6としたエラー）です。", "x = -[F]18/5[F]": "分配時の符号ミスおよび最終符号ミスです。" } },
+            { wave: 2, q: "方程式を解きなさい（小数）。2.3x+0.5=1.9x+2.3", ans: "x = 4.5", c: ["x = 0.45", "x = 4.5", "x = -4.5", "x = 7"], exp: { "x = 4.5": "正解。両辺を10倍して 23x + 5 = 19x + 23 ➔ 4x = 18 ➔ x = 18/4 = 4.5 となります。", "x = 0.45": "10倍した後の帳尻合わせを余計に行ってしまった桁ミスです。", "x = -4.5": "移項時の符号ミスです。", "x = 7": "加減算のミスです。" } },
+            { wave: 2, q: "方程式を解きなさい（小数）。0.5x+3=0.42x+0.6", ans: "x = -30", c: ["x = -3", "x = 3", "x = -30", "x = 30"], exp: { "x = -30": "正解。両辺を100倍して 50x + 300 = 42x + 60 ➔ 8x = -240 ➔ x = -30 です。", "x = -3": "100倍する際、3を300にするのを忘れた（倍率の不一致）典型的なミスです。", "x = 3": "倍率ミスおよび符号ミスです。", "x = 30": "符号の取り違えミスです。" } },
+            { wave: 2, q: "方程式を解きなさい。30x+60=20x-100", ans: "x = -16", c: ["x = -4", "x = 4", "x = -16", "x = 16"], exp: { "x = -16": "正解。移項して 10x = -160 ➔ x = -16 です。", "x = -4": "移項時の符号ミス（-100+60など）によるエラーです。", "x = 4": "移項時の符号ミスです。", "x = 16": "全体の符号ミスです。" } },
+            { wave: 2, q: "方程式を解きなさい。100(y+1)=60(y+15)", ans: "y = 20", c: ["y = -20", "y = 20", "y = 35", "y = 10"], exp: { "y = 20": "正解。両辺を20で除算して簡略化します。 5(y+1) = 3(y+15) ➔ 2y = 40 ➔ y = 20 です。", "y = -20": "移項にともなう符号ミスです。", "y = 35": "展開・計算のミスです。", "y = 10": "計算ミスです。" } },
+            { wave: 2, q: "比例式を解きなさい。x : 0.3 = 100 : 0.2", ans: "x = 150", c: ["x = 15", "x = 150", "x = 6", "x = 60"], exp: { "x = 150": "正解。外項・内項の積より 0.2x = 30 ➔ 2x = 300 ➔ x = 150 となります。", "x = 15": "小数点の位置（桁数）を間違えてしまったミスです。", "x = 6": "比の性質の誤解、または計算ミスです。", "x = 60": "計算ミスです。" } },
+            { wave: 2, q: "比例式を解きなさい。x : (14-x) = 3 : 4", ans: "x = 6", c: ["x = 42", "x = 6", "x = -42", "x = 14"], exp: { "x = 6": "正解。 4x = 3(14 - x) ➔ 4x = 42 - 3x ➔ 7x = 42 ➔ x = 6 です。", "x = 42": "カッコ内のxへの分配、あるいは移項を忘れたミスです。", "x = -42": "符号のミスです。", "x = 14": "計算ミスです。" } },
+            { wave: 2, q: "新定義「*」の計算ルール： a * b = a + ab - b。3 * x = 11 のとき、xの値を求めなさい。", ans: "x = 4", c: ["x = 2", "x = 4", "x = -4", "x = 1"], exp: { "x = 4": "正解。定義に当てはめて 3 + 3x - x = 11 ➔ 2x = 8 ➔ x = 4 となります。", "x = 2": "計算ミスです。", "x = -4": "符号ミスです。", "x = 1": "代入・展開のエラーです。" } },
+            { wave: 2, q: "方程式を解きなさい。[F]x/5[F]=[F]x/10[F]-2", ans: "x = -20", c: ["x = 20", "x = -20", "x = -10", "x = 10"], exp: { "x = -20": "正解。両辺を10倍して分母を払います。 2x = x - 20 ➔ x = -20 です。", "x = 20": "分母を払う際、右辺の定数「-2」に10を掛け忘れたか、符号のミスです。", "x = -10": "倍率の計算ミスです。", "x = 10": "計算ミスです。" } },
+            { wave: 2, q: "方程式を解きなさい。[F](x+3)/3[F]=[F]x/2[F]", ans: "x = 6", c: ["x = -6", "x = 6", "x = 3", "x = 12"], exp: { "x = 6": "正解。両辺を6倍して 2(x+3) = 3x ➔ 2x + 6 = 3x ➔ x = 6 となります。", "x = -6": "最後の移項、または符号処理のミスです。", "x = 3": "分子の展開ミスです。", "x = 12": "計算ミスです。" } },
+            { wave: 2, q: "方程式を解きなさい。[F](2x-1)/2[F]-[F](x+1)/3[F]=1", ans: "x = [F]11/4[F]", c: ["x = -[F]11/4[F]", "x = [F]11/4[F]", "x = [F]5/4[F]", "x = [F]7/4[F]"], exp: { "x = [F]11/4[F]": "正解。全項を6倍します。 3(2x-1) - 2(x+1) = 6 ➔ 6x - 3 - 2x - 2 = 6 ➔ 4x = 11 ➔ x = 11/4 です。", "x = -[F]11/4[F]": "最終的な符号ミスです。", "x = [F]5/4[F]": "後ろの分子へのマイナス分配漏れ（-2×(+1)を+2とした）による典型的なミスです。", "x = [F]7/4[F]": "右辺の「1」に6を掛け忘れた（1のまま処理した）ミスです。" } },
+            { wave: 2, q: "方程式を解きなさい。[F]3/4[F]x-[F]1/3[F]=[F]2/3[F]x+2", ans: "x = 28", c: ["x = -28", "x = 28", "x = 14", "x = 7"], exp: { "x = 28": "正解。両辺を12倍して分母を完全に払います。 9x - 4 = 8x + 24 ➔ x = 28 となります。", "x = -28": "移項時の符号ミスです。", "x = 14": "倍率、または通分の計算ミスです。", "x = 7": "計算ミスです。" } },
+            { wave: 2, q: "方程式を解きなさい。[F]1/2[F](3x-2)=[F]1/3[F](x-3)", ans: "x = 0", c: ["x = 2", "x = -2", "x = 0", "x = 1"], exp: { "x = 0": "正解。両辺を6倍して 3(3x-2) = 2(x-3) ➔ 9x - 6 = 2x - 6 ➔ 7x = 0 ➔ x = 0 です。", "x = 2": "定数項の消去時にミスが発生しています。", "x = -2": "計算ミスです。", "x = 1": "移項エラーです。" } },
+            { wave: 2, q: "方程式を解きなさい。[F](x-4)/9[F]=x+7", ans: "x = -[F]67/8[F]", c: ["x = -[F]67/8[F]", "x = [F]67/8[F]", "x = -[F]59/8[F]", "x = [F]59/8[F]"], exp: { "x = -[F]67/8[F]": "正解。9倍して x - 4 = 9(x + 7) ➔ x - 4 = 9x + 63 ➔ -8x = 67 ➔ x = -67/8 となります。", "x = [F]67/8[F]": "全体の符号ミスです。", "x = -[F]59/8[F]": "右辺の7に9を掛け忘れたか、定数項の合算ミス（63 - 4 = 59とした）です。", "x = [F]59/8[F]": "定数項の合算ミスおよび符号ミスです。" } },
+            { wave: 2, q: "方程式を解きなさい。5x - 7 = 2x + 8", ans: "x = 5", c: ["x = -5", "x = 5", "x = 1", "x = [F]15/7[F]"], exp: { "x = 5": "正解。移項して 3x = 15 ➔ x = 5 となります。", "x = -5": "符号ミスです。", "x = 1": "移項時の符号ミス（8 - 7）によるエラーです。", "x = [F]15/7[F]": "文字項の加算ミス（5x + 2x = 7x）によるエラーです。" } },
+            { wave: 2, q: "方程式を解きなさい。4 - 3x = 2x - 1", ans: "x = 1", c: ["x = -1", "x = 1", "x = [F]3/5[F]", "x = 5"], exp: { "x = 1": "正解。移項して -5x = -5 ➔ x = 1 です。", "x = -1": "符号ミスです。-5 ÷ -5 は正の1になります。", "x = [F]3/5[F]": "定数項の移項ミス（4 - 1 = 3）によるエラーです。", "x = 5": "計算ミスです。" } },
+            { wave: 2, q: "方程式を解きなさい。0.2x - 0.5 = 0.1x + 0.3", ans: "x = 8", c: ["x = 0.8", "x = 8", "x = -8", "x = 80"], exp: { "x = 8": "正解。10倍して 2x - 5 = x + 3 ➔ x = 8 です。", "x = 0.8": "10倍した後に余計に10で割ってしまった桁ミスです。", "x = -8": "移項にともなう符号ミスです。", "x = 80": "100倍して計算してしまったか、桁のミスです。" } },
+            { wave: 2, q: "新定義のルール： a * b = a + ab - b。2 * (-3) の値を求めなさい。", ans: "-1", c: ["-7", "-5", "5", "-1"], exp: { "-1": "正解。定義通りに 2 + 2(-3) - (-3) = 2 - 6 + 3 = -1 と展開されます。", "-7": "最後の「- b」のマイナス処理ミス（-3のまま引いて -2 とした）です。", "-5": "乗算や符号のミスです。", "5": "全体の符号処理が歪んでしまったミスです。" } },
+
+            // --- WAVE 3 ---
+            { wave: 3, q: "値札の3割引きから、さらに150円値引きしてくれたので、結果的に値札の半額([F]1/2[F])の値段で購入することができた。値札に書かれていた本来の金額を求めなさい。", ans: "750円", c: ["500円", "750円", "1500円", "1000円"], exp: { "750円": "正解。元の値段をxとすると、 0.7x - 150 = 0.5x ➔ 0.2x = 150 ➔ 2x = 1500 ➔ x = 750円となります。", "500円": "立式、または計算のミスです。", "1500円": "計算途中の2倍処理などのズレです。", "1000円": "計算ミスです。" } },
+            { wave: 3, q: "体育館の長いすに生徒を4人ずつ座らせると12人が座れず、5人ずつ座らせると最後の1脚には2人だけが座ることになった。このときの全生徒数を求めなさい。", ans: "72人", c: ["15人", "72人", "60人", "84人"], exp: { "72人": "正解。椅子の数をxとすると、 4x + 12 = 5(x - 1) + 2 ➔ 4x + 12 = 5x - 3 ➔ x = 15脚。全生徒数は 4(15) + 12 = 72人です。", "15人": "問題文の読み落とし。求めた「長いすの数（15脚）」をそのまま答えてしまっています。", "60人": "余りの人数（12人）の足し忘れ、または立式ミスです。", "84人": "条件の取り違えによる計算ミスです。" } },
+            { wave: 3, q: "クリスマス会の参加者から1人550円ずつ集めると計画予算より950円少なく、1人600円ずつ集めると計画予算より600円多く集まる。参加者の人数を求めなさい。", ans: "31人", c: ["15人", "31人", "25人", "40人"], exp: { "31人": "正解。人数をxとすると、 550x + 950 = 600x - 600 ➔ 50x = 1550 ➔ x = 31人となります。", "15人": "計算途中の数値ミスです。", "25人": "過不足の加減（950と600の処理）を間違えた立式ミスです。", "40人": "計算ミスです。" } },
+            { wave: 3, q: "家から図書館へ時速15kmで進むと開館15分前に到着し、時速8kmで進むと開館20分後に到着する。家から図書館までの道のりを求めなさい。", ans: "10km", c: ["5km", "10km", "15km", "20km"], exp: { "10km": "正解。道のりをxとすると、時間＝道のり/速さ より、 x/15 + 15/60 = x/8 - 20/60 ➔ 24倍して 8x + 30 = 15x - 40 ➔ 7x = 70 ➔ x = 10km となります。", "5km": "単位（分を時間に直す処理）の落とし穴による計算ミスです。", "15km": "計算ミスです。", "20km": "倍率処理のミスです。" } },
+            { wave: 3, q: "重さが異なる3個のおもりA, B, Cと、重さが120gのおもりDがある。A, B, Cの重さは順に50gずつ重くなっており、4つの合計は540gである。おもりCの重さを求めなさい。", ans: "190g", c: ["90g", "140g", "190g", "240g"], exp: { "190g": "正解。A+B+C = 540 - 120 = 420g。Aを基準とすると A + (A+50) + (A+100) = 420 ➔ 3A + 150 = 420 ➔ A=90g。求めたいCは A+100 なので 190g です。", "90g": "最も軽いおもりAの重さをそのまま答えてしまった、問題文の読み落としミスです。", "140g": "中央のおもりBの重さを答えてしまったミスです。", "240g": "計算途中のスライドミスです。" } }
+        ],
+        4: [
+            // 第4章：変化と対応（WAVE 1: 20問、WAVE 2: 20問、WAVE 3: 10問 = 計50問完全新規追加プール）
+            { wave: 1, q: "次のxとyの関係を式に表しなさい。\n面積が12cm[P]2[P]である三角形の底辺 x cm と高さ y cm", ans: "y = [F]24/x[F]", c: ["y = [F]12/x[F]", "y = [F]24/x[F]", "y = 12x", "y = 24x"], exp: { "y = [F]24/x[F]": "正解。三角形の面積公式は 底辺×高さ÷2 = 12 ➔ x × y ÷ 2 = 12 ➔ xy = 24 ➔ y = 24/x となります [cite: 297]。", "y = [F]12/x[F]": "公式の割る2を忘れてしまった典型的な反比例ミスです [cite: 297]。", "y = 12x": "比例と反比例を混同してしまったミスです [cite: 296, 297]。" } },
+            { wave: 1, q: "次のxとyの関係を式に表しなさい。\n1本70円のペンを x 本買ったときの代金 y 円", ans: "y = 70x", c: ["y = [F]70/x[F]", "y = 70x", "y = x + 70", "y = [F]x/70[F]"], exp: { "y = 70x": "正解。代金は 単価 × 本数 に比例するため、 y = 70x となります [cite: 298]。", "y = [F]70/x[F]": "反比例と比例を誤認してしまっているミスです [cite: 296, 298]。" } },
+            { wave: 1, q: "次のxとyの関係を式に表しなさい。\n周の長さが16cmの長方形で、横の長さを x cm としたときの縦の長さ y cm", ans: "y = 8 - x", c: ["y = 16 - x", "y = 8 - x", "y = [F]16/x[F]", "y = [F]8/x[F]"], exp: { "y = 8 - x": "正解。縦と横の和は周の長さの半分（16 ÷ 2 = 8cm）になるため、 x + y = 8 ➔ y = 8 - x となります [cite: 299, 300]。", "y = 16 - x": "周の長さそのものから横を引いてしまったミスです。縦と横は2本ずつあります [cite: 299]。", "y = [F]16/x[F]": "面積の関係（反比例）と混同してしまったミスです [cite: 297, 299]。" } },
+            { wave: 1, q: "y は x に比例し、x = 9 のとき y = 3 です。\nx と y の関係を正しい式で表しなさい。", ans: "y = [F]1/3[F]x", c: ["y = 3x", "y = [F]1/3[F]x", "y = [F]27/x[F]", "y = [F]3/x[F]"], exp: { "y = [F]1/3[F]x": "正解。比例の基本式 y = ax に代入して 3 = 9a ➔ a = 1/3 と定数を求めます [cite: 302, 303]。", "y = 3x": "比例定数の割り算を逆（a = 9÷3）にしてしまった典型的なミスです [cite: 302]。", "y = [F]27/x[F]": "比例ではなく反比例の式に代入してしまったミスです [cite: 302, 339]。" } },
+            { wave: 1, q: "反比例の関係 y = [F]a/x[F] のグラフが点(1, 4)を通るとき、\n比例定数 a の値を求めなさい。", ans: "a = 4", c: ["a = [F]1/4[F]", "a = 4", "a = -4", "a = 5"], exp: { "a = 4": "正解。 y = a/x に x = 1, y = 4 を代入して 4 = a/1 ➔ a = 4 となります [cite: 339, 341]。", "a = [F]1/4[F]": "xとyの代入位置を逆（a = x/y）と勘違いしてしまった分数ミスです [cite: 340, 341]。" } },
+            { wave: 1, q: "比例の関係 y = ax のグラフが点(3, 4)を通るとき、\n比例定数 a の値を求めなさい。", ans: "a = [F]4/3[F]", c: ["a = [F]3/4[F]", "a = [F]4/3[F]", "a = 12", "a = -[F]4/3[F]"], exp: { "a = [F]4/3[F]": "正解。 4 = 3a ➔ a = 4/3 となります [cite: 306, 308, 363, 365]。", "a = [F]3/4[F]": "比例定数を a = x/y と上下逆にして求めてしまったミスです [cite: 306, 363]。" } },
+            { wave: 1, q: "座標平面において、点Aの座標が (3, -2) のとき、\nx軸に関して対称な点A'の座標を求めなさい。", ans: "(3, 2)", c: ["(-3, -2)", "(3, 2)", "(-3, 2)", "(2, -3)"], exp: { "(3, 2)": "正解。x軸対称移動では、x座標は不変で、y座標の符号が反転します。", "(-3, -2)": "y軸対称（xの符号反転）と混同してしまっているミスです。" } },
+            { wave: 1, q: "座標平面において、点Bの座標が (-4, 5) のとき、\n原点に関して対称な点B'の座標を求めなさい。", ans: "(4, -5)", c: ["(4, 5)", "(-4, -5)", "(4, -5)", "(5, -4)"], exp: { "(4, -5)": "正解。原点対称移動では、x座標・y座標ともに符号が反転します。" } },
+            { wave: 1, q: "y = -2x のグラフ上に存在する点の座標を選びなさい。", ans: "(-3, 6)", c: ["(3, 6)", "(-3, 6)", "(-2, -4)", "(4, -2)"], exp: { "(-3, 6)": "正解。 x = -3 を代入すると y = -2 × (-3) = 6 となり一致します。", "(3, 6)": "符号ミス。 x = 3 のときは y = -6 にならなければなりません。" } },
+            { wave: 1, q: "y = [F]12/x[F] のグラフ上に存在する点の座標を選びなさい。", ans: "(-2, -6)", c: ["(2, -6)", "(-2, -6)", "(-3, 4)", "(12, 0)"], exp: { "(-2, -6)": "正解。xとyの積が比例定数12になる必要があります。 (-2) × (-6) = 12 です。", "(2, -6)": "積が-12になってしまうため、符号が異なります。" } },
+            { wave: 1, q: "y は x に比例し、比例定数が -5 のとき、\nx = -3 のときの y の値を求めなさい。", ans: "15", c: ["-15", "15", "[F]5/3[F]", "[F]3/5[F]"], exp: { "15": "正解。 y = -5x に x = -3 を代入して y = -5 × (-3) = 15 となります。" } },
+            { wave: 1, q: "y は x に反比例し、比例定数が 24 のとき、\nx = -6 のときの y の値を求めなさい。", ans: "-4", c: ["4", "-4", "-144", "144"], exp: { "-4": "正解。 y = 24/x に x = -6 を代入して y = 24 / -6 = -4 です。", "-144": "反比例なのに掛け算（24 × (-6)）を行ってしまったミスです。" } },
+            { wave: 1, q: "次のうち、y が x に比例する関係のものを選びなさい。", ans: "時速5kmでx時間歩いたときの道のりy km", c: ["100ページの本をxページ読んだ残りのyページ", "時速5kmでx時間歩いたときの道のりy km", "面積が20cm[P]2[P]の長方形の縦x cmと横y cm", "30リットル入る水槽に毎分xリットルずつ入れる時の満水までの時間y分"], exp: { "時速5kmでx時間歩いたときの道のりy km": "正解。 y = 5x となり、純粋な比例関係です [cite: 296]。", "面積が20cm[P]2[P]の長方形の縦x cmと横y cm": "xy = 20 ➔ y = 20/x となり、これは反比例の関係です [cite: 296, 297]。" } },
+            { wave: 1, q: "次のうち、y が x に反比例する関係のものを選びなさい。", ans: "80円の切手をx枚買ったときの代金y円 ➔ これ比例、修正：", x: "1200mの道のりを分速x mで進むときにかかる時間y分", ans: "1200mの道のりを分速x mで進むときにかかる時間y分", c: ["1辺x cmの正方形の面積y cm[P]2[P]", "1200mの道のりを分速x mで進むときにかかる時間y分", "100円玉を出してx円の品物を買ったおつりy円", "身長x cmの人の体重y kg"], exp: { "1200mの道のりを分速x mで進むときにかかる時間y分": "正解。 時間 ＝ 道のり ÷ 速さ より y = 1200/x となり、反比例です [cite: 296]。", "1辺x cmの正方形の面積y cm[P]2[P]": "y = x[P]2[P] となり、これは2乗に比例する関数（1年範囲外）です。" } },
+            { wave: 1, q: "点A(-2, 3)は座標平面上のどの位置（象限）にありますか。", ans: "第2象限", c: ["第1象限", "第2象限", "第3象限", "第4象限"], exp: { "第2象限": "正解。x座標が負、y座標が正の領域は、左上の「第2象限」です。" } },
+            { wave: 1, q: "点B(4, -5)は座標平面上のどの位置（象限）にありますか。", ans: "第4象限", c: ["第1象限", "第2象限", "第3象限", "第4象限"], exp: { "第4象限": "正解。x座標が正、y座標が負の領域は、右下の「第4象限」です。" } },
+            { wave: 1, q: "y = [F]18/x[F] において、x 変域が 2 <= x <= 6 のとき、\ny の変域を求めなさい。", ans: "3 <= y <= 9", c: ["3 <= y <= 9", "2 <= y <= 6", "1/9 <= y <= 1/3", "9 <= y <= 3 (不等号逆)"], exp: { "3 <= y <= 9": "正解。 x=2 のとき y=9, x=6 のとき y=3。小さい順に並べて 3 <= y <= 9 とします。" } },
+            { wave: 1, q: "y = -3x において、x 変域が -1 <= x <= 3 のとき、\ny の変域を求めなさい。", ans: "-9 <= y <= 3", c: ["-3 <= y <= 9", "-9 <= y <= 3", "3 <= y <= -9", "-9 <= y <= -3"], exp: { "-9 <= y <= 3": "正解。 x=-1 のとき y=3, x=3 のとき y=-9。負の最大値が左端に来るため -9 <= y <= 3 です。" } },
+            { wave: 1, q: "比例の式 y = -[F]2/3[F]x のグラフの傾き（特徴）として\n正しい記述を選びなさい。", ans: "右下がりの直線", c: ["右上がりの直線", "右下がりの直線", "右上と左下の双曲線", "左上と右下の双曲線"], exp: { "右下がりの直線": "正解。比例定数が負の直線は、右下がりのグラフになります [cite: 306]。", "左上と右下の双曲線": "これは反比例（aが負）のグラフの特徴です。比例は直線になります [cite: 306, 339, 340]。" } },
+            { wave: 1, q: "反比例の式 y = [F]6/x[F] のグラフが存在する象限を選びなさい。", ans: "第1象限と第3象限", c: ["第1象限と第2象限", "第1象限と第3象限", "第2象限と第4象限", "すべての象限"], exp: { "第1象限と第3象限": "正解。反比例定数が正（+6）の場合、グラフ（双曲線）は右上（第1）と左下（第3）に現れます [cite: 339, 340]。" } },
+
+            // WAVE 2: 標準的な変域・座標・点判定の罠（20問）
+            { wave: 2, q: "y は x に反比例し、x = -4 のとき y = 5 です。\nx = 10 のときの y の値を求めなさい。", ans: "-2", c: ["-2", "2", "-8", "[F]25/2[F]"], exp: { "-2": "正解。 xy = -20 より比例定数 a = -20。 y = -20/10 = -2 となります [cite: 304, 305]。", "-8": "比例のロジック（y=ax）で計算してしまった際の間違いです [cite: 302, 304]。" } },
+            { wave: 2, q: "比例の関係 y = ax のグラフをかいたら点(12, -9)を通りました。\nこの直線上にあって、y座標が6である点のx座標を求めなさい。", ans: "-8", c: ["-8", "8", "-4.5", "-[F]9/2[F]"], exp: { "-8": "正解。 -9 = 12a ➔ a = -3/4。 式は y = -3/4 x。 6 = -3/4 x ➔ x = 6 × (-4/3) = -8 です [cite: 306, 310]。", "8": "符号の処理ミス。yが正なので、右下がりの直線上ではxは負になります [cite: 306, 310]。" } },
+            { wave: 2, q: "反比例の関係 y = [F]a/x[F] のグラフが点(1, 4)を通る双曲線であるとき、\nこの双曲線の上にあって、x座標が16である点のy座標を求めなさい。", ans: "[F]1/4[F]", c: ["4", "[F]1/4[F]", "64", "1/2"], exp: { "[F]1/4[F]": "正解。 4 = a/1 ➔ a = 4。 式は y = 4/x。 x = 16 のとき y = 4/16 = 1/4 です [cite: 339, 340, 344, 346]。", "64": "反比例なのに掛け算（4 × 16）を行ってしまったミスです [cite: 339, 344]。" } },
+            { wave: 2, q: "点A(3, 3), B(-3, 1), C(2, 3)の3点を頂点とする\n三角形ABCの面積を求めなさい(1目もり=1cm)。", ans: "1cm[P]2[P]", c: ["2cm[P]2[P]", "1cm[P]2[P]", "3cm[P]2[P]", "4cm[P]2[P]"], exp: { "1cm[P]2[P]": "正解。AとCのy座標が同じ(3)なので、ACを底辺とすると長さは 3 - 2 = 1cm。高さはy軸方向の距離 3 - 1 = 2cm。 1 × 2 ÷ 2 = 1cm[P]2[P] となります [cite: 348, 354]。", "2cm[P]2[P]": "三角形の面積公式の「割る2」を忘れてしまったミスです [cite: 354, 361]。" } },
+            { wave: 2, q: "y は x に比例し、x が 2 から 6 まで増加するとき、\ny は 8 から 24 まで増加します。x = -3 のときの y の値を求めなさい。", ans: "-12", c: ["-12", "12", "-4", "-6"], exp: { "-12": "正解。変化の割合（比例定数）は (24-8)/(6-2) = 16/4 = 4。 y = 4x に x = -3 を代入して -12 です。" } },
+            { wave: 2, q: "y = [F]a/x[F] において、x の値が 2 から 4 段階まで2倍になるとき、\ny の値はどのように変化しますか。", ans: "[F]1/2[F] になる", c: ["2倍になる", "[F]1/2[F] になる", "4倍になる", "変化しない"], exp: { "[F]1/2[F] になる": "正解。反比例の性質。xの値が2倍、3倍になると、yの値は1/2、1/3になります [cite: 296, 339]。" } },
+            { wave: 2, q: "点(0.5, 8)は、点(1, 4)を通る反比例の双曲線上にありますか。", ans: "ある", c: ["ある", "ない", "問題の条件だけでは決まらない", "原点を通る"], exp: { "ある": "正解。点(1, 4)を通ることから xy = 4（比例定数4）。 (0.5) × 8 = 4 となり満たします [cite: 339, 340, 342]。" } },
+            { wave: 2, q: "点(-16, 10)は、点(12, -9)を通る比例の直線上にありますか。", ans: "ない", c: ["ある", "ない", "原点でのみ交わる", "計算不能"], exp: { "ない": "正解。比例定数は -9/12 = -3/4。 y = -3/4 x に x = -16 を代入すると y = 12 となり、10とは一致しません [cite: 306, 309]。" } },
+            { wave: 2, q: "y = [F]a/x[F] のグラフで、a = -12 のとき、\nx 座標、y 座標がともに整数である点は全部でいくつありますか。", ans: "12個", c: ["6個", "12個", "8個", "24個"], exp: { "120個...直しました12個": "正解。-12の約数の個数を調べます。12の約数は 1,2,3,4,6,12 の6個。正負を考慮して 6 × 2 = 12個の組み合わせが存在します。" } },
+            { wave: 2, q: "y = 4x のグラフと y = [F]16/x[F] のグラフの、\n第1象限における交点の座標を求めなさい。", ans: "(2, 8)", c: ["(4, 16)", "(2, 8)", "(1, 4)", "(2, 4)"], exp: { "(2, 8)": "正解。 4x = 16/x ➔ 4x[P]2[P] = 16 ➔ x[P]2[P] = 4。第1象限なので x = 2。 y = 4(2) = 8 です。" } },
+            { wave: 2, q: "水槽に毎分3リットルずつ水を入れるとき、x分後の水の量をyリットルとする。\nxの変域が 0 <= x <= 15 のとき、yの変域を求めなさい。", ans: "0 <= y <= 45", c: ["0 <= y <= 15", "0 <= y <= 45", "3 <= y <= 45", "0 <= y <= 5"], exp: { "0 <= y <= 45": "正解。式は y = 3x。 x=0 のとき y=0, x=15 のとき y=45 となります。" } },
+            { wave: 2, q: "20本の鉛筆を、x人に均等にy本ずつ配る時の関係式を求めなさい。\nただし全員に少なくとも1本は配るものとする。", ans: "y = [F]20/x[F]", c: ["y = 20x", "y = [F]20/x[F]", "y = 20 - x", "y = x - 20"], exp: { "y = [F]20/x[F]": "正解。 人数 × 1人分の本数 ＝ 20 より、 xy = 20 ➔ y = 20/x となり反比例です。" } },
+            { wave: 2, q: "y = -[F]3/4[F]x のグラフ上にあって、x 座標が -12 のときの\ny 座標の値を求めなさい。", ans: "9", c: ["-9", "9", "-16", "16"], exp: { "9": "正解。 y = -3/4 × (-12) = 9 となります。負×負は正です [cite: 306]。" } },
+            { wave: 2, q: "y は x に比例し、x = -2 のとき y = -6 です。\nx = 5 のときの y の値を求めなさい。", ans: "15", c: ["-15", "15", "-10", "10"], exp: { "15": "正解。 -6 = -2a ➔ a = 3。 式は y = 3x。 x = 5 のとき y = 15 です。" } },
+            { wave: 2, q: "y は x に反比例し、x = 3 のとき y = -4 です。\nx = -2 のときの y の値を求めなさい。", ans: "6", c: ["-6", "6", "-24", "12"], exp: { "6": "正解。 xy = -12 より比例定数は -12。 y = -12 / -2 = 6 となります。" } },
+            { wave: 2, q: "比例のグラフ y = 5x をy軸の正の方向に3だけ平行移動させた直線が\n点(2, k)を通るとき、kの値を求めなさい(1年応用外発展)。", ans: "13", c: ["10", "13", "7", "16"], exp: { "13": "正解。移動後の直線は y = 5x + 3。 x = 2 を代入して k = 10 + 3 = 13 です。" } },
+            { wave: 2, q: "反比例 y = [F]8/x[F] のグラフにおいて、xの値が 1 から 4 まで変化するときの\nyの値の変化量（yの減少量）を求めなさい。", ans: "6", c: ["2", "4", "6", "-6"], exp: { "6": "正解。 x=1 のとき y=8。 x=4 のとき y=2。 yの値は 8 から 2 に変化したため、減少量は 8 - 2 = 6 です [cite: 339]。" } },
+            { wave: 2, q: "y = [F]12/x[F] のx変域が -6 <= x <= -2 のとき、\nyの変域を正しく表したものを選びなさい。", ans: "-6 <= y <= -2", c: ["-2 <= y <= -6", "-6 <= y <= -2", "2 <= y <= 6", "-12 <= y <= -2"], exp: { "-6 <= y <= -2": "正解。 x=-6 のとき y=-2。 x=-2 のとき y=-6。小さい順に並べ替えて -6 <= y <= -2 とします。" } },
+            { wave: 2, q: "座標平面上で、点P(a, b)が第3象限にあるとき、\na と b の符号の組み合わせとして正しいものを選びなさい。", ans: "a < 0, b < 0", c: ["a > 0, b > 0", "a < 0, b > 0", "a < 0, b < 0", "a > 0, b < 0"], exp: { "a < 0, b < 0": "正解。左下のエリアである第3象限は、x座標(a)・y座標(b)ともに負になります。" } },
+            { wave: 2, q: "比例 y = [F]2/5[F]x のグラフ上で、x座標とy座標がともに整数となる点のうち、\n原点に最も近い点（原点を除く）のx座標を求めなさい。", ans: "5", c: ["2", "5", "10", "1"], exp: { "5": "正解。yが整数になるには、xが分母5の倍数である必要があります。よって最小の正の整数は5です。" } },
+
+            // WAVE 3: 複雑な二点間距離・比例反比例の複合・入試チャレンジ（10問）
+            { wave: 3, q: "【入試問題】関数 y = [F]a/x[F] のグラフ（点Oは原点）上に\n点A(3, 4)があります。比例定数 a の値を求めなさい。", ans: "12", c: ["7", "12", "[F]4/3[F]", "[F]3/4[F]"], exp: { "12": "正解。 y = a/x に x = 3, y = 4 を代入して 4 = a/3 ➔ a = 12 となります [cite: 352, 363, 365]。", "[F]4/3[F]": "比例の式（y=ax）と勘違いして計算してしまったミスです [cite: 306, 352]。" } },
+            { wave: 3, q: "【入試問題】y = [F]12/x[F] の双曲線上に点Qがあり、\n点Qを通りx軸に平行な直線とy軸との交点をRとする。\n点Qのx座標が大きくなる時、三角形OQRの面積はどのように変化するか。", ans: "一定である。", c: ["大きくなる。", "小さくなる。", "一定である。", "大きくなってから小さくなる。"], exp: { "一定である。": "正解。点Qの座標を (t, 12/t) とおくと、底辺ORの長さは 12/t、高さQRの長さは t。面積は t × (12/t) ÷ 2 = 6 となり、t（x座標）の値に関わらず常に6で一定です [cite: 363, 368, 371, 372, 373, 380]。" } },
+            { wave: 3, q: "【図書館と公園】図書館から西に2kmに公園、東に3kmに駅がある。\nけいた（公園へ分速50m）と、かりん（駅へ分速?m）が同時に出発した。\nグラフより、出発して8分後に2人は何m離れていますか。", ans: "1200m", c: ["400m", "800m", "1200m", "1600m"], exp: { "1200m": "正解。8分後、かりんの東方向の位置は+800m。けいたは西方向（マイナス）へ分速50mで進むため、8分後は -400mの位置。2人の距離は 800 - (-400) = 1200m です [cite: 312, 313, 321, 323, 327, 334, 335, 336]。" } },
+            { wave: 3, q: "【図書館と公園】かりんが東の駅（3km先）に着いたとき、\n西の公園（2km先）へ向かっていたけいたさんは、\n公園まであと何mのところにいますか。", ans: "500m", c: ["500m", "1500m", "1000m", "0m（到着している）"], exp: { "500m": "正解。かりんは8分で800m進む（分速100m）。3km(3000m)先の駅には 3000÷100=30分で到着。この30分間にけいたが進む距離は 50m×30=1500m。公園は2km(2000m)先なので、残りは 2000 - 1500 = 500m です [cite: 312, 313, 321, 327, 334, 337, 338]。" } },
+            { wave: 3, q: "比例 y = 3x の直線と 反比例 y = [F]12/x[F] の双曲線が\n第1象限で交わる点をP、第3象限で交わる点をQとする。\n線分PQの長さを求めなさい(三平方の定理の融合発展)。", ans: "4√10", c: ["2√10", "4√10", "8", "4√5"], exp: { "4√10": "正解。交点は 3x = 12/x ➔ x[P]2[P]=4 ➔ x=2。 P(2, 6), Q(-2, -6)。xの差は4, yの差は12。 PQ[P]2[P] = 4[P]2[P] + 12[P]2[P] = 16 + 144 = 160 ➔ PQ = √160 = 4√10 となります。" } },
+            { wave: 3, q: "y は x に比例し、z は y に反比例する関係がある。\nx = 2 のとき z = 6 である。x = 4 のときの z の値を求めなさい。", ans: "3", c: ["3", "12", "1.5", "6"], exp: { "3": "正解。 y = ax, z = b/y ➔ z = b/(ax) ➔ xz = b/a（一定）。 つまり z は x に反比例します。 2×6 = 12 より、 4×z = 12 ➔ z = 3 となります。" } },
+            { wave: 3, q: "y = [F]24/x[F] のグラフにおいて、x変域が -6 <= x <= -2 のときの\nyの最大値を M、最小値を m とするとき、M - m の値を求めなさい。", ans: "8", c: ["8", "-8", "12", "4"], exp: { "8": "正解。 x=-6 のとき y=-4。 x=-2 のとき y=-12。よって最大値 M = -4, 最小値 m = -12。 M - m = -4 - (-12) = 8 となります。" } },
+            { wave: 3, q: "原点Oと2点A(4, 2), B(2, 6)を頂点とする\n三角形OABの面積を求めなさい。", ans: "10", c: ["12", "10", "20", "14"], exp: { "10": "正解。2点を囲む長方形(4×6=24)から、外側の3つの直角三角形（4×2÷2=4, 2×6÷2=6, 2×4÷2=4）を引きます。 24 - 4 - 6 - 4 = 10 となります。" } },
+            { wave: 3, q: "比例 y = -2x の直線上にあり、x座標とy座標の絶対値の和が\n12である第4象限の点の座標を求めなさい。", ans: "(4, -8)", c: ["(-4, 8)", "(4, -8)", "(3, -6)", "(2, -4)"], exp: { "(4, -8)": "正解。第4象限なので x>0, y<0。 y = -2x より絶対値の比は 1:2。和が12なので |x|=4, |y|=8。よって (4, -8) です。" } },
+            { wave: 3, q: "反比例 y = [F]18/x[F] のグラフと、原点を通る直線が点A(3, 6)で交わっている。\nこの直線が双曲線と交わるもう一つの点Bの座標を求めなさい。", ans: "(-3, -6)", c: ["(3, -6)", "(-3, 6)", "(-3, -6)", "(-6, -3)"], exp: { "(-3, -6)": "正解。比例の直線と反比例の双曲線は、ともに原点に関して対称なグラフです。よって点A(3, 6)と対称な点Bは (-3, -6) になります [cite: 306, 339, 340]。" } }
+        ]
+    };
+
+    let examQuestions = [];
+    let currentIndex = 0;
+    let correctCount = 0;
+    let totalElapsedTime = 0;
+    
+    let questionTimer = 0;
+    let timerId = null;
+    let returnCount = 0;
+    let everReturnedInExam = false;
+    let lastSelectedChoice = "";
+    let currentStageNum = 1;
+
+    // 各章のユニーク称号データの定義（4章の4個を完全新規配列追加）
+    const badgeDefinitions = {
+        1: { clearName: "🔓 正負の旅人", sName: "🏆 正負の支配者", speedName: "⚡ ゼロ・グラビティ", ironName: "🛡 鉄の意思" },
+        2: { clearName: "🔓 式の開拓者", sName: "🏆 同類項の統治者", speedName: "⚡ 電光石火の分配", ironName: "🛡 孤高の代入" },
+        3: { clearName: "🔓 天秤の調律師", sName: "🏆 方程式の覇者", speedName: "⚡ 音速の移項", ironName: "🛡 完全なる均衡" },
+        4: { clearName: "🔓 関数の旅人", sName: "🏆 変化の統治者", speedName: "⚡ 神速の座標", ironName: "🛡 不動の直線" }
+    };
+
+    // 4章まで対応するようにループ上限を ch <= 4 へ拡張修正
+    function updateHomeUI() {
+        for (let ch = 1; ch <= 4; ch++) {
+            const clearBadge = document.getElementById(`badge-stage${ch}-clear`);
+            const sBadge = document.getElementById(`badge-stage${ch}-s`);
+            const speedBadge = document.getElementById(`badge-stage${ch}-speed`);
+            const ironBadge = document.getElementById(`badge-stage${ch}-iron`);
+            const selectBtn = document.getElementById(`stage-${ch}-select-btn`);
+            const names = badgeDefinitions[ch];
+
+            if (sessionStorage.getItem(`stage-${ch}-clear`) === 'true') {
+                clearBadge.className = 'badge clear-unlocked';
+                clearBadge.innerHTML = `${names.clearName}<br><span style="font-size:11px;color:#a7f3d0;">(STATUS: PASSED)</span>`;
+                if (selectBtn) selectBtn.style.borderLeftColor = 'var(--correct-color)';
+            } else {
+                clearBadge.className = 'badge';
+                clearBadge.innerHTML = `${names.clearName}<br><span style="font-size:11px;">(正答率90%以上)</span>`;
+            }
+
+            if (sessionStorage.getItem(`stage-${ch}-s`) === 'true') {
+                sBadge.className = 'badge s-unlocked';
+                sBadge.innerHTML = `${names.sName}<br><span style="font-size:11px;color:#fef08a;">(RANK S MASTER)</span>`;
+                if (selectBtn) selectBtn.style.background = 'linear-gradient(90deg, #1e293b, #78350f 150%)';
+            } else {
+                sBadge.className = 'badge';
+                sBadge.innerHTML = `${names.sName}<br><span style="font-size:11px;">(完璧なSランク)</span>`;
+            }
+
+            if (sessionStorage.getItem(`stage-${ch}-badge-speed`) === 'true') {
+                speedBadge.className = 'badge speed-unlocked';
+                speedBadge.innerHTML = `${names.speedName}<br><span style="font-size:11px;color:#e0f2fe;">(神速: 140s内クリア)</span>`;
+            } else {
+                speedBadge.className = 'badge';
+                speedBadge.innerHTML = `${names.speedName}<br><span style="font-size:11px;">(140秒以内クリア)</span>`;
+            }
+
+            if (sessionStorage.getItem(`stage-${ch}-badge-iron`) === 'true') {
+                ironBadge.className = 'badge iron-unlocked';
+                ironBadge.innerHTML = `${names.ironName}<br><span style="font-size:11px;color:#f3e8ff;">(ノーリターン全正解)</span>`;
+            } else {
+                ironBadge.className = 'badge';
+                ironBadge.innerHTML = `${names.ironName}<br><span style="font-size:11px;">(ノーリターン全正解)</span>`;
+            }
+        }
+    }
+
+    // 4章のセレクト制限コードを解除して、1〜4章すべてを正常スタート可能へ修正
+    function startExam(stageNum) {
+        currentStageNum = stageNum;
+        const pool = all_stages_pool[stageNum];
+        
+        const w1 = shuffle([...pool.filter(p => p.wave === 1)]).slice(0, 4);
+        const w2 = shuffle([...pool.filter(p => p.wave === 2)]).slice(0, 4);
+        const w3 = shuffle([...pool.filter(p => p.wave === 3)]).slice(0, 2);
+        
+        examQuestions = [...w1, ...w2, ...w3];
+        currentIndex = 0;
+        correctCount = 0;
+        totalElapsedTime = 0;
+        returnCount = 0;
+        everReturnedInExam = false;
+
+        renderQuestion();
+    }
+
+    function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[j], array[i]] = [array[i], array[j]];
+        }
+        return array;
+    }
+
+    function renderQuestion() {
+        switchScreen('screen-think');
+        
+        const q = examQuestions[currentIndex];
+        document.getElementById('think-progress').innerText = `${currentIndex + 1} / 10`;
+        document.getElementById('question-display').innerHTML = parseMathText(q.q);
+
+        const waveLabels = { 1: "WAVE 1: BASIC (基礎)", 2: "WAVE 2: STANDARD (罠注意)", 3: "WAVE 3: OVERLORD (最難関)" };
+        const waveColors = { 1: "#312e81", 2: "#b45309", 3: "#991b1b" };
+        const waveIndicator = document.getElementById('think-wave');
+        waveIndicator.innerText = waveLabels[q.wave];
+        waveIndicator.style.backgroundColor = waveColors[q.wave];
+
+        updateSLimitDisplay();
+
+        questionTimer = 0;
+        document.getElementById('think-timer').innerText = "0.0s";
+        clearInterval(timerId);
+        timerId = setInterval(() => {
+            questionTimer += 0.1;
+            document.getElementById('think-timer').innerText = questionTimer.toFixed(1) + "s";
+            updateSLimitDisplay();
+        }, 100);
+    }
+
+    function updateSLimitDisplay() {
+        const remaining = 140.0 - (totalElapsedTime + questionTimer);
+        const limitDisplay = document.getElementById('s-limit-timer');
+        
+        if (remaining < 0) {
+            limitDisplay.style.color = "var(--danger-color)";
+            limitDisplay.innerText = "防衛失敗 (" + remaining.toFixed(1) + "s)";
+        } else {
+            limitDisplay.style.color = "var(--gold-color)";
+            limitDisplay.innerText = remaining.toFixed(1) + "s";
+        }
+    }
+
+    function transitionToAnswer() {
+        switchScreen('screen-answer');
+        document.getElementById('answer-progress').innerText = `${currentIndex + 1} / 10`;
+
+        const q = examQuestions[currentIndex];
+        const choiceArea = document.getElementById('choice-area');
+        choiceArea.innerHTML = '';
+
+        const shuffledChoices = shuffle([...q.c]);
+        shuffledChoices.forEach(choice => {
+            const btn = document.createElement('button');
+            btn.className = 'choice-btn';
+            btn.innerHTML = parseMathText(choice);
+            btn.onclick = () => registerAnswer(choice);
+            choiceArea.appendChild(btn);
+        });
+
+        document.getElementById('answer-timer').innerText = questionTimer.toFixed(1) + "s";
+        
+        clearInterval(timerId);
+        timerId = setInterval(() => {
+            questionTimer += 0.1;
+            document.getElementById('answer-timer').innerText = questionTimer.toFixed(1) + "s";
+            updateSLimitDisplay();
+        }, 100);
+    }
+
+    function returnToQuestion() {
+        returnCount++;
+        everReturnedInExam = true;
+        totalElapsedTime += questionTimer;
+        renderQuestion();
+    }
+
+    function registerAnswer(selected) {
+        clearInterval(timerId);
+        totalElapsedTime += questionTimer;
+
+        lastSelectedChoice = selected;
+        const q = examQuestions[currentIndex];
+        
+        switchScreen('screen-explain');
+        
+        const isCorrect = (selected === q.ans);
+        const titleArea = document.getElementById('explain-result-title');
+        const bodyArea = document.getElementById('explain-body');
+        
+        document.getElementById('explain-q-text').innerHTML = parseMathText(q.q.replace(/\n/g, " "));
+        document.getElementById('explain-correct-ans').innerHTML = parseMathText(q.ans);
+
+        if (isCorrect) {
+            correctCount++;
+            titleArea.innerText = "■ 正解 (CORRECT)";
+            titleArea.style.color = "var(--correct-color)";
+        } else {
+            titleArea.innerText = "■ 不正解 (WRONG)";
+            titleArea.style.color = "var(--danger-color)";
+        }
+
+        if (q.exp && q.exp[selected]) {
+            bodyArea.innerHTML = parseMathText(q.exp[selected]);
+        } else {
+            bodyArea.innerText = "選択された誤答の計算プロセスには符号または計算順序に誤りがあります。";
+        }
+    }
+
+    function proceedAfterExplanation() {
+        currentIndex++;
+        if (currentIndex < 10) {
+            renderQuestion();
+        } else {
+            renderFinalResult();
+        }
+    }
+
+    function renderFinalResult() {
+        switchScreen('screen-result');
+        clearInterval(timerId);
+
+        const accuracy = (correctCount / 10) * 100;
+        const avgSpeed = totalElapsedTime / 10;
+
+        document.getElementById('res-accuracy').innerText = accuracy + "%";
+        document.getElementById('res-time').innerText = totalElapsedTime.toFixed(1) + "s";
+        document.getElementById('res-avg-speed').innerText = avgSpeed.toFixed(1) + "s/問";
+        document.getElementById('res-returns').innerText = returnCount + "回";
+
+        let rank = "D";
+        let statusText = "";
+        let rankColor = "#ef4444";
+
+        if (accuracy < 90) {
+            rank = "FAILED";
+            statusText = "知識の定着が認められません。もう一度ノートを開きなさい。";
+            rankColor = "#ef4444";
+        } else {
+            if (accuracy === 100 && totalElapsedTime <= 140 && !everReturnedInExam) {
+                rank = "S";
+                statusText = "パーフェクト。圧倒的な計算精度と速度です。";
+                rankColor = varColor('--gold-color');
+                sessionStorage.setItem(`stage-${currentStageNum}-s`, 'true');
+            } else if (accuracy === 100) {
+                rank = "A";
+                statusText = "全問正解ですが、速度または正確なブラインド思考に改善の余地があります。";
+                rankColor = "#e2e8f0";
+            } else {
+                rank = "B";
+                statusText = "合格基準を満たしましたが、罠選択肢に思考を揺さぶられています。";
+                rankColor = "#38bdf8";
+            }
+            sessionStorage.setItem(`stage-${currentStageNum}-clear`, 'true');
+        }
+
+        if (accuracy === 100 && totalElapsedTime <= 140) sessionStorage.setItem(`stage-${currentStageNum}-badge-speed`, 'true');
+        if (accuracy === 100 && !everReturnedInExam) sessionStorage.setItem(`stage-${currentStageNum}-badge-iron`, 'true');
+
+        const rankOut = document.getElementById('result-rank');
+        rankOut.innerText = rank;
+        rankOut.style.color = rankColor;
+        document.getElementById('result-status-text').innerText = statusText;
+    }
+
+    function abortToHome() {
+        clearInterval(timerId);
+        if(confirm("進行状況がすべて破棄されます。よろしいですか？")) {
+            switchScreen('screen-home');
+            updateHomeUI();
+        } else {
+            const isThinkActive = document.getElementById('screen-think').classList.contains('active');
+            const targetTimerId = isThinkActive ? 'think-timer' : 'answer-timer';
+            
+            timerId = setInterval(() => {
+                questionTimer += 0.1;
+                document.getElementById(targetTimerId).innerText = questionTimer.toFixed(1) + "s";
+                updateSLimitDisplay();
+            }, 100);
+        }
+    }
+
+    function varColor(varName) {
+        return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
+    }
+
+    function switchScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+    }
+
+    function exitToHome() {
+        updateHomeUI();
+        switchScreen('screen-home');
+    }
+
+    window.onload = updateHomeUI;
+</script>
+</body>
+</html>

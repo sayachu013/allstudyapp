@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>英検3級 大問1・2 特訓アプリ</title>
+    <style>
+        :root {
+            --primary-color: #1a73e8;
+            --success-color: #34a853;
+            --error-color: #ea4335;
+            --warning-color: #fbbc04;
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            color: var(--primary-color);
+            text-align: center;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .menu-card {
+            background: #f1f3f4;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: left;
+            border-left: 5px solid var(--primary-color);
+        }
+        .menu-card.test-mode { border-left-color: var(--error-color); }
+        .menu-card.review-mode { border-left-color: var(--warning-color); }
+
+        .menu-title {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+        .menu-desc {
+            font-size: 0.85rem;
+            color: #5f6368;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .meta-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .home-back-btn {
+            background-color: #e8eaed;
+            color: #3c4043;
+            border: 1px solid #dadce0;
+            border-radius: 4px;
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+        .home-back-btn:hover {
+            background-color: #dadce0;
+        }
+
+        .question-box {
+            font-size: 1.15rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: #f1f3f4;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary-color);
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background-color: #ffffff;
+            border: 2px solid #dadce0;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 1.05rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background-color: #f1f3f4;
+            border-color: #9aa0a6;
+        }
+
+        .option-number {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #e8eaed;
+            text-align: center;
+            line-height: 24px;
+            margin-right: 12px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .option-btn.correct { background-color: #e6f4ea; border-color: var(--success-color); color: #137333; }
+        .option-btn.correct .option-number { background-color: var(--success-color); color: white; }
+        .option-btn.wrong { background-color: #fce8e6; border-color: var(--error-color); color: #c5221f; }
+        .option-btn.wrong .option-number { background-color: var(--error-color); color: white; }
+
+        .feedback-box {
+            margin-top: 20px;
+            padding: 18px;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .feedback-box.correct-bg { background-color: #e6f4ea; color: #137333; border: 1px solid #34a853; }
+        .feedback-box.wrong-bg { background-color: #fce8e6; color: #c5221f; border: 1px solid #ea4335; }
+
+        .feedback-title { font-weight: bold; font-size: 1.25rem; margin-bottom: 10px; }
+        .user-selection { font-size: 0.95rem; font-weight: bold; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px dashed rgba(0,0,0,0.1); }
+        .section-title { font-weight: bold; color: #333; margin-top: 10px; margin-bottom: 4px; font-size: 0.95rem; }
+        .translation-text, .explanation-text { font-size: 0.95rem; color: #3c4043; line-height: 1.5; }
+        .translation-text { background: rgba(255,255,255,0.6); padding: 8px; border-radius: 4px; }
+
+        .action-btn {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .action-btn:hover { background-color: #1557b0; }
+        .action-btn:disabled { background-color: #ccc; cursor: not-allowed; box-shadow: none; }
+        
+        .menu-btn { margin-top: 5px; padding: 8px; font-size: 0.9rem; }
+        .btn-test { background-color: var(--error-color); }
+        .btn-test:hover { background-color: #b31412; }
+        .btn-review { background-color: var(--warning-color); color: #333; }
+        .btn-review:hover { background-color: #dfa000; }
+
+        .result-screen { text-align: center; display: none; }
+        .score-circle {
+            width: 130px; height: 130px; border-radius: 50%;
+            background-color: #e8f0fe; color: var(--primary-color);
+            font-size: 1.8rem; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+            margin: 20px auto; border: 5px solid var(--primary-color);
+        }
+        .result-screen.fail .score-circle {
+            color: var(--error-color); background-color: #fce8e6; border-color: var(--error-color);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<div class="container" id="home-screen">
+    <h1>英検®3級 大問1・2 特訓ルーム</h1>
+    
+    <div class="menu-card">
+        <div class="menu-title">📖 通常練習モード</div>
+        <div class="menu-desc">全問をじっくり解いていく勉強用モード。間違えた問題は自動的に「復習リスト」に登録され、後から繰り返し挑戦できます。</div>
+        <button class="action-btn menu-btn" onclick="startMode('practice')">練習をスタート</button>
+    </div>
+
+    <div class="menu-card review-mode">
+        <div class="menu-title">🔄 復習リストを解く</div>
+        <div class="menu-desc">「通常練習モード」で間違えた問題だけが集まる場所です。完璧に覚えたらリストから自動で消えます。</div>
+        <button class="action-btn menu-btn btn-review" id="review-start-btn" onclick="startMode('review')">復習をスタート (残り: 0問)</button>
+    </div>
+
+    <div class="menu-card test-mode">
+        <div class="menu-title">🔥 10問エンドレステスト</div>
+        <div class="menu-desc">全問題からランダムで10問をピッキング。間違えたら即不合格！【満点(10点)】を取るまで終われない地獄の特訓モードです。</div>
+        <button class="action-btn menu-btn btn-test" onclick="startMode('test')">テストをスタート</button>
+    </div>
+</div>
+
+<div class="container" id="quiz-screen" style="display: none;">
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+    
+    <div class="meta-info">
+        <span id="part-title">モード</span>
+        <span id="question-number">0 / 0</span>
+        <button class="home-back-btn" onclick="goToHomeFromQuiz()">🏠 ホームへ</button>
+    </div>
+
+    <div class="question-box" id="question-text"></div>
+    <div class="options-list" id="options-container"></div>
+
+    <div class="feedback-box" id="feedback-box">
+        <div class="feedback-title" id="feedback-result"></div>
+        <div class="user-selection" id="user-selection-info"></div>
+        <div class="section-title">💡 問題の和訳:</div>
+        <div class="translation-text" id="translation-box"></div>
+        <div class="section-title">📝 解説:</div>
+        <div class="explanation-text" id="explanation-box"></div>
+    </div>
+
+    <button class="action-btn" id="next-btn" style="display: none;" onclick="nextQuestion()">つぎの問題へ</button>
+</div>
+
+<div class="container result-screen" id="result-screen">
+    <h1 id="result-title">テスト結果</h1>
+    <div class="score-circle" id="score-text">0 / 0</div>
+    <p id="result-comment" style="font-size: 1.1rem; margin-bottom: 25px; font-weight: bold;"></p>
+    <button class="action-btn" id="result-action-btn" onclick="backToHome()">ホームメニューに戻る</button>
+</div>
+
+<script>
+// ★★★ 問題データ管理エリア ★★★
+// 今後追加する問題は、この [ ] の中にコピペしていきます。
+const masterQuizData = [
+    // ⬇️ ここに問題データを追加していく
+    { id: 1, type: 1, question: "A: I didn't see you at the party yesterday.<br>B: I wanted to go, but I ( &nbsp; &nbsp; ) stay home and study.", options: ["had to", "should", "must not", "don't have to"], answer: 0, translation: "A: 昨日パーティーで君を見かけなかったよ。<br>B: 行きたかったんだけど、家にいて勉強しなければならなかったんだ。", explanation: "【助動詞: had to】「〜しなければならなかった（must / have toの過去形）」。yesterday（昨日）の話なので過去形を選びます。" },
+    { id: 2, type: 1, question: "The window ( &nbsp; &nbsp; ) by the children while they were playing baseball in the garden.", options: ["break", "broke", "was broken", "is breaking"], answer: 2, translation: "庭で野球をしている間に、子どもたちによって窓が（壊された）。", explanation: "【文法: 受動態】「was + 過去分詞（broken）」で受け身の文を作ります。while〜（〜している間に）という過去の出来事なので過去形のwasになります。" },
+    { id: 3, type: 1, question: "A: Have you ever ( &nbsp; &nbsp; ) to a foreign country, Tom?<br>B: Yes, I went to Canada last year.", options: ["be", "been", "go", "gone"], answer: 1, translation: "A: トム、今までに外国へ（行ったことがありますか）？<br>B: うん、去年カナダに行ったよ。", explanation: "【文法: 現在完了】Have you ever been to 〜? で「今までに〜へ行ったことがありますか（経験）」を表す定番のひっかけ問題です。goneを使うと「行ってしまってここにはいない」という意味になります。" },
+    { id: 4, type: 1, question: "My grandmother is looking forward ( &nbsp; &nbsp; ) seeing you next week.", options: ["at", "for", "to", "on"], answer: 2, translation: "私の祖母は、来週あなたに会うのを（楽しみにしています）。", explanation: "【熟語: look forward to 〜ing】「〜するのを素晴らしい楽しみに待つ」という3級超重要の熟語です。toの後ろが動詞の原形ではなく動名詞（seeing）になる点もポイントです。" },
+    { id: 5, type: 1, question: "This math test was ( &nbsp; &nbsp; ) than the one we took last month.", options: ["difficult", "more difficult", "most difficult", "as difficult"], answer: 1, translation: "今回の数学のテストは、先月私たちが受けたもの（よりも難しかった）。", explanation: "【文法: 比較級】後ろに than（〜よりも）があるため比較級にします。difficultのような長い単語は、語尾に-erをつけるのではなく、前に more を置きます。" },
+    { id: 6, type: 1, question: "The movie was so ( &nbsp; &nbsp; ) that many people in the theater started to cry.", options: ["sad", "excited", "happy", "careful"], answer: 0, translation: "その映画はとても（悲しかった）ので、映画館の多くの人々が泣き始めた。", explanation: "【形容詞】sad（悲しい）。「人々が泣き始めた（started to cry）」という結果につながる、原因となる感情を表す形容詞を選びます。" },
+    { id: 7, type: 1, question: "A: Excuse me, could you ( &nbsp; &nbsp; ) me the way to the history museum?<br>B: Sure. Go straight and turn right at the first corner.", options: ["say", "speak", "talk", "tell"], answer: 3, translation: "A: すみません、歴史博物館への道を（教えて）いただけませんか？<br>B: もちろんです。真っ直ぐ行って、最初の角を右に曲がってください。", explanation: "【語彙: tell】「道を教える」は tell を使います（tell A the way to B）。sayは「言葉を発する」、speakは「言語を話す」、talkは「話し合う」です。" },
+    { id: 8, type: 1, question: "Our teacher told us to ( &nbsp; &nbsp; ) up the garbage on the classroom floor.", options: ["pick", "take", "bring", "put"], answer: 0, translation: "先生は私たちに、教室の床にあるゴミを（拾う）ように言った。", explanation: "【熟語: pick up】「〜を拾い上げる」。garbage（ゴミ）を床から綺麗にする行動として最も適切です。" },
+    { id: 9, type: 1, question: "I don't know the boy ( &nbsp; &nbsp; ) is talking with Ms. Green over there.", options: ["who", "which", "whose", "whom"], answer: 0, translation: "向こうでグリーン先生と話している男の子を、私は（知りません）。", explanation: "【文法: 関係代名詞】説明したい名詞（先行詞）が the boy（人）で、後ろの文の主語が抜けているため、主格の関係代名詞 who を選びます。" },
+    { id: 10, type: 1, question: "A: Don't forget to ( &nbsp; &nbsp; ) off the lights when you leave the room.<br>B: OK, I will.", options: ["turn", "get", "make", "keep"], answer: 0, translation: "A: 部屋を出るときは、電気を（消す）のを忘れないでね。<br>B: わかった、そうするよ。", explanation: "【熟語: turn off】「（電気・テレビなどを）消す」。つけるときは turn on です。" },
+    { id: 11, type: 1, question: "Mr. Davis has lived in Tokyo ( &nbsp; &nbsp; ) five years, so he knows many good restaurants.", options: ["since", "for", "during", "until"], answer: 1, translation: "デイビス先生は東京に5（年間）住んでいるので、美味しいレストランをたくさん知っている。", explanation: "【文法: 現在完了（継続）】期間を表す数字（five years）の前には for を置きます。sinceは「〜から（過去の起点）」となるので不適切です。" },
+    { id: 12, type: 1, question: "Yuki didn't have enough money, so she couldn't ( &nbsp; &nbsp; ) to buy the expensive dress.", options: ["afford", "agree", "accept", "achieve"], answer: 0, translation: "ユキは十分なお金を持っていなかったので、その高いドレスを買う（余裕がなかった）。", explanation: "【熟語: can afford to 〜】「〜する余裕がある」。お金や時間のゆとりがあることを表す、3級レベルの重要動詞です。" },
+    { id: 13, type: 1, question: "The city was covered ( &nbsp; &nbsp; ) white snow when we woke up this morning.", options: ["by", "with", "of", "in"], answer: 1, translation: "今朝私たちが起きたとき、街は白い雪（で覆われていた）。", explanation: "【熟語: be covered with 〜】「〜で覆われている」。受動態の形ですが、by以外の前置詞を使う重要表現です。" },
+    { id: 14, type: 1, question: "I have a lot of things ( &nbsp; &nbsp; ) today, so I cannot play video games with you.", options: ["do", "doing", "to do", "done"], options: ["do", "doing", "to do", "done"], answer: 2, translation: "今日は（やるべき）ことがたくさんあるので、あなたと一緒にテレビゲームをすることはできません。", explanation: "【文法: 不定詞（形容詞的用法）】things to do で「やるべきこと」となり、前の名詞（things）を後ろから詳しく説明します。" },
+    { id: 15, type: 1, question: "The internet allows us to collect a lot of useful ( &nbsp; &nbsp; ) easily.", options: ["information", "accident", "purpose", "century"], answer: 0, translation: "インターネットは、私たちが多くの役立つ（情報）を簡単に集めることを可能にする。", explanation: "// 【語彙: information】「情報」。collect（集める）やuseful（役立つ）という単語とセットでよく狙われます。" },
+
+    // --- 大問2：会話文の空欄補充 ---
+    { id: 16, type: 2, question: "Daughter: Mom, can I go to the mall with Kenji this afternoon?<br>Mother: ( &nbsp; &nbsp; ) But you must finish your homework first.<br>Daughter: Thanks! I'll do it right now.", options: ["I don't think so.", "Why not?", "That's too bad.", "I'm busy now."], answer: 1, translation: "娘: お母さん、今日の午後ケンジとモールに行ってもいい？<br>母親: （いいわよ / ダメな理由があるかしら？）でも、先に宿題を終わらせなきゃダメよ。<br>娘: ありがとう！今すぐやるね。", explanation: "【会話表現】Why not? は「もちろんいいよ（ダメな理由なんてないよ）」と相手の提案や許可に快く賛成する時の定番フレーズです。" },
+    { id: 17, type: 2, question: "Grandpa: Thank you for helping me clean the garden, Hana.<br>Hana: ( &nbsp; &nbsp; ) I enjoyed working with you.<br>Grandpa: You're such a kind girl.", options: ["You're welcome.", "Excuse me.", "Good job.", "Pardon me?"], answer: 0, translation: "祖父: 庭の掃除を手伝ってくれてありがとう、ハナ。<br>ハナ: （どういたしまして。）おじいちゃんと一緒に作業できて楽しかったよ。<br>祖父: 本当に優しい子だね。", explanation: "【会話表現】Thank you（ありがとう）と言われたら、定番の返答である You're welcome.（どういたしまして）を選びます。" },
+    { id: 18, type: 2, question: "Boy 1: Do you have any plans for this Sunday?<br>Boy 2: Not really. ( &nbsp; &nbsp; )<br>Boy 1: We are going to play soccer in the park. Do you want to come?", options: ["What's up?", "How about you?", "Where are you going?", "Why do you ask?"], answer: 3, translation: "男子1: 今週の予定は何かある？<br>男子2: 特にはないよ。（何で聞くの？）<br>男子1: 公園でサッカーをする予定なんだ。君も来ない？", explanation: "【会話表現】Why do you ask?（何でそんなこと聞くの？）。相手が自分の予定を尋ねてきた意図（誘いなど）を聞き返す、自然な表現です。" },
+    { id: 19, type: 2, question: "Teacher: Class, quiet down please. I have an important announcement.<br>Student: ( &nbsp; &nbsp; )<br>Teacher: Our school trip next week will start an hour earlier.", options: ["What is it?", "Who are you?", "When is it over?", "Where is it?"], answer: 0, translation: "先生: みんな、静かにしてください。大事なお知らせがあります。<br>生徒: （何ですか？）<br>先生: 来週の修学旅行の出発が1時間早くなります。", explanation: "【会話表現】「大事なお知らせ（important announcement）がある」と言われたので、「それは何ですか？」と内容を促す What is it? が最適です。" },
+    { id: 20, type: 2, question: "Tourist: Excuse me. Is there a convenience store near here?<br>Local person: Yes. Walk past the bank, and you'll see it on your right. ( &nbsp; &nbsp; )<br>Tourist: No, that's clear. Thank you!", options: ["Can you help me?", "Do you lost your way?", "Do you have any questions?", "Is it far from here?"], answer: 2, translation: "観光客: すみません。この近くにコンビニはありますか？<br>地元の人: はい。銀行を通り過ぎると、右側に見えますよ。（何か質問はありますか？）<br>観光客: いえ、よく分かりました。ありがとうございます！", explanation: "【会話表現】道を教え終わった後に、観光客が「いいえ、よく分かりました（clear）」と言っているため、「まだ分からないことや、質問はありますか？」と尋ねるフレーズが入ります。" },
+,
+    { id: 21, type: 1, question: "It is important for young people ( &nbsp; &nbsp; ) many books to learn about the world.", options: ["read", "reading", "to read", "reads"], answer: 2, translation: "若い人々にとって、世界について学ぶためにたくさんの本を（読むこと）は重要です。", explanation: "【文法: 不定詞（形式主語）】`It is 形容詞 + for (人) + to + 動詞の原形` で「（人）にとって〜することは…だ」という3級超重要の構文です。" },
+    { id: 22, type: 1, question: "A: Do you know ( &nbsp; &nbsp; ) left this umbrella on the chair?<br>B: I think it belongs to Emily.", options: ["who", "what", "where", "how"], answer: 0, translation: "A: 誰がこの傘を椅子の上に置き忘れたか（誰が置いたか）知っていますか？<br>B: エミリーのものだと思います。", explanation: "【文法: 間接疑問文】疑問文が know の後ろにカタマリとして入り込んでいます。「誰が（who）傘を置き忘れたか」という文脈が最も自然です。" },
+    { id: 23, type: 1, question: "The woman ( &nbsp; &nbsp; ) next to the window is my English teacher, Ms. Smith.", options: ["sit", "sat", "sitting", "sits"], answer: 2, translation: "窓の隣に（座っている）女性は、私の英語の先生のスミス先生です。", explanation: "【文法: 後置修飾（現在分詞）】`The woman sitting next to the window` で「窓の隣に座っている女性」となり、名詞を後ろから詳しく説明します。女性が「座っている（能動）」ので `-ing` の形にします。" },
+    { id: 24, type: 1, question: "I finally finished ( &nbsp; &nbsp; ) my bedroom, so now I can go out to play.", options: ["clean", "cleaned", "to clean", "cleaning"], answer: 3, translation: "ようやく自分の寝室の（掃除をし終えた）ので、もう遊びに出かけることができます。", explanation: "【文法: 動名詞】動詞 `finish` の後ろには、不定詞（to 〜）ではなく動名詞（〜ing）しか置くことができません。よく狙われるルールです。" },
+    { id: 25, type: 1, question: "A: How long does it ( &nbsp; &nbsp; ) to walk from the hotel to the station?<br>B: About ten minutes.", options: ["take", "spend", "cost", "use"], answer: 0, translation: "A: ホテルから駅まで歩いてどのくらいの時間が（かかりますか）？<br>B: 約10分です。", explanation: "【熟語: It takes + 時間】「（時間が）〜かかる」を表す定番表現です。How long（どのくらいの長さ）とセットで頻出します。" },
+    { id: 26, type: 1, question: "The sky became dark, and it started to rain ( &nbsp; &nbsp; ) after we arrived at the park.", options: ["soon", "yet", "already", "ever"], answer: 0, translation: "空が暗くなり、私たちが公園に到着した（すぐ）後に雨が降り始めた。", explanation: "【熟語: soon after 〜】「〜のすぐ後に」。yet（まだ）や already（すでに）は文脈に合いません。" },
+    { id: 27, type: 1, question: "A: Don't give ( &nbsp; &nbsp; ) your dream of becoming a professional musician!<br>B: Thank you. I'll keep practicing hard.", options: ["out", "up", "away", "off"], answer: 1, translation: "A: プロの音楽家になるという夢を（諦め）ないで！<br>B: ありがとう。これからも一生懸命練習を続けるよ。", explanation: "【熟語: give up】「諦める」。後ろの `dream`（夢）や、Bの「練習を続ける」という前向きな返答から判断します。" },
+    { id: 28, type: 1, question: "This camera is as ( &nbsp; &nbsp; ) as that one, but it is much lighter.", options: ["good", "better", "best", "well"], answer: 0, translation: "このカメラはあのカメラ（と同じくらい良い）が、こちらの方がずっと軽い。", explanation: "【文法: 比較（原級）】`as + 形容詞の原形 + as` で「〜と同じくらい…だ」となります。better などの比較級にしてしまわないよう注意が必要です。" },
+    { id: 29, type: 1, question: "The local festival was held ( &nbsp; &nbsp; ) the heavy rain yesterday.", options: ["instead", "in spite of", "because", "although"], answer: 1, translation: "昨日、大雨（にもかかわらず）地元の祭りが開催された。", explanation: "【熟語: in spite of 〜】「〜にもかかわらず」。大雨というマイナス要素があっても祭りが開催された（was held）という文脈を繋ぎます。" },
+    { id: 30, type: 1, question: "A: Have you ( &nbsp; &nbsp; ) the decision about which high school to go to?<br>B: Not yet. I'm still thinking.", options: ["done", "made", "taken", "chosen"], answer: 1, translation: "A: どの高校に行くか（決断を下しました）か？<br>B: まだだよ。まだ考えているところなんだ。", options: ["done", "made", "taken", "chosen"], answer: 1, translation: "A: どの高校に行くか（決断を下しました）か？<br>B: まだだよ。まだ考えているところなんだ。", explanation: "【熟語: make a decision】「決断する、決める」。現在完了の文なので過去分詞の `made` になっています。decision と相性が良い動詞は make です。" },
+    { id: 31, type: 1, question: "My younger brother is afraid ( &nbsp; &nbsp; ) dogs, so he always walks away when he sees one.", options: ["at", "with", "of", "for"], answer: 2, translation: "私の弟は犬を（怖がっている）ので、犬を見るといつも離れて歩きます。", explanation: "【熟語: be afraid of 〜】「〜を恐れる、怖がる」。3級の読解やリスニングでも非常によく使われる重要形容詞熟語です。" },
+    { id: 32, type: 1, question: "The computer that my uncle bought for me is very ( &nbsp; &nbsp; ) for my school homework.", options: ["useful", "careless", "dangerous", "heavy"], answer: 0, translation: "叔父が私に買ってくれたコンピュータは、学校の宿題にとても（役立って）いる。", explanation: "【形容詞】useful（役に立つ）。宿題（homework）をする上でプラスになる性質を選びます。" },
+    { id: 33, type: 1, question: "A: Please tell me the ( &nbsp; &nbsp; ) why you were late for the meeting.<br>B: I'm sorry. My train stopped because of an accident.", options: ["reason", "subject", "member", "opinion"], answer: 0, translation: "A: 会議に遅れた（理由）を教えてください。<br>B: すみません。事故で電車が止まってしまったんです。", explanation: "【語彙: reason】「理由」。後ろの `why`（関係副詞）に導かれる名詞として、`the reason why 〜`（〜する理由）は定番のセットです。" },
+    { id: 34, type: 1, question: "We must protect nature to leave a beautiful earth for the next ( &nbsp; &nbsp; ).", options: ["generation", "information", "government", "population"], answer: 0, translation: "私たちは、次の（世代）に美しい地球を残すために自然を守らなければならない。", explanation: "【語彙: generation】「世代」。`the next generation`（次世代）という表現は、3級の環境問題などの長文でも頻出のキーワードです。" },
+    { id: 35, type: 1, question: "A: Could you pass me the salt, please?<br>B: ( &nbsp; &nbsp; ) Here it is.", options: ["No problem.", "By the way.", "Certainly.", "Never mind."], answer: 2, translation: "A: 塩を取っていただけますか？<br>B: （かしこまりました。）はい、どうぞ。", explanation: "【会話表現】頼み事（Could you 〜?）を快く引き受ける際の「もちろん」「かしこまりました」は Certainly. が適切です。" },
+
+    // --- 大問2：会話文の空欄補充 ---
+    { id: 36, type: 2, question: "Boy: Excuse me, I'm looking for the science room. Do you know where it is?<br>Teacher: Yes. Go up to the third floor. It's the second room on your left.<br>Boy: ( &nbsp; &nbsp; )<br>Teacher: You're welcome. Have a nice day.", options: ["I see. Thank you very much.", "I'm sorry to hear that.", "That's a good idea.", "Excuse me for being late."], answer: 0, translation: "男子生徒: すみません、理科室を探しています。どこにあるか知っていますか？<br>先生: ええ。3階に上がってください。左側の2番目の部屋ですよ。<br>男子生徒: （分かりました。本当にありがとうございました。）<br>先生: どういたしまして。良い一日を。", explanation: "【会話表現】先生が道を教えてくれたのに対して、お礼を伝える `Thank you very much.` が入ります。先生の返答が `You're welcome.` であることも大きなヒントです。" },
+    { id: 37, type: 2, question: "Woman: Hello, this is Mary. May I speak to Jane, please?<br>Man: I'm sorry, she's out walking the dog right now.<br>Woman: I see. ( &nbsp; &nbsp; )<br>Man: Sure. I'll tell her to call you back later.", options: ["Can I leave a message?", "Can you tell me her number?", "Who is calling, please?", "May I ask where she is?"], answer: 0, translation: "女性: もしもし、メアリーです。ジェーンさんはいらっしゃいますか？<br>男性: すみません、彼女は今、犬の散歩に出かけています。<br>女性: そうですか。（伝言をお願いできますか？）<br>男性: もちろんです。後で折り返し電話するよう彼女に伝えますね。", explanation: "【会話表現】`Can I leave a message?`（伝言を残せますか？）は、電話の会話文における超定番フレーズです。男性の「後で伝えておくよ」という返答と一致します。" },
+    { id: 38, type: 2, question: "Girl 1: I'm going to perform in a dance show this Saturday. I'm so nervous.<br>Girl 2: ( &nbsp; &nbsp; ) You've practiced so hard for it.<br>Girl 1: Thanks. I'll try my best.", options: ["Don't worry.", "Congratulations!", "It's too late.", "I hope not."], answer: 0, translation: "女子1: 今週の土曜日にダンスショーに出演するんだ。すごく緊張しているよ。<br>女子2: （心配しないで。）そのためにすごく一生懸命練習してきたんだから。<br>女子1: ありがとう。全力で頑張るよ。", explanation: "【会話表現】緊張している友人に対して「心配しないで、大丈夫だよ」と励ます `Don't worry.` が最適です。" },
+    { id: 39, type: 2, question: "Son: Dad, can we go to the beach tomorrow?<br>Father: Well, the weather forecast says it will rain all day.<br>Son: ( &nbsp; &nbsp; ) We planned it a month ago.<br>Father: I know, but we can go next weekend instead.", options: ["That's a relief.", "That's too bad.", "That sounds fun.", "That's incredible."], answer: 1, translation: "息子: お父さん、明日ビーチに行ける？<br>父親: うーん、天気予報によると一日中雨らしいよ。<br>息子: （それは残念だな。）1ヶ月前から計画していたのに。<br>父親: 分かっているよ、でも代わりに次の週末に行けるさ。", explanation: "【会話表現】楽しみにしていたビーチ行きが雨でダメになりそうな状況なので、ガッカリした気持ちを表す `That's too bad.`（それは残念だ）を選びます。" },
+    { id: 40, type: 2, question: "Customer: Excuse me. I bought this shirt yesterday, but it's a little too small for me.<br>Clerk: I see. ( &nbsp; &nbsp; )<br>Customer: Yes, please. A medium would be perfect.", options: ["Would you like to try it on?", "Would you like a larger size?", "Where did you buy it?", "How much was it?"], answer: 1, translation: "客: すみません。昨日このシャツを買ったのですが、私には少し小さすぎました。<br>店員: なるほど。（もっと大きいサイズにいたしますか？）<br>客: はい、お願いします。Mサイズがぴったりだと思います。", explanation: "【会話表現】シャツが「小さすぎた（too small）」という不満に対して、店員が「より大きいサイズ（a larger size）にしますか？」と提案する流れです。客の「Mサイズが良い」という返答とも綺麗に噛み合います。" },
+,
+    { id: 41, type: 1, question: "The library ( &nbsp; &nbsp; ) was built last year has a lot of interesting comic books.", options: ["who", "which", "whose", "where"], answer: 1, translation: "昨年建てられたその図書館には、おもしろい漫画の本がたくさんあります。", explanation: "【文法: 関係代名詞】説明したい名詞（先行詞）が `The library`（物）で、後ろの文の主語が抜けているため、主格の関係代名詞 `which`（またはthat）を選びます。" },
+    { id: 42, type: 1, question: "A: Did you hear the news? Our school festival will ( &nbsp; &nbsp; ) held next month.<br>B: Wow, I can't wait!", options: ["be", "been", "being", "is"], answer: 0, translation: "A: ニュースを聞いた？私たちの文化祭、来月開催されるんだって。<br>B: わあ、待ちきれないよ！", explanation: "【文法: 未来の受動態】助動詞 `will` の後ろには動詞の原形を置くルールがあるため、受け身（be + 過去分詞）のbe動詞は原形の `be` になります。" },
+    { id: 43, type: 1, question: "My mother is very busy today, so I decided to make dinner ( &nbsp; &nbsp; ) myself.", options: ["by", "with", "for", "at"], answer: 0, translation: "今日はお母さんがとても忙しいので、私は（自分自身で / ひとりで）夕食を作ることにしました。", explanation: "【熟語: by oneself】「自分自身で、独力で、ひとりで」という意味の重要表現です。`by myself` で「私ひとりで」となります。" },
+    { id: 44, type: 1, question: "A: What are you looking ( &nbsp; &nbsp; ), Ken?<br>B: My dictionary. I need it for the next English class.", options: ["at", "for", "after", "like"], answer: 1, translation: "A: ケン、何を（探している）の？<br>B: 辞書だよ。次の英語の授業で必要なんだ。", explanation: "【熟語: look for 〜】「〜を探す」。Bが「辞書だよ（My dictionary）」と答えているため、「探す」という熟語にするのが自然です。look atは「見る」、look afterは「世話をする」です。" },
+    { id: 45, type: 1, question: "I enjoy ( &nbsp; &nbsp; ) pictures of beautiful flowers when I go hiking in the mountains.", options: ["take", "took", "taking", "to take"], answer: 2, translation: "山にハイキングに行くとき、私は美しい花の写真を（撮ることを楽しんでいます）。", explanation: "【文法: 動名詞】動詞 `enjoy` の後ろには、不定詞（to 〜）ではなく動名詞（〜ing）しか置くことができません。finish と並んで超頻出のルールです。" },
+    { id: 46, type: 1, question: "The weather was very bad, but the soccer match was not ( &nbsp; &nbsp; ) off.", options: ["put", "called", "taken", "turned"], answer: 1, translation: "天気はとても悪かったが、サッカーの試合は（中止にされ）なかった。", explanation: "// 【熟語: call off】「〜を中止する」。受動態（was not called off）の形で「中止されなかった」となります。put offは「延期する」という意味になります。" },
+    { id: 47, type: 1, question: "A: Which dress do you like better, the red one or the blue one?<br>B: I like the blue one. It looks ( &nbsp; &nbsp; ) on me than the red one.", options: ["good", "better", "best", "well"], answer: 1, translation: "A: 赤いドレスと青いドレス、どちらが好き？<br>B: 青い方かな。赤い方よりも私に（似合っている）気がするよ。", explanation: "【文法: 比較級】後ろに `than`（〜よりも）があるため、goodの比較級である `better` を選びます。`look better` で「より良く見える、より似合う」となります。" },
+    { id: 48, type: 1, question: "Mr. Baker is loved by all of his students because he is always ( &nbsp; &nbsp; ) to everyone.", options: ["kind", "busy", "tired", "scared"], answer: 0, translation: "ベーカー先生は誰にでもいつも（親切な）ので、すべての生徒から愛されています。", explanation: "【形容詞】kind（親切な）。生徒から愛されている（is loved by all）理由として、最もふさわしいポジティブな性質を選びます。" },
+    { id: 49, type: 1, question: "A: Excuse me, where is the nearest bus stop?<br>B: Go straight down this street. You can't ( &nbsp; &nbsp; ) it.", options: ["lose", "find", "miss", "leave"], answer: 2, translation: "A: すみません、一番近いバス停はどこですか？<br>B: この道を真っ直ぐ行ってください。（見落とすはずがありませんよ / すぐ分かりますよ）。", explanation: "【会話表現: You can't miss it.】道案内の最後によく使われる決まり文句で、「絶対に見つかりますよ、すぐに分かりますよ」という意味になります。" },
+    { id: 50, type: 1, question: "Our family ( &nbsp; &nbsp; ) to move to Kyoto next spring because of my father's new job.", options: ["decided", "finished", "enjoyed", "stopped"], answer: 0, translation: "父の新しい仕事のため、私たちの家族は来年の春に京都へ引っ越すことを（決めた）。", explanation: "【文法: 不定詞と動詞の相性】後ろに `to move`（to + 動詞の原形）が続いています。選択肢の中で後ろに不定詞を置くことができるのは `decide`（decide to 〜: 〜することを決める）だけです。" },
+    { id: 51, type: 1, question: "The international airport was built on a large piece of ( &nbsp; &nbsp; ) near the sea.", options: ["land", "sky", "cloud", "air"], answer: 0, translation: "その国際空港は、海の近くの広い（土地）の上に建てられました。", explanation: "【語彙: land】「土地、陸地」。`a piece of land` で「一画の土地」という意味になり、空港が建てられた場所として適切です。" },
+    { id: 52, type: 1, question: "A: Did you finish reading that thick book?<br>B: Yes. It took me a ( &nbsp; &nbsp; ) of two weeks to read it all.", options: ["total", "grade", "score", "level"], answer: 0, translation: "A: あの厚い本を読み終えたの？<br>B: うん。全部読むのに（合計で）2週間かかったよ。", explanation: "【熟語: a total of 〜】「合計で〜、総計〜」。後ろに時間の長さや数がきて、その締めくくりを表す3級レベルの名詞です。" },
+    { id: 53, type: 1, question: "The computer suddenly stopped working, but I didn't know the ( &nbsp; &nbsp; ) of the problem.", options: ["cause", "result", "history", "future"], answer: 0, translation: "コンピュータが突然動かなくなったが、私はそのトラブルの（原因）が分からなかった。", explanation: "【語彙: cause】「原因」。動かなくなった問題（the problem）の「原因」が分からず困っている文脈を作ります。" },
+    { id: 54, type: 1, question: "A: Are you going to go shopping tomorrow?<br>B: It ( &nbsp; &nbsp; ) on the weather. If it rains, I'll stay home.", options: ["arrives", "depends", "happens", "belongs"], answer: 1, translation: "A: 明日買い物に行く予定？<br>B: 天気（次第かな）。もし雨が降ったら家にいるよ。", explanation: "【熟語: depend on 〜】「〜次第である、〜によって決まる」。英検で非常によく狙われる重要熟語です。If it rains〜（もし雨なら…）という後ろの文とも一致します。" },
+    { id: 55, type: 1, question: "A: Look! The children are playing happily in the garden.<br>B: Yes, they look like they are having a lot of ( &nbsp; &nbsp; ).", options: ["fun", "job", "care", "worry"], answer: 0, translation: "A: 見て！子どもたちが庭で楽しそうに遊んでいるよ。<br>B: 本当だね、とても（楽しそう）にしているね。", explanation: "【熟語: have fun】「楽しむ」。`have a lot of fun` で「とても楽しむ」となり、楽しそうに遊んでいる（playing happily）様子を表すのに最適です。" },
+
+    // --- 大問2：会話文の空欄補充 ---
+    { id: 56, type: 2, question: "Girl: Excuse me, I'm a little lost. How can I get to the central park?<br>Man: Oh, just go straight down this road for two blocks. You'll see it on your left.<br>Girl: I see. ( &nbsp; &nbsp; )<br>Man: No, it's very close. It takes only five minutes.", options: ["Is it far from here?", "Is there a restroom?", "Can I take a bus?", "What time does it close?"], answer: 0, translation: "女子生徒: すみません、少し道に迷ってしまって。中央公園にはどうやったら行けますか？<br>男性: ああ、この道を真っ直ぐ2ブロック行ってください。左側に見えますよ。<br>女子生徒: 分かりました。（ここから遠いですか？）<br>男性: いいえ、とても近いですよ。5分しかかかりません。", explanation: "【会話表現】男性が「いいえ、とても近いですよ（very close）」と答えているため、質問側は「遠いですか？」と尋ねる `Is it far from here?` が正解となります。" },
+    { id: 57, type: 2, question: "Father: Welcome home, Tom. How was your school trip to Nara?<br>Tom: ( &nbsp; &nbsp; ) We saw many beautiful temples and fed the deer.<br>Father: I'm glad to hear that. You look tired, though.", options: ["It was wonderful.", "I didn't go there.", "It was too cold.", "I lost my bag."], answer: 0, translation: "父親: お帰り、トム。奈良への修学旅行はどうだった？<br>トム: （素晴らしかったよ！）たくさんの美しいお寺を見て、シカにエサをあげたんだ。<br>父親: それを聞けて嬉しいよ。ちょっと疲れているみたいだけどね。", explanation: "【会話表現】「お寺を見てシカにエサをあげた」という楽しかった思い出を語っているため、旅行の感想としてポジティブな `It was wonderful.` を選びます。父親の「それを聞けて嬉しい」というセリフとも合致します。" },
+    { id: 58, type: 2, question: "Clerk: Next, please. Hello, what can I get for you today?<br>Customer: Hello. I'd like a cheeseburger and a large cola, please.<br>Clerk: OK. ( &nbsp; &nbsp; )<br>Customer: For here, please. I'll eat it at the table over there.", options: ["Is that all?", "For here or to go?", "How would you like to pay?", "Can I have your name?"], answer: 1, translation: "店員: 次の方どうぞ。こんにちは、本日は何にいたしますか？<br>客: こんにちは。チーズバーガーとコーラのLサイズをお願いします。<br>店員: かしこまりました。（店内でお召し上がりですか、お持ち帰りですか？）<br>客: 店内でお願いします。向こうの席で食べますので。", explanation: "【会話表現】客が `For here, please.`（店内でお願いします）と答えているため、店員側の質問はファストフード店などの超定番フレーズ `For here or to go?`（店内で、またはお持ち帰りで？）になります。" },
+    { id: 59, type: 2, question: "Aki: Hi, Ben. Are you free this afternoon? Let's play tennis.<br>Ben: I'd love to, but I can't. I have to clean my room today.<br>Aki: Oh, that's too bad. ( &nbsp; &nbsp; )<br>Ben: Sure! I'm free all day on Saturday.", options: ["How about next Saturday?", "Why are you busy?", "Can you clean it now?", "Where is your racket?"], answer: 0, translation: "アキ: やあ、ベン。今日の午後空いてる？テニスをしようよ。<br>ベン: ぜひしたいんだけど、無理なんだ。今日は部屋の掃除をしなきゃいけなくて。<br>アキ: ああ、残念だな。（次の土曜日はどう？）<br>ベン: もちろんいいよ！土曜日は一日中空いているからね。", explanation: "【会話表現】今日の誘いを断られた（I can't）アキが、ベンの最後のセリフ「土曜日は一日空いている」に繋がるように、別の候補日を提案している `How about next Saturday?`（次の土曜日はどう？）が適切です。" },
+    { id: 60, type: 2, question: "Student: Excuse me, Mr. Green. I don't understand the meaning of this word.<br>Teacher: Oh, let's look it up in the dictionary together. ( &nbsp; &nbsp; )<br>Student: Yes, I have it in my school bag. Just a moment, please.", options: ["Do you have yours?", "Where is the library?", "Do you like reading?", "Who is your teacher?"], answer: 0, translation: "生徒: すみません、グリーン先生。この単語の意味が分からないのですが。<br>先生: おう、一緒に辞書で調べてみよう。（君の辞書は持っているかい？）<br>生徒: はい、スクールバッグの中に入っています。ちょっと待ってください。", explanation: "【会話表現】先生が「辞書で調べよう」と言い、生徒が「バッグに入っています」と答えているため、先生は「自分の（辞書を）持っている？」と尋ねているはずです。`yours` は `your dictionary` の代わりをしています。" },
+,
+    { id: 61, type: 1, question: "My grandfather often helps me ( &nbsp; &nbsp; ) my mathematics homework on weekends.", options: ["do", "did", "done", "does"], answer: 0, translation: "祖父は週末、私の数学の宿題を（するのをよく手伝ってくれます）。", explanation: "【文法: 使役（help）】`help + 人 + 動詞の原形` で「（人）が〜するのを手伝う」という形を作ります。to不定詞（to do）も使えますが、原形を選ぶ問題が3級ではよく狙われます。" },
+    { id: 62, type: 1, question: "You visited your aunt in London last summer, ( &nbsp; &nbsp; ) you?", options: ["aren't", "don't", "didn't", "wasn't"], answer: 2, translation: "君は去年の夏、ロンドンにいるおばさんを訪ねた（よね？）", explanation: "【文法: 付加疑問文】「〜ですね？」と念を押す表現です。前の文が一般動詞の過去形（visited）の肯定文なので、後ろには `didn't` を置きます。" },
+    { id: 63, type: 1, question: "A: Do you know ( &nbsp; &nbsp; ) to make a traditional Japanese paper crane?<br>B: Yes. My mother taught me when I was a child.", options: ["what", "how", "where", "why"], answer: 1, translation: "A: 伝統的な日本の折り鶴の（作り方）を知っていますか？<br>B: うん。子どもの頃にお母さんが教えてくれたんだ。", explanation: "【文法: 疑問詞＋to不定詞】`how to + 動詞の原形` で「〜の仕方、作り方、やり方」という意味になります。taught（教えた）という返答とも一致します。" },
+    { id: 64, type: 1, question: "The heavy rain prevented us ( &nbsp; &nbsp; ) going out for a walk this morning.", options: ["from", "to", "for", "with"], answer: 0, translation: "大雨のせいで、私たちは今朝、散歩に出かけることが（できなかった）。", explanation: "【熟語: prevent A from 〜ing】「Aが〜するのを妨げる / Aのせいで〜できない」という、3級の上位問題で頻出の重要構文です。" },
+    { id: 65, type: 1, question: "The dog looked very hungry, so Ken ( &nbsp; &nbsp; ) it some meat and water.", options: ["feed", "fed", "feeding", "feeds"], answer: 1, translation: "その犬はとてもお腹が空いているように見えたので、ケンは肉と水を（与えた）。", explanation: "【時制: 過去形（不規則動詞）】前の文が `looked`（過去形）なので、後ろの動詞も過去形にします。giveの過去形 gave ではなく、今回は `feed`（エサをやる）の過去形である `fed` を選びます。" },
+    { id: 66, type: 1, question: "A: Why didn't you come to the stadium to watch the game?<br>B: I ( &nbsp; &nbsp; ) my keys, so I couldn't leave my house.", options: ["lost", "found", "broke", "kept"], answer: 0, translation: "A: なぜ試合を見にスタジアムに来なかったの？<br>B: 鍵を（なくしちゃって）、家を出られなかったんだよ。", explanation: "【動詞】lost（loseの過去形: なくした）。「家を出られなかった（couldn't leave）」というトラブルの原因として最も適切な行動です。" },
+    { id: 67, type: 1, question: "Mr. Miller has lived in Paris for a long time, so he speaks French ( &nbsp; &nbsp; ).", options: ["fluent", "fluently", "fluency", "fluid"], answer: 1, translation: "ミラーさんは長い間パリに住んでいるので、フランス語を（流暢に）話します。", explanation: "【品詞: 副詞】動詞 `speaks`（話す）を詳しく説明するために、副詞の `fluently`（流暢に）を選びます。fluentは形容詞なので動詞を修飾できません。" },
+    { id: 68, type: 1, question: "A: I'm planning to travel around Italy next month.<br>B: Wow! Have a nice ( &nbsp; &nbsp; ). Don't forget to take many pictures.", options: ["trip", "job", "class", "life"], answer: 0, translation: "A: 来月、イタリアを旅行する計画を立てているんだ。<br>B: わあ！良い（旅行）をね。写真をたくさん撮るのを忘れないでね。", explanation: "【会話表現: Have a nice trip!】旅行（travel）に行く人への定番の挨拶で、「良い旅を！」という意味になります。" },
+    { id: 69, type: 1, question: "The international soccer game was full ( &nbsp; &nbsp; ) excited fans from both countries.", options: ["with", "of", "by", "at"], answer: 1, translation: "その国際サッカーの試合は、両国からの興奮したファン（でいっぱいだった）。", explanation: "【熟語: be full of 〜】「〜で満ちている、いっぱいである」。`be filled with` と同じ意味ですが、前置詞の組み合わせが異なるひっかけ問題です。" },
+    { id: 70, type: 1, question: "A: Did you see the beautiful rainbow in the sky?<br>B: Yes, it ( &nbsp; &nbsp; ) after the heavy rain stopped.", options: ["disappeared", "appeared", "changed", "moved"], answer: 1, translation: "A: 空に綺麗な虹が出たのを見た？<br>B: うん、大雨が止んだ後に（現れた）よね。", explanation: "【動詞】appeared（現れた）。虹（rainbow）が大雨の後に「出現した」という文脈です。disappearedは「消え去った」になります。" },
+    { id: 71, type: 1, question: "The young scientist finally ( &nbsp; &nbsp; ) his goal of developing a new useful medicine.", options: ["achieved", "failed", "forgot", "dropped"], answer: 0, translation: "その若い科学者は、新しい役立つ薬を開発するという目標をようやく（達成した）。", explanation: "【動詞】achieved（達成した）。`goal`（目標）という名詞と非常に相性が良く、3級の長文読解などでも必須の重要動詞です。" },
+    { id: 72, type: 1, question: "A: It's cold outside. You should put ( &nbsp; &nbsp; ) your warm jacket.<br>B: OK, Mom.", options: ["on", "off", "up", "away"], answer: 0, translation: "A: 外は寒いよ。温かいジャケットを（着なさい）。<br>B: わかったよ、お母さん。", explanation: "【熟語: put on 〜】「〜を身につける、着る」。寒そうにしている子どもへのアドバイスとして適切です。put offは「延期する」になります。" },
+    { id: 73, type: 1, question: "The information on this website is very ( &nbsp; &nbsp; ) for our school project.", options: ["valuable", "careless", "dangerous", "noisy"], answer: 0, translation: "このウェブサイトの情報は、私たちの学校の課題にとって非常に（価値がある / 有益だ）。", explanation: "【形容詞】valuable（価値のある、有益な）。学校の課題（project）に役立っているという肯定的な意味を繋ぎます。" },
+    { id: 74, type: 1, question: "A: What is your sister's favorite ( &nbsp; &nbsp; ) at school?<br>B: She likes science best because she enjoys doing experiments.", options: ["subject", "sport", "hobby", "season"], answer: 0, translation: "A: お姉さんの学校での一番好きな（教科）は何？<br>B: 理科が一番好きだよ。実験をするのが楽しいんだって。", explanation: "【語彙: subject】「教科、科目」。Bが「理科（science）」と答えているため、学校の「教科」を尋ねていると判断します。" },
+    { id: 75, type: 1, question: "My family always exchanges Christmas ( &nbsp; &nbsp; ) on the morning of December 25th.", options: ["gifts", "tickets", "menus", "addresses"], answer: 0, translation: "私たちの家族は、いつも12月25日の朝にクリスマスの（プレゼント）を交換します。", explanation: "【語彙: gifts】「贈り物、プレゼント」。クリスマスに交換（exchange）するものとして最も自然です。" },
+
+    // --- 大問2：会話文の空欄補充 ---
+    { id: 76, type: 2, question: "Girl: Excuse me, Mr. Davis. Could you check my English essay when you have time?<br>Teacher: Sure, leave it on my desk. ( &nbsp; &nbsp; )<br>Girl: By tomorrow morning, please. I need to practice reading it.", options: ["When do you need it?", "Where are you going?", "How long is it?", "Who wrote it?"], answer: 0, translation: "女子生徒: すみません、デイビス先生。お時間があるときに私の英語のエッセイをチェックしていただけますか？<br>先生: いいよ、机の上に置いておいて。（いつまでに必要だい？）<br>女子生徒: 明日の朝までにお願いします。読む練習をしなければいけないので。", explanation: "【会話表現】生徒が `By tomorrow morning`（明日の朝までに）と期限を答えているため、先生側の質問は「いつ必要なの？」と尋ねる `When do you need it?` になります。" },
+    { id: 77, type: 2, question: "Man: Hi, Sally. I heard you passed the audition for the school play!<br>Sally: Yes, I'm going to play the main character!<br>Man: ( &nbsp; &nbsp; ) I know how hard you practiced.<br>Sally: Thank you so much.", options: ["Congratulations!", "Better luck next time.", "I'm sorry to hear that.", "Don't worry about it."], answer: 0, translation: "男性: やあ、サリー。学校の劇のオーディションに合格したんだってね！<br>サリー: うん、主役を演じることになったの！<br>男性: （おめでとう！）君がどれだけ一生懸命練習していたか知っているよ。<br>サリー: 本当にありがとう。", explanation: "【会話表現】オーディション合格（passed the audition）というおめでたい報告を受けているため、お祝いを伝える `Congratulations!` が大正解です。" },
+    { id: 78, type: 2, question: "Grandma: Ken, could you help me carry this heavy box to the living room?<br>Ken: ( &nbsp; &nbsp; ) Where should I put it?<br>Grandma: On the table, please. Thank you, Ken.", options: ["I'd love to, but I can't.", "With pleasure.", "I'm sorry, I'm busy.", "No, thank you."], answer: 1, translation: "祖母: ケン、この重い箱を居間まで運ぶのを手伝ってくれないかい？<br>ケン: （喜んで。）どこの上に置けばいい？<br>祖母: テーブルの上にお願い。ありがとう、ケン。", explanation: "【会話表現】手伝いの依頼に対して、快く「喜んで！」と引き受ける `With pleasure.` を選びます。ケンの後ろのセリフ「どこに置けばいい？」からも、手伝う気満々であることが分かります。" },
+    { id: 79, type: 2, question: "Wife: Dear, are you going to the supermarket now? Can you buy some eggs?<br>Husband: Sure. ( &nbsp; &nbsp; )<br>Wife: Just one carton of ten eggs, please.", options: ["How many do you need?", "How much are they?", "Where are they?", "When will you cook?"], answer: 0, translation: "妻: あなた、今からスーパーに行く？卵をいくつか買ってきてくれる？<br>夫: いいよ。（何個必要なんだい？）<br>妻: 1パック（10個入り）だけお願い。", explanation: "【会話表現】妻が `Just one carton of ten eggs`（1パック10個入り）と、必要な数量を具体的に答えているため、夫側の質問は「何個必要なの？」と聞く `How many do you need?` が適切です。" },
+    { id: 80, type: 2, question: "Boy: Hi, Mary. Are you ready for the history presentation tomorrow?<br>Mary: No, not yet. I still need to finish my slides. ( &nbsp; &nbsp; )<br>Boy: I'm almost done. I can help you if you want.", options: ["How about you?", "What time is it?", "Who is your partner?", "Where is the classroom?"], answer: 0, translation: "男子生徒: やあ、メアリー。明日の歴史のプレゼンの準備はできた？<br>メアリー: ううん、まだだよ。まだスライドを終わらせなきゃいけなくて。（あなたはどう？）<br>男子生徒: 僕はほとんど終わったよ。もしよかったら手伝おうか？", explanation: "【会話表現】自分の状況（準備がまだ）を話したメアリーが、相手の進行状況を尋ね返す `How about you?`（あなたはどう？）が正解です。男子生徒の「僕はほとんど終わったよ（I'm almost done.）」という返答に綺麗に繋がります。" }
+    // ⬆️ ここに問題データを追加していく
+];
+
+// アプリ変数
+let currentMode = ""; 
+let activeQuestions = [];
+let currentQuestionIndex = 0;
+let score = 0;
+let isAnswered = false;
+
+let reviewList = JSON.parse(sessionStorage.getItem('eiken3_review_list')) || [];
+
+window.onload = function() {
+    updateReviewButton();
+};
+
+function updateReviewButton() {
+    const btn = document.getElementById("review-start-btn");
+    btn.innerText = `復習をスタート (残り: ${reviewList.length}問)`;
+    btn.disabled = (reviewList.length === 0);
+}
+
+function startMode(mode) {
+    currentMode = mode;
+    currentQuestionIndex = 0;
+    score = 0;
+
+    if (mode === 'practice') {
+        // 通常練習：全問をランダムにシャッフルして出題
+        activeQuestions = [...masterQuizData].sort(() => 0.5 - Math.random());
+    } else if (mode === 'review') {
+        // 復習モード：復習リスト内の問題をランダムにシャッフルして出題
+        activeQuestions = [...reviewList].sort(() => 0.5 - Math.random());
+    } else if (mode === 'test') {
+        // 10問テスト：全問からランダムに10問を抽出
+        let shuffled = [...masterQuizData].sort(() => 0.5 - Math.random());
+        activeQuestions = shuffled.slice(0, 10); 
+    }
+
+    document.getElementById("home-screen").style.display = "none";
+    document.getElementById("quiz-screen").style.display = "block";
+    loadQuestion();
+}
+
+function loadQuestion() {
+    isAnswered = false;
+    const currentQuestion = activeQuestions[currentQuestionIndex];
+    
+    const progressPercent = (currentQuestionIndex / activeQuestions.length) * 100;
+    document.getElementById("progress-fill").style.width = progressPercent + "%";
+    document.getElementById("question-number").innerText = `${currentQuestionIndex + 1} / ${activeQuestions.length}`;
+    
+    let modeTitle = "";
+    if (currentMode === 'practice') modeTitle = "📖 通常練習";
+    if (currentMode === 'review') modeTitle = "🔄 弱点復習";
+    if (currentMode === 'test') modeTitle = "🔥 10問満点テスト";
+    
+    document.getElementById("part-title").innerText = `${modeTitle} [大問${currentQuestion.type}]`;
+    document.getElementById("question-text").innerHTML = currentQuestion.question;
+
+    const optionsContainer = document.getElementById("options-container");
+    optionsContainer.innerHTML = "";
+    
+    currentQuestion.options.forEach((option, index) => {
+        const button = document.createElement("button");
+        button.className = "option-btn";
+        button.innerHTML = `<span class="option-number">${index + 1}</span> ${option}`;
+        button.onclick = () => checkAnswer(index);
+        optionsContainer.appendChild(button);
+    });
+
+    document.getElementById("feedback-box").style.display = "none";
+    document.getElementById("next-btn").style.display = "none";
+}
+
+function checkAnswer(selectedIndex) {
+    if (isAnswered) return;
+    isAnswered = true;
+
+    const currentQuestion = activeQuestions[currentQuestionIndex];
+    const options = document.getElementsByClassName("option-btn");
+    
+    for (let i = 0; i < options.length; i++) {
+        options[i].disabled = true;
+    }
+
+    const feedbackBox = document.getElementById("feedback-box");
+    const feedbackResult = document.getElementById("feedback-result");
+    const userSelectionInfo = document.getElementById("user-selection-info");
+    
+    const userChoiceText = currentQuestion.options[selectedIndex];
+    const correctChoiceText = currentQuestion.options[currentQuestion.answer];
+
+    if (selectedIndex === currentQuestion.answer) {
+        options[selectedIndex].classList.add("correct");
+        feedbackBox.className = "feedback-box correct-bg";
+        feedbackResult.innerHTML = "⭕ 正解！";
+        userSelectionInfo.innerHTML = `あなたの選択: <strong style="color:#137333;">${selectedIndex + 1}. ${userChoiceText}</strong>`;
+        score++;
+
+        if (currentMode === 'review') {
+            reviewList = reviewList.filter(item => item.id !== currentQuestion.id);
+            sessionStorage.setItem('eiken3_review_list', JSON.stringify(reviewList));
+        }
+    } else {
+        options[selectedIndex].classList.add("wrong");
+        options[currentQuestion.answer].classList.add("correct");
+        feedbackBox.className = "feedback-box wrong-bg";
+        feedbackResult.innerHTML = "❌ 不正解...";
+        userSelectionInfo.innerHTML = `あなたの選択: <span style="color:#c5221f;">${selectedIndex + 1}. ${userChoiceText}</span><br>正解: <strong style="color:#137333;">${currentQuestion.answer + 1}. ${correctChoiceText}</strong>`;
+
+        if (currentMode === 'practice' || currentMode === 'test') {
+            if (!reviewList.some(item => item.id === currentQuestion.id)) {
+                reviewList.push(currentQuestion);
+                sessionStorage.setItem('eiken3_review_list', JSON.stringify(reviewList));
+            }
+        }
+    }
+
+    document.getElementById("translation-box").innerHTML = currentQuestion.translation;
+    document.getElementById("explanation-box").innerHTML = currentQuestion.explanation;
+    
+    feedbackBox.style.display = "block";
+    document.getElementById("next-btn").style.display = "block";
+}
+
+function nextQuestion() {
+    currentQuestionIndex++;
+    if (currentQuestionIndex < activeQuestions.length) {
+        loadQuestion();
+    } else {
+        showResult();
+    }
+}
+
+function showResult() {
+    document.getElementById("quiz-screen").style.display = "none";
+    const resultScreen = document.getElementById("result-screen");
+    resultScreen.style.display = "block";
+    
+    const commentEle = document.getElementById("result-comment");
+    const actionBtn = document.getElementById("result-action-btn");
+
+    document.getElementById("score-text").innerText = `${score} / ${activeQuestions.length}`;
+
+    if (currentMode === 'test') {
+        if (score === 10) {
+            resultScreen.className = "container result-screen";
+            document.getElementById("result-title").innerText = "🎉 テスト合格！";
+            commentEle.innerText = "素晴らしい！見見事満点を達成しました！この調子で本番へ臨みましょう！";
+            commentEle.style.color = "var(--success-color)";
+            actionBtn.innerText = "ホームメニューに戻る";
+            actionBtn.onclick = backToHome;
+        } else {
+            resultScreen.className = "container result-screen fail";
+            document.getElementById("result-title").innerText = "🚨 不合格（やり直し）";
+            commentEle.innerText = `満点(10点)以外は認められません！(今回:${score}点)\n間違えた問題は「復習リスト」に入ったので、覚えるまで再挑戦！`;
+            commentEle.style.color = "var(--error-color)";
+            actionBtn.innerText = "もう一度テストに挑戦する";
+            actionBtn.onclick = () => startMode('test');
+        }
+    } else {
+        resultScreen.className = "container result-screen";
+        document.getElementById("result-title").innerText = "お疲れ様でした！";
+        commentEle.style.color = "var(--text-color)";
+        if (currentMode === 'practice') {
+            commentEle.innerText = `練習終了！間違えた問題（${activeQuestions.length - score}問）は復習リストに登録されました。`;
+        } else {
+            commentEle.innerText = `復習終了！現在の残り復習問題は ${reviewList.length}問 です。`;
+        }
+        actionBtn.innerText = "ホームメニューに戻る";
+        actionBtn.onclick = backToHome;
+    }
+}
+
+function backToHome() {
+    document.getElementById("result-screen").style.display = "none";
+    document.getElementById("home-screen").style.display = "block";
+    updateReviewButton();
+}
+
+function goToHomeFromQuiz() {
+    if (confirm("ホーム画面に戻りますか？\n（※現在解いているモードの進行状況はリセットされます）")) {
+        document.getElementById("quiz-screen").style.display = "none";
+        document.getElementById("home-screen").style.display = "block";
+        updateReviewButton();
+    }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中2理科 定期テスト対策（化学変化と原子・分子）</title>
+    <style>
+        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f0f2f5; color: #333; }
+        .page { display: none; }
+        .active { display: block; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        h1 { color: #2c5282; text-align: center; border-bottom: 3px solid #2c5282; padding-bottom: 10px; }
+        #timer-bar, #score-bar { position: sticky; top: 0; background: #c53030; color: white; padding: 10px; text-align: center; font-weight: bold; border-radius: 5px; z-index: 1000; font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        #score-bar { background: #2f855a; top: 50px; display: none; }
+        .question-item { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #cbd5e0; }
+        .q-num { font-weight: bold; color: #2b6cb0; margin-right: 10px; }
+        .q-type { font-size: 0.8em; background: #edf2f7; padding: 2px 8px; border-radius: 4px; margin-left: 10px; color: #4a5568; }
+        .options-container { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .option-item { background: #fff; border: 1px solid #2b6cb0; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; color: #2b6cb0; }
+        .btn { display: block; width: 100%; padding: 15px; background: #2b6cb0; color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; text-align: center; margin-top: 20px; text-decoration: none; }
+        .btn:hover { background: #2c5282; }
+        .scoring-btns { margin-top: 10px; display: flex; gap: 10px; }
+        .score-btn { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-correct { background: #e6fffa; color: #234e52; border: 1px solid #38b2ac; }
+        .btn-correct.selected { background: #38b2ac; color: white; }
+        .btn-wrong { background: #fff5f5; color: #742a2a; border: 1px solid #f56565; }
+        .btn-wrong.selected { background: #f56565; color: white; }
+        .ans-item { margin-bottom: 20px; padding: 15px; background: #f7fafc; border-left: 4px solid #2f855a; }
+        .ans-q-text { font-size: 0.95em; color: #4a5568; margin: 10px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+        .ans-correct { font-weight: bold; color: #2f855a; font-size: 1.1em; }
+        .ans-explanation { font-size: 0.9em; color: #4a5568; margin-top: 5px; background: #fff; padding: 10px; border-radius: 4px; }
+        .category-header { background: #4a5568; color: white; padding: 8px 15px; margin: 30px 0 15px 0; border-radius: 5px; font-size: 1em; }
+    </style>
+</head>
+<body>
+
+<div id="test-page" class="page active">
+    <div id="timer-bar">残り時間: <span id="timer">30:00</span></div>
+    <h1>理科 定期テスト対策（化学変化と原子・分子）</h1>
+    <div class="card">
+        <p>※ノートに解答を記入し、最後に「採点ページへ」を押して確認してください。</p>
+        <div id="test-container">
+            <div class="category-header">第1ブロック：記号選択（10問）</div>
+            <div id="questions-container-1"></div>
+            <div class="category-header">第2ブロック：頻出の元素記号・化学式（10問）</div>
+            <div id="questions-container-2"></div>
+            <div class="category-header">第3ブロック：一問一答（20問）</div>
+            <div id="questions-container-3"></div>
+            <div class="category-header">第4ブロック：記述問題（10問）</div>
+            <div id="questions-container-4"></div>
+            <div class="category-header">第5ブロック：発展・応用（10問）</div>
+            <div id="questions-container-5"></div>
+        </div>
+        <button class="btn" onclick="showAnswers()">テストを終了して採点ページへ</button>
+    </div>
+</div>
+
+<div id="answer-page" class="page">
+    <div id="score-bar">正答率: <span id="score-val">0</span>% (<span id="correct-count">0</span>/60問)</div>
+    <h1>解答・解説一覧</h1>
+    <div class="card" id="answers-container"></div>
+    <button class="btn" onclick="location.reload()">テストTOPに戻る</button>
+</div>
+
+<script>
+const questions = [
+    // 第1ブロック：記号選択 (1-10)
+    { id: 1, type: "記号選択", cat: 1, q: "水を電気分解するとき、電流を流れやすくするために少量溶かす物質はどれか。", options: ["デンプン", "水酸化ナトリウム", "エタノール", "砂糖"], a: "水酸化ナトリウム", e: "純粋な水には電流がほとんど流れないため、電流を流れやすくする目的で水酸化ナトリウムを溶かします。" },
+    { id: 2, type: "記号選択", cat: 1, q: "炭酸水素ナトリウムを加熱するとき、試験管の口を底よりもわずかに下げる理由はどれか。", options: ["発生した気体が外に出やすくするため", "加熱する部分に熱を集中させるため", "発生した液体が加熱部分に流れて試験管が割れるのを防ぐため", "ゴム管が折れ曲がらないようにするため"], a: "発生した液体が加熱部分に流れて試験管が割れるのを防ぐため", e: "試験管の底（加熱している部分）に液体が流れると、急激な温度変化によって試験管が割れる恐れがあります。" },
+    { id: 3, type: "記号選択", cat: 1, q: "水の電気分解において、陰極側と陽極側に発生する気体の体積の比（陰極：陽極）として正しいものはどれか。", options: ["1：1", "1：2", "2：1", "3：1"], a: "2：1", e: "陰極側からは水素が、陽極側からは酸素が発生します。分解によって生じる体積の比は 水素：酸素 ＝ 2：1 となります。" },
+    { id: 4, type: "記号選択", cat: 1, q: "次のうち、「たたくと広がる性質（展性）」や「みがくと光る性質（金属光沢）」をすべて持つ物質はどれか。", options: ["水", "二酸化炭素", "銀", "砂糖"], a: "銀", e: "展性や金属光沢、電気や熱をよく伝える性質は、金属（銀など）に共通して見られる特徴です。" },
+    { id: 5, type: "記号選択", cat: 1, q: "鉄と硫黄の混合物を加熱するとき、反応が始まったら加熱をやめても反応が最後まで進む理由はどれか。", options: ["鉄が空気中の酸素と反応し続けるから", "反応によって発生した熱で次の反応が引き起こされるから", "硫黄が自然に燃え続ける性質を持つから", "アルミニウムはくが熱を閉じ込めるから"], a: "反応によって発生した熱で次の反応が引き起こされるから", e: "鉄と硫黄が結びつく反応は激しく、大きな光と熱を出します。この発生した熱がまわりの未反応の部分を加熱するため、次々と反応が進みます。" },
+    { id: 6, type: "記号選択", cat: 1, q: "次のうち、物質の「分子」を正しく説明している文はどれか。", options: ["化学変化によって、それ以上に分割できる粒子である", "物質の性質を示す最小単位の粒子である", "2種類以上の元素が混じり合ったものである", "金属の物質にしか存在しない粒子である"], a: "物質の性質を示す最小単位の粒子である", e: "いくつかの原子が結びついた粒子であり、その物質としての性質を示す最も小さな単位を分子と呼びます。" },
+    { id: 7, type: "記号選択", cat: 1, q: "炭酸水素ナトリウムを加熱したあと、試験管の底に残った「白い粉末（炭酸ナトリウム）」の性質として正しいものはどれか。", options: ["水に少ししかとけず、フェノールフタレイン溶液をうすい赤色にする", "水によくとけ、フェノールフタレイン溶液を濃い赤色にする", "水によくとけ、塩酸を加えると独特の腐卵臭がする", "加熱前の物質とまったく同じ物質である"], a: "水によくとけ、フェノールフタレイン溶液を濃い赤色にする", e: "残った物質は炭酸ナトリウムです。元の炭酸水素ナトリウムよりも水によくとけ、強いアルカリ性を示す特徴があります。" },
+    { id: 8, type: "記号選択", cat: 1, q: "次のうち、2種類以上の元素からできている物質である「化合物」はどれか。", options: ["酸素", "鉄", "二酸化炭素", "マグネシウム"], a: "二酸化炭素", e: "1種類の元素のみからなるのが単体（酸素、鉄など）、2種類以上の元素からなるのが化合物（二酸化炭素など）です。" },
+    { id: 9, type: "記号選択", cat: 1, q: "青色の塩化コバル紙が桃色（赤色）に変化したとき、そこに存在することが確かめられる物質はどれか。", options: ["二酸化炭素", "酸素", "水素", "水"], a: "水", e: "塩化コバル紙は、水にふれると青色から桃色（赤色）に変わる性質があり、水の検出に用いられます。" },
+    { id: 10, type: "記号選択", cat: 1, q: "原子の性質について説明した次のア〜エの文のうち、誤っているものはどれか。", options: ["化学変化によって、原子はそれ以上に分割することはできない", "原子の種類によって、質量や大きさが決まっている", "化学変化によって、他の種類の原子に変わることがある", "化学変化によって、新しくできたり、なくなったりしない"], a: "化学変化によって、他の種類の原子に変わることがある", e: "化学変化によって原子が他の種類の原子に変わったり、なくなったり、新しくできたりすることはありません（原子の保存）。" },
+
+    // 第2ブロック：頻出の元素記号・化学式 (11-20)
+    { id: 11, type: "元素記号・化学式", cat: 2, q: "「水素」の元素記号を書け。", a: "H", e: "水素の元素記号は大文字のHです。" },
+    { id: 12, type: "元素記号・化学式", cat: 2, q: "「マグネシウム」の元素記号を書け。", a: "Mg", e: "マグネシウムの元素記号はMgです。1文字目は大文字、2文字目は小文字で書きます。" },
+    { id: 13, type: "元素記号・化学式", cat: 2, q: "「塩素」の元素記号を書け。", a: "Cl", e: "塩素の元素記号はCl（シー・エル）です。小文字のl（エル）の書き方に注意しましょう。" },
+    { id: 14, type: "元素記号・化学式", cat: 2, q: "「銅」の元素記号を書け。", a: "Cu", e: "銅の元素記号はCuです。" },
+    { id: 15, type: "元素記号・化学式", cat: 2, q: "「銀」の元素記号を書け。", a: "Ag", e: "銀の元素記号はAgです。" },
+    { id: 16, type: "元素記号・化学式", cat: 2, q: "「酸素分子」の化学式を書け。", a: "O<sub>2</sub>", e: "酸素分子は、酸素原子が2個結びついているためO<sub>2</sub>と表します。" },
+    { id: 17, type: "元素記号・化学式", cat: 2, q: "「水」の化学式を書け。", a: "H<sub>2</sub>O", e: "水分子は水素原子2個と酸素原子1個が結びついているためH<sub>2</sub>Oとなります。" },
+    { id: 18, type: "元素記号・化学式", cat: 2, q: "「塩化ナトリウム」の化学式を書け。", a: "NaCl", e: "ナトリウム原子と塩素原子が1：1の割合で結合しているため、NaClと表します。" },
+    { id: 19, type: "元素記号・化学式", cat: 2, q: "「二酸化炭素」の化学式を書け。", a: "CO<sub>2</sub>", e: "炭素原子1個に酸素原子2個が結びついているためCO<sub>2</sub>と表します。" },
+    { id: 20, type: "元素記号・化学式", cat: 2, q: "「硫化鉄」の化学式を書け。", a: "FeS", e: "鉄(Fe)と硫黄(S)が1：1の割合で結びついた化合物です。" },
+
+    // 第3ブロック：一問一答 (21-40)
+    { id: 21, type: "一問一答", cat: 3, q: "もとの物質とちがう別の物質ができる変化を何というか。", a: "化学変化（または化学反応）", e: "元の物質の性質が失われ、全く新しい性質の物質に変わる現象です。" },
+    { id: 22, type: "一問一答", cat: 3, q: "1種類の物質が、2種類以上の別の物質に分かれる化学変化を何というか。", a: "分解", e: "熱による分解（熱分解）や、電流による分解（電気分解）があります。" },
+    { id: 23, type: "一問一答", cat: 3, q: "物質に熱を加えることによって分解することを何というか。", a: "熱分解", e: "炭酸水素ナトリウムや酸化銀の加熱による分解がこれに当たります。" },
+    { id: 24, type: "一問一答", cat: 3, q: "物質に電流を流すことによって分解することを何というか。", a: "電気分解", e: "水の電気分解などが代表例です。" },
+    { id: 25, type: "一問一答", cat: 3, q: "それ以上分割することができない、物質をつくる最小単位の粒子を何というか。", a: "原子", e: "化学変化の前後でそれ以上壊れたり、新しくできたり、他のものに変わったりしない粒子です。" },
+    { id: 26, type: "一問一答", cat: 3, q: "「原子の種類」のことを何というか。", a: "元素", e: "物質を構成する基本的な成分（種類）を指す言葉です。" },
+    { id: 27, type: "一問一答", cat: 3, q: "元素記号を組み合わせて、物質を式で表したものを何というか。", a: "化学式", e: "物質をつくっている原子の種類や、その割合・数を表したものです。" },
+    { id: 28, type: "一問一答", cat: 3, q: "1種類の元素だけでできている純粋な物質を何というか。", a: "単体", e: "水素(H<sub>2</sub>)、酸素(O<sub>2</sub>)、鉄(Fe)などが単体の例です。" },
+    { id: 29, type: "一問一答", cat: 3, q: "2種類以上の元素からできている純粋な物質を何というか。", a: "化合物", e: "水(H<sub>2</sub>O)や二酸化炭素(CO<sub>2</sub>)など、複数の元素が結びついたものです。" },
+    { id: 30, type: "一問一答", cat: 3, q: "純粋な物質に対し、2種類以上の物質が混じり合っているものを何というか。", a: "混合物", e: "空気や食塩水など、複数の物質が混ざったもので、1つの化学式では表せません。" },
+    { id: 31, type: "一問一答", cat: 3, q: "元素の性質を規則的に整理してまとめた表を何というか。", a: "元素の周期表（または周期表）", e: "縦の列に似た性質を持つ元素が並ぶように配置された表です。" },
+    { id: 32, type: "一問一答", cat: 3, q: "化学式を用いて、化学変化を表した式を何というか。", a: "化学反応式", e: "矢印（→）の左側に反応前の物質、右側に反応後の物質を配置して表します。" },
+    { id: 33, type: "一問一答", cat: 3, q: "酸化銀を熱分解したとき、試験管の底に残る「白い物質」の名称を書け。", a: "銀", e: "黒っぽい酸化銀を加熱すると、白色の銀と酸素に分解されます。" },
+    { id: 34, type: "一問一答", cat: 3, q: "集めた気体に「火のついた線香」を入れると、激しく燃えた。この気体は何か。", a: "酸素", e: "酸素には、物が燃えるのを助ける性質（助燃性）があります。" },
+    { id: 35, type: "一問一答", cat: 3, q: "集めた気体に「火のついたマッチ」を近づけると、音を立てて燃えた。この気体は何か。", a: "水素", e: "水素は非常に燃えやすく、空気と混ざって火を近づけると音を立てて爆発的に燃える性質をもちます。" },
+    { id: 36, type: "一問一答", cat: 3, q: "発生した気体を「石灰水」に通すと、白く濁った。この気体は何か。", a: "二酸化炭素", e: "二酸化炭素を石灰水に通すと、特有の化学変化によって白く濁る性質があります。" },
+    { id: 37, type: "一問一答", cat: 3, q: "鉄粉と硫黄の粉末が結びついてできた、黒くてかたい物質は何か。", a: "硫化鉄", e: "鉄と硫黄が熱を出して激しく反応し、硫化鉄という別の物質に変化します。" },
+    { id: 38, type: "一問一答", cat: 3, q: "硫化鉄にうすい塩酸を加えたとき、発生する特有の腐卵臭（卵の腐ったようなにおい）がする気体は何か。", a: "硫化水素", e: "硫化鉄と塩酸が反応すると、有毒で独特のにおいを持つ硫化水素が発生します。" },
+    { id: 39, type: "一問一答", cat: 3, q: "鉄粉にうすい塩酸を加えたとき、発生するにおいのない気体は何か。", a: "水素", e: "金属である鉄に塩酸を加えると、水素が発生します。" },
+    { id: 40, type: "一問一答", cat: 3, q: "物質の状態（固体・液体・気体）が変わるだけで、別の物質に変わらない現象を何というか。", a: "状態変化", e: "氷が溶けて水になる変化などは状態変化であり、物質そのものは変わっていないため化学変化ではありません。" },
+
+    // 第4ブロック：記述問題 (41-50)
+    { id: 41, type: "記述", cat: 4, q: "炭酸水素ナトリウムを熱分解したとき、3つの物質に分かれる。それぞれの物質名をすべて答えよ。", a: "炭酸ナトリウム、二酸化炭素、水", e: "炭酸水素ナトリウムを加熱すると、固体の炭酸ナトリウム、気体の二酸化炭素、液体の水に分解されます。" },
+    { id: 42, type: "記述", cat: 4, q: "水の電気分解の実験を行う際、最初に集めた試験管1本分の気体を使用せずに捨てるのはなぜか。", a: "はじめのうちは、装置の中に残っていた空気が出てくるから。", e: "装置内に最初からたまっていた空気が混ざっているため、純粋な発生気体を調べるために最初の気体は捨てます。" },
+    { id: 43, type: "記述", cat: 4, q: "水の電気分解の実験において、陰極側から発生する気体が「水素」であることを確かめる方法を説明せよ。", a: "気体に火のついたマッチを近づけると、音を立てて燃えることを確認する。", e: "水素特有の「燃えやすい性質（可燃性）」を利用した確かめ方です。" },
+    { id: 44, type: "記述", cat: 4, q: "水を冷凍庫に入れて氷にする変化が「化学変化とはいえない」理由を説明せよ。", a: "状態が液体から固体に変化しただけで、水が別の物質に変わったわけではないから。", e: "物質そのものの性質（粒子）は変わっていないため、これは状態変化にあたります。" },
+    { id: 45, type: "記述", cat: 4, q: "鉄粉と硫黄の粉末を混ぜ合わせただけのもの（加熱前）に磁石を近づけるとどうなるか、理由とともに説明せよ。", a: "引き寄せられる。まだ化学変化を起こしておらず、鉄の性質がそのまま残っているから。", e: "ただ混ざっているだけの混合物なので、それぞれの物質の元の性質（鉄が磁石につく性質など）がそのまま保たれています。" },
+    { id: 46, type: "記述", cat: 4, q: "鉄と硫黄の混合物を加熱してできた物質（硫化鉄）に磁石を近づけるとどうなるか、理由とともに説明せよ。", a: "引き寄せられない（または引き寄せられにくい）。化学変化によって、鉄とは別の性質を持つ物質に変わったから。", e: "化合物になると元の物質とは全く異なる性質を持つため、鉄の持っていた強い磁性は失われます。" },
+    { id: 47, type: "記述", cat: 4, q: "化学反応式を書く際、矢印（→）の左側と右側で必ず等しくしなければならないルールは何か説明せよ。", a: "原子の種類と、それぞれの原子の総数（個数）。", e: "化学変化によって原子が新しく生まれたり消えたり、他の種類の原子に変わることはないため、反応の前後で総数が一致する必要があります。" },
+    { id: 48, type: "記述", cat: 4, q: "酸化銀の加熱を途中でやめたとき、試験管に残った物質は純粋な銀といえるか、理由とともに説明せよ。", a: "いえない。まだ分解されていない未反応の酸化銀が混ざっているから。", e: "完全に熱分解が終わるまでは、生成された銀の中に黒っぽい酸化銀が残った状態（混合物）になります。" },
+    { id: 49, type: "記述", cat: 4, q: "温泉に銀のアクセサリーをつけたまま入ると黒く変色することがある理由を説明せよ。", a: "銀が温泉に含まれる硫黄の成分と反応し、黒色の別の物質（硫化銀）に変わるから。", e: "銀と硫黄が結びつく化学変化（硫化）が起こったために色が変化します。" },
+    { id: 50, type: "記述", cat: 4, q: "「単体」と「化合物」の共通点と相違点を、それぞれ「元素」という言葉を使って説明せよ。", a: "共通点はどちらも1種類の物質（純物質）である点。相違点は、単体は1種類の元素からできているのに対し、化合物は2種類以上の元素からできている点。", e: "どちらも他の物質が混じっていない純粋な物質ですが、それを構成している元素の種類数が異なります。" },
+
+    // 第5ブロック：発展・応用 (51-60)
+    { id: 51, type: "発展", cat: 5, q: "炭酸水素ナトリウムの熱分解実験で、ガスバーナーの火を消す前に必ず「ガラス管の先を水の中から出す」のはなぜか。", a: "水槽の水が、加熱した試験管に逆流して試験管が割れるのを防ぐため。", e: "火を先に消すと試験管内の空気が冷えて収縮し気圧が下がるため、外部の水が逆流して試験管が割れる危険があります。" },
+    { id: 52, type: "発展", cat: 5, q: "「2H」と「H<sub>2</sub>」という表現は、それぞれ何を表しているか、その違いを原子・分子の観点から説明せよ。", a: "「2H」は結びついていない水素原子が2個あることを表し、「H<sub>2</sub>」は水素原子2個が結びついた水素分子1個を表す。", e: "化学式の前の大きな数字は粒子の個数を、右下の小さな数字は1つの分子を構成する原子の数を表します。" },
+    { id: 53, type: "発展", cat: 5, q: "鉄と硫黄の結びつく変化を、化学反応式で表せ。", a: "Fe + S → FeS", e: "鉄(Fe)と硫黄(S)が反応して、硫化鉄(FeS)ができる反応です。原子の数は左右で最初から揃っています。" },
+    { id: 54, type: "発展", cat: 5, q: "炭素と酸素が結びついて二酸化炭素ができる変化を、化学反応式で表せ。", a: "C + O<sub>2</sub> → CO<sub>2</sub>", e: "炭素(C)と酸素分子(O<sub>2</sub>)が反応して、二酸化炭素(CO<sub>2</sub>)ができます。" },
+    { id: 55, type: "発展", cat: 5, q: "水素と酸素が結びついて水ができる変化を、化学反応式で表せ。", a: "2H<sub>2</sub> + O<sub>2</sub> → 2H<sub>2</sub>O", e: "左右の原子の数を合わせるために係数を補う必要があります。水素分子2個と酸素分子1個から、水分子2個ができます。" },
+    { id: 56, type: "発展", cat: 5, q: "水が電気分解されて水素と酸素ができる変化を、化学反応式で表せ。", a: "2H<sub>2</sub>O → 2H<sub>2</sub> + O<sub>2</sub>", e: "水の電気分解は、水素と酸素が結びつく反応（水の合成）のちょうど逆の式になります。" },
+    { id: 57, type: "発展", cat: 5, q: "酸化銀(Ag<sub>2</sub>O)を加熱して銀と酸素に分解される変化を、化学反応式で表せ。", a: "2Ag<sub>2</sub>O → 4Ag + O<sub>2</sub>", e: "酸化銀の化学式はAg<sub>2</sub>Oです。反応前後の原子数をそろえると 2Ag<sub>2</sub>O → 4Ag ＋ O<sub>2</sub> になります。" },
+    { id: 58, type: "発展", cat: 5, q: "炭酸水素ナトリウム(NaHCO<sub>3</sub>)の熱分解の変化を、化学反応式で表せ。", a: "2NaHCO3 → Na<sub>2</sub>CO<sub>3</sub> + CO<sub>2</sub> + H<sub>2</sub>O", e: "2分子の炭酸水素ナトリウムから、炭酸ナトリウム(Na<sub>2</sub>CO<sub>3</sub>)、二酸化炭素(CO<sub>2</sub>)、水(H<sub>2</sub>O)がそれぞれ1つずつ生成されます。" },
+    { id: 59, type: "発展", cat: 5, q: "都市ガスの主成分であるメタン(CH<sub>4</sub>)を燃やす（酸素 O<sub>2</sub> と反応させる）と、二酸化炭素と水ができる。この化学反応式を書け。", a: "CH<sub>4</sub> + 2O<sub>2</sub> → CO<sub>2</sub> + 2H<sub>2</sub>O", e: "メタン分子1個と酸素分子2個が反応して、二酸化炭素分子1個と水分子2個が生成されます。左右のO原子の数が4個で一致します。" },
+    { id: 60, type: "発展", cat: 5, q: "鉄原子と硫黄原子が結びつくとき、それぞれの原子は何対何という個数の割合（比）で結びつくか答えよ。", a: "1：1", e: "鉄の原子と硫黄の原子は、常に 1：1 の個数比で規則正しく結びついて硫化鉄(FeS)の結晶を作ります。" }
+];
+
+let timeLeft = 30 * 60;
+const timerDisplay = document.getElementById('timer');
+const userScores = new Array(questions.length).fill(null);
+
+function generateQuestions() {
+    questions.forEach(q => {
+        const container = document.getElementById(`questions-container-${q.cat}`);
+        const div = document.createElement('div');
+        div.className = 'question-item';
+        let content = `<span class="q-num">問${q.id}</span> <span class="q-type">${q.type}</span><br>${q.q}`;
+        
+        if (q.type === "記号選択" && q.options) {
+            content += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                content += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            content += `</div>`;
+        }
+        
+        div.innerHTML = content;
+        container.appendChild(div);
+    });
+}
+
+function showAnswers() {
+    clearInterval(countdown);
+    document.getElementById('test-page').classList.remove('active');
+    document.getElementById('answer-page').classList.add('active');
+    document.getElementById('score-bar').style.display = 'block';
+    
+    const container = document.getElementById('answers-container');
+    questions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'ans-item';
+        div.id = `ans-item-${idx}`;
+        
+        let qContent = `<div class="ans-q-text"><span class="q-num">問${q.id}</span> [${q.type}] ${q.q}`;
+        if (q.type === "記号選択" && q.options) {
+            qContent += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                qContent += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            qContent += `</div>`;
+        }
+        qContent += `</div>`;
+
+        div.innerHTML = `
+            ${qContent}
+            <div><span class="ans-correct">正解：${q.a}</span></div>
+            <div class="ans-explanation"><strong>解説:</strong> ${q.e}</div>
+            <div class="scoring-btns">
+                <button class="score-btn btn-correct" id="btn-c-${idx}" onclick="setScore(${idx}, true)">○ 正解</button>
+                <button class="score-btn btn-wrong" id="btn-w-${idx}" onclick="setScore(${idx}, false)">× 不正解</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+    window.scrollTo(0, 0);
+}
+
+const countdown = setInterval(() => {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+    timerDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    if (timeLeft <= 0) {
+        clearInterval(countdown);
+        alert('時間終了です！採点ページへ移ります。');
+        showAnswers();
+    }
+    timeLeft--;
+}, 1000);
+
+function setScore(idx, isCorrect) {
+    userScores[idx] = isCorrect;
+    document.getElementById(`btn-c-${idx}`).classList.toggle('selected', isCorrect);
+    document.getElementById(`btn-w-${idx}`).classList.toggle('selected', !isCorrect);
+    updateScore();
+}
+
+function updateScore() {
+    const correctCount = userScores.filter(s => s === true).length;
+    document.getElementById('correct-count').innerText = correctCount;
+    document.getElementById('score-val').innerText = Math.round((correctCount / questions.length) * 100);
+}
+
+generateQuestions();
+</script>
+
+</body>
+</html>

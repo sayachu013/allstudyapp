@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中2英語 確認テスト（過去形・過去進行形・未来表現・動名詞）</title>
+    <style>
+        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f0f2f5; color: #333; }
+        .page { display: none; }
+        .active { display: block; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        h1 { color: #2c5282; text-align: center; border-bottom: 3px solid #2c5282; padding-bottom: 10px; }
+        #timer-bar, #score-bar { position: sticky; top: 0; background: #c53030; color: white; padding: 10px; text-align: center; font-weight: bold; border-radius: 5px; z-index: 1000; font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        #score-bar { background: #2f855a; top: 50px; display: none; }
+        .question-item { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #cbd5e0; }
+        .q-num { font-weight: bold; color: #2b6cb0; margin-right: 10px; }
+        .q-type { font-size: 0.8em; background: #edf2f7; padding: 2px 8px; border-radius: 4px; margin-left: 10px; color: #4a5568; }
+        .options-container { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .option-item { background: #fff; border: 1px solid #2b6cb0; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; color: #2b6cb0; }
+        .btn { display: block; width: 100%; padding: 15px; background: #2b6cb0; color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; text-align: center; margin-top: 20px; text-decoration: none; }
+        .btn:hover { background: #2c5282; }
+        .scoring-btns { margin-top: 10px; display: flex; gap: 10px; }
+        .score-btn { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-correct { background: #e6fffa; color: #234e52; border: 1px solid #38b2ac; }
+        .btn-correct.selected { background: #38b2ac; color: white; }
+        .btn-wrong { background: #fff5f5; color: #742a2a; border: 1px solid #f56565; }
+        .btn-wrong.selected { background: #f56565; color: white; }
+        .ans-item { margin-bottom: 20px; padding: 15px; background: #f7fafc; border-left: 4px solid #2f855a; }
+        .ans-q-text { font-size: 0.95em; color: #4a5568; margin: 10px 0; border-bottom: 1px solid #e2e880; padding-bottom: 10px; }
+        .ans-correct { font-weight: bold; color: #2f855a; font-size: 1.1em; }
+        .ans-explanation { font-size: 0.9em; color: #4a5568; margin-top: 5px; background: #fff; padding: 10px; border-radius: 4px; }
+        .category-header { background: #4a5568; color: white; padding: 8px 15px; margin: 30px 0 15px 0; border-radius: 5px; font-size: 1em; }
+        
+        .vertical-calc-box { font-family: "Courier New", Courier, monospace; font-size: 1.2em; line-height: 1.3; background: #f8fafc; padding: 12px 20px; border-radius: 6px; display: inline-block; margin: 10px 0; border: 1px solid #cbd5e0; text-align: right; letter-spacing: 2px; }
+        .vertical-calc-line { border-bottom: 2px solid #333; margin-top: 2px; margin-bottom: 4px; }
+        
+        .q-table { border-collapse: collapse; margin-top: 10px; margin-bottom: 10px; min-width: 280px; }
+        .q-table th, .q-table td { border: 1px solid #cbd5e0; padding: 6px 12px; text-align: center; font-size: 0.9em; }
+        .q-table th { background: #edf2f7; }
+    </style>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            chtml: { matchFontHeight: false }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+
+<div id="test-page" class="page active">
+    <div id="timer-bar">残り時間: <span id="timer">40:00</span></div>
+    <h1>中2英語 確認テスト（過去形・過去進行形・未来表現・動名詞）</h1>
+    <div class="card">
+        <p>※ノートに解答を記入し、最後に「採点ページへ」を押して確認してください。</p>
+        <div id="test-container">
+            <div class="category-header">第1ブロック：記号選択（10問）［重要表現・語形変化・文法識別］</div>
+            <div id="questions-container-1"></div>
+            <div class="category-header">第2ブロック：語形変化・空欄補充［一般動詞とbe動詞の過去形］（10問）</div>
+            <div id="questions-container-2"></div>
+            <div class="category-header">第3ブロック：並び替え問題［過去進行形・未来・動名詞］（15問）</div>
+            <div id="questions-container-3"></div>
+            <div class="category-header">第4ブロック：空欄補充・英作文【応用】（10問）</div>
+            <div id="questions-container-4"></div>
+            <div class="category-header">第5ブロック：長文・対話文の読解・内容一致（15問）</div>
+            <div id="questions-container-5"></div>
+        </div>
+        <button class="btn" onclick="showAnswers()">テストを終了して採点ページへ</button>
+    </div>
+</div>
+
+<div id="answer-page" class="page">
+    <div id="score-bar">正答率: <span id="score-val">0</span>% (<span id="correct-count">0</span>/60問)</div>
+    <h1>解答・解説一覧</h1>
+    <div class="card" id="answers-container"></div>
+    <button class="btn" onclick="location.reload()">テストTOPに戻る</button>
+</div>
+
+<script>
+const questions = [
+    // 第1ブロック：記号選択 (1-10)
+    { id: 1, type: "記号選択", cat: 1, q: "次の日本語に合う最も適切な英単語（過去形）を選びなさい。<br>「（元の場所に）もどった、帰ってきた」", options: ["went", "came", "saw", "took"], a: "イ", ans_literal: "came", e: "「もどる、帰る」は come back [cite: 77]、その過去形は came back となります [cite: 54]。wentはgo [cite: 165]、sawはsee [cite: 542]、tookはtakeの過去形です [cite: 71, 772]。" },
+    { id: 2, type: "記号選択", cat: 1, q: "次のうち、動詞「read（読む）」の過去形として、発音（読み方）が同じ単語を選びなさい。", options: ["red", "ride", "ready", "road"], a: "ア", ans_literal: "red", e: "readの過去形はスペルは同じですが [cite: 70]、発音は「レッド」となり [cite: 70]、色の「赤（red）」と同じ発音になります。" },
+    { id: 3, type: "記号選択", cat: 1, q: "次の文章の（ &nbsp; ）に入る適切な語を選びなさい。<br>I have a ( &nbsp; ) because I traveled between Japan and Finland.", options: ["sauna", "reindeer", "jet lag", "candy"], a: "ウ", ans_literal: "jet lag", e: "日本とフィンランドの間を移動した状況から、「時差ぼけ（jet lag）」が最も適切です [cite: 100, 154]。" },
+    { id: 4, type: "記号選択", cat: 1, q: "次のうち、規則動詞（過去形にするときに-edを付ける動詞）の組み合わせとして正しいものを選びなさい。<br>ア：play &nbsp;&nbsp; イ：eat &nbsp;&nbsp; ウ：visit &nbsp;&nbsp; エ：buy", options: ["ア と イ", "ア と ウ", "イ と エ", "ウ と エ"], a: "イ", ans_literal: "ア と ウ", e: "play $\\rightarrow$ played [cite: 724], visit $\\rightarrow$ visited [cite: 725] は規則変化動詞です。eat $\\rightarrow$ ate [cite: 752], buy $\\rightarrow$ bought [cite: 752] は不規則変化動詞です。" },
+    { id: 5, type: "記号選択", cat: 1, q: "次の英文の（ &nbsp; ）に入る語として最も適切なものを選びなさい。<br>The sun didn't rise ( &nbsp; ) 11 a.m. in winter.", options: ["during", "until", "for", "at"], a: "イ", ans_literal: "until", e: "not ~ until ... で「...まで〜しない」という意味になります [cite: 576, 578]。「冬は午前11時まで太陽が昇らなかった」という意味にするには until（〜まで）が適切です [cite: 576, 603]。" },
+    { id: 6, type: "記号選択", cat: 1, q: "次の表現のうち、「連絡をとり続ける」という意味の熟語を選びなさい。", options: ["take care", "find out", "keep in touch", "hold on to"], a: "ウ", ans_literal: "keep in touch", e: "keep in touch で「連絡をとり続ける」という意味になります [cite: 1891, 1978]。take care（気をつける） [cite: 1899, 1973]、find out（見つけ出す） [cite: 482]。" },
+    { id: 7, type: "記号選択", cat: 1, q: "「〜してはどうですか（提案）」を表す表現を選びなさい。", options: ["Why don't you ~?", "Are you ~?", "What did you ~?", "Will you ~?"], a: "ア", ans_literal: "Why don't you ~?", e: "Why don't you + 動詞の原形 ~? で「〜してはどうですか」と相手に提案や勧誘をする表現になります [cite: 2083, 2144]。" },
+    { id: 8, type: "記号選択", cat: 1, q: "次の文の（ &nbsp; ）に当てはまる語を選びなさい。<br>We enjoyed ( &nbsp; ) soccer in the park yesterday.", options: ["play", "played", "playing", "to play"], a: "ウ", ans_literal: "playing", e: "enjoyの直後には、動詞の-ing形（動名詞）が来ます [cite: 1654, 2011]。「〜することを楽しむ」という意味になり [cite: 1658]、to playは使えません。" },
+    { id: 9, type: "記号選択", cat: 1, q: "次の未来を表す文のうち、「その場で決めた話し手の意志」を表す時に使う最も一般的な助動詞を選びなさい。<br>例：今決めたんだけど、今晩電話するよ。 &rightarrow; I ( &nbsp; ) call you tonight.", options: ["am going to", "will", "was", "did"], a: "イ", ans_literal: "will", e: "すでに決まっている予定には be going to を使いますが [cite: 1558, 1730]、話しているその場で決めた意志や推測には will を用います [cite: 1629, 1735]。" },
+    { id: 10, type: "記号選択", cat: 1, q: "「海外で、海外へ」という意味を持つ副詞を次から選びなさい。", options: ["outside", "overseas", "local", "anywhere"], a: "イ", ans_literal: "overseas", e: "overseas は「海外で、海外へ」という意味です [cite: 2052, 2061]。outside（戸外で） [cite: 561, 609]、local（地元の） [cite: 1924, 1960]。" },
+
+    // 第2ブロック：語形変化・空欄補充 (11-20)
+    { id: 11, type: "一問一答", cat: 2, q: "動詞 go を過去形に書き換えなさい。", a: "went", e: "goの過去形は不規則変化の went です [cite: 165, 752]。" },
+    { id: 12, type: "一問一答", cat: 2, q: "動詞 buy を過去形に書き換えなさい。", a: "bought", e: "buyの過去形は不規則変化の bought です [cite: 461, 752]。" },
+    { id: 13, type: "一問一答", cat: 2, q: "動詞 win を過去形に書き換えなさい。", a: "won", e: "win（勝つ）の過去形は不規則変化の won です [cite: 752, 755]。" },
+    { id: 14, type: "一問一答", cat: 2, q: "動詞 take を過去形に書き換えなさい。", a: "took", e: "takeの過去形は不規則変化の took です [cite: 71, 752]。" },
+    { id: 15, type: "一問一答", cat: 2, q: "次の（ &nbsp; ）に適切な過去の否定を作る語を1語入れなさい。<br>I （ &nbsp; ） sleep well last night.", a: "didn't", e: "一般動詞の過去の否定文は「didn't + 動詞の原形」で作ります [cite: 162, 190]。（did not も正解 [cite: 168]）" },
+    { id: 16, type: "一問一答", cat: 2, q: "次の（ &nbsp; ）に過去の疑問文を作る語を1語入れなさい。<br>（ &nbsp; ） you enjoy your trip to Canada?", a: "Did", e: "一般動詞の過去の疑問文は、文頭に Did を置き、動詞を原形にします [cite: 141, 144, 206]。" },
+    { id: 17, type: "一問一答", cat: 2, q: "次の文の（ &nbsp; ）に適切なbe動詞の過去形を入れなさい。<br>I （ &nbsp; ） a student two years ago.", a: "was", e: "主語が I のとき、過去形は was になります [cite: 819, 1435]。" },
+    { id: 18, type: "一問一答", cat: 2, q: "次の文の（ &nbsp; ）に適切なbe動詞の過去形を入れなさい。<br>They （ &nbsp; ） very busy last week.", a: "were", e: "主語が They（複数形）のとき、be動詞の過去形は were になります [cite: 1435]。" },
+    { id: 19, type: "一問一答", cat: 2, q: "次の文を過去の否定文にする時、（ &nbsp; ）に入る語を短縮形で答えなさい。<br>He （ &nbsp; ） tired yesterday.", a: "wasn't", e: "主語が He のときの be動詞過去形は was です [cite: 1435]。その否定の短縮形は wasn't です [cite: 920]。（was not も正解 [cite: 927]）" },
+    { id: 20, type: "一問一答", cat: 2, q: "次の日本語に合うよう、（ &nbsp; ）に適切な語を入れなさい。<br>「あなたは昨日の午後、家にいましたか」 &rightarrow; （ &nbsp; ） you at home yesterday afternoon?", a: "Were", e: "主語が you のとき、過去の疑問文は Were を主語の前に出します [cite: 855, 891, 910]。" },
+
+    // 第3ブロック：並び替え問題 (21-35)
+    { id: 21, type: "一問一答", cat: 3, q: "「健太は昨日サッカーをしました」という意味になるように、語群を並び替えなさい。<br>[ soccer / Kenta / yesterday / played ]", a: "Kenta played soccer yesterday.", e: "「主語 ＋ 動詞の過去形 ＋ 目的語 ＋ 過去を表す語句」の順になります [cite: 716, 719]。" },
+    { id: 22, type: "一問一答", cat: 3, q: "「私たちは先週、図書館に行きませんでした」という意味になるように、語群を並び替えなさい。<br>[ last / go / we / didn't / to the library / week ]", a: "We didn't go to the library last week.", e: "「主語 ＋ didn't ＋ 動詞の原形 ~」の語順になります [cite: 188, 190]。" },
+    { id: 23, type: "一問一答", cat: 3, q: "「あなたは昨夜、テレビを見ましたか」という意味になるように、語群を並び替えなさい。<br>[ last night / you / watch / did / TV ]?", a: "Did you watch TV last night?", e: "「Did ＋ 主語 ＋ 動詞の原形 ~?」の語順になります [cite: 199, 206]。" },
+    { id: 24, type: "一問一答", cat: 3, q: "「私はそのとき本を読んでいました」という意味になるように、語群を並び替えなさい。<br>[ reading / I / a book / was / then ]", a: "I was reading a book then.", e: "過去進行形は「主語 ＋ was/were ＋ 動詞の-ing形」の語順になります [cite: 950, 979, 982]。" },
+    { id: 25, type: "一問一答", cat: 3, q: "「彼らはそのとき勉強していませんでした」という意味になるように、語群を並び替えなさい。<br>[ at that time / studying / they / not / were ]", a: "They were not studying at that time.", e: "進行形の否定文はbe動詞の後ろに not を置きます [cite: 1000, 1470]。" },
+    { id: 26, type: "一問一答", cat: 3, q: "「彼はそのときテレビゲームをしていましたか」という意味になるように、語群を並び替えなさい。<br>[ playing / he / video games / was / then ]?", a: "Was he playing video games then?", e: "過去進行形の疑問文は、be動詞を主語の前に出して「Was/Were ＋ 主語 ＋ -ing ~?」とします [cite: 1007, 1473]。" },
+    { id: 27, type: "一問一答", cat: 3, q: "「そのときあなたは何をしていましたか」という意味になるように、語群を並び替えなさい。<br>[ doing / you / what / then / were ]?", a: "What were you doing then?", e: "疑問詞 What を文頭に置き、その後に過去進行形の疑問文の語順を続けます [cite: 932, 949, 988]。" },
+    { id: 28, type: "一問一答", cat: 3, q: "「私は明日、新しい自転車を買う予定です」という意味になるように、語群を並び替えなさい。<br>[ to / buy / am / a new bike / I / going ] tomorrow", a: "I am going to buy a new bike tomorrow.", e: "「主語 ＋ be going to ＋ 動詞の原形」で決まった未来の予定を表します [cite: 1557, 1720, 1721]。" },
+    { id: 29, type: "一問一答", cat: 3, q: "「彼は今日の午後、テニスをする予定ではありません」という意味になるように、語群を並び替えなさい。<br>[ not / is / going / tennis / he / to play ] this afternoon", a: "He is not going to play tennis this afternoon.", e: "be going to の否定文は、be動詞の直後に not を挟みます [cite: 1562, 2163]。" },
+    { id: 30, type: "一問一答", cat: 3, q: "「あなたは明日、数学を勉強する予定ですか」という意味になるように、語群を並び替えなさい。<br>[ you / to / tomorrow / going / study / are ] math?", a: "Are you going to study math tomorrow?", e: "be going to の疑問文は、be動詞を主語の前に出して「Be動詞 ＋ 主語 ＋ going to ＋ 原形?」とします [cite: 1562, 2165]。" },
+    { id: 31, type: "一問一答", cat: 3, q: "「明日は暑くなるでしょう」という意味になるように、語群を並び替えなさい。<br>[ hot / will / it / tomorrow / be ]", a: "It will be hot tomorrow.", e: "天候を表す主語 It の後ろに「will ＋ 動詞の原形（be）」を置きます [cite: 1591, 1624, 1737]。" },
+    { id: 32, type: "一問一答", cat: 3, q: "「健太は次の土曜日は家にいないでしょう」という意味になるように、語群を並び替えなさい。<br>[ at home / won't / next Saturday / Kenta / be ]", a: "Kenta won't be at home next Saturday.", e: "will not の短縮形 won't の後ろに動詞の原形（be）を続けます [cite: 1714, 1737, 2172]。" },
+    { id: 33, type: "一問一答", cat: 3, q: "「毎日英語を練習することは重要です」という意味になるように、語群を並び替えなさい。<br>[ every day / important / is / english / practicing ]", a: "Practicing English every day is important.", e: "「英語を毎日練習すること」という動名詞のカタマリ（Practicing English every day）を主語にします [cite: 2213, 2222]。" },
+    { id: 34, type: "一問一答", cat: 3, q: "「私の兄は昨年、野球をするのをやめました」という意味になるように、語群を並び替えなさい。<br>[ baseball / my brother / playing / stopped ] last year", a: "My brother stopped playing baseball last year.", e: "stop の後ろに動名詞を置くことで「〜するのをやめる」となります [cite: 2211, 2221]。" },
+    { id: 35, type: "一問一答", cat: 3, q: "「彼女はいつ出発する予定ですか」という意味になるように、語群を並び替えなさい。<br>[ she / leave / when / is / going / to ]?", a: "When is she going to leave?", e: "疑問詞 When の後ろに、be going to の疑問文の語順（is she going to leave）を続けます [cite: 1768, 1771]。" },
+
+    // 第4ブロック：空欄補充・英作文【応用】 (36-45)
+    { id: 36, type: "発展応用", cat: 4, q: "次の日本語を英文に直すとき、（ &nbsp; ）に適切な語をそれぞれ1語ずつ入れなさい。<br>「私は昨日、昼食に焼きそばを作って食べました」<br>&rightarrow; I （ &nbsp; ） and （ &nbsp; ） yakisoba for lunch yesterday.", a: "cooked, ate", e: "「作った」は cooked [cite: 22]、「食べた」は ate （eatの過去形）を入れます [cite: 22, 752]。過去の出来事を並べるので両方とも過去形にします [cite: 22]。" },
+    { id: 37, type: "発展応用", cat: 4, q: "次の2つの文がほぼ同じ意味になるように、（ &nbsp; ）に適切な語を入れなさい。<br>It will be rainy tomorrow.<br>&rightarrow; It is （ &nbsp; ） （ &nbsp; ） （ &nbsp; ） rainy tomorrow.", a: "going to be", e: "will を be going to に書き換える問題です [cite: 2156, 2160, 2170]。天候の It に合わせて is going to とし、後ろの動詞の原形は be となります [cite: 2175]。" },
+    { id: 38, type: "発展応用", cat: 4, q: "次の文章のカッコ内の動詞を、適切な形（過去形か過去進行形）に直しなさい。<br>When Kenta called me, I ( watch ) TV.", a: "was watching", e: "「健太が私に電話をくれたとき、私はテレビを見ている最中だった」となるため、過去進行形（was watching）にするのが適切です [cite: 960, 1469]。" },
+    { id: 39, type: "発展応用", cat: 4, q: "次の日本語に合うように、（ &nbsp; ）に適切な過去の動詞を1語入れなさい。<br>「私はこの前の日曜日、イヌを散歩に連れていきました」<br>&rightarrow; I （ &nbsp; ） my dog for a walk last Sunday.", a: "took", e: "take ~ for a walk で「〜を散歩に連れていく」という熟語です [cite: 639, 656]。過去の文なので take を過去形の took にします [cite: 71, 773]。" },
+    { id: 40, type: "発展応用", cat: 4, q: "次の日本語に合うように、（ &nbsp; ）に入る適切な英語を2語で答えなさい（短縮形を使わないこと）。<br>「私たちはあなたを忘れるつもりはありません」<br>&rightarrow; We （ &nbsp; ） （ &nbsp; ） forget you.", a: "will not", e: "未来の否定「〜するつもりはない」は will not を使います [cite: 1631, 1892]。短縮形なら won't です [cite: 1890, 1977]。" },
+    { id: 41, type: "発展応用", cat: 4, q: "次の会話の空欄に入る適切なbe動詞の過去形をそれぞれ答えなさい。<br>A: （ &nbsp; ） you busy yesterday?<br>B: No, I （ &nbsp; ）.", a: "Were, wasn't", e: "Aの主語は you なので Were [cite: 855]、Bは I で受けて否定で答えるので wasn't (was not) となります [cite: 874, 913]。" },
+    { id: 42, type: "発展応用", cat: 4, q: "次の対話を完成させる時、空欄（ &nbsp; ）に入る最も適切な疑問詞を1語で答えなさい。<br>A: （ &nbsp; ） were you yesterday afternoon?<br>B: I was in the library.", a: "Where", e: "Bが「図書館にいました」と場所を答えているため [cite: 877]、場所を尋ねる疑問詞 Where（どこ）が適切です [cite: 876]。" },
+    { id: 43, type: "発展応用", cat: 4, q: "次の日本語を英作文しなさい（主語は I を使用すること）。<br>「私は先週、カナダを訪れました」", a: "I visited Canada last week.", e: "「主語(I) ＋ 動詞の過去形(visited) ＋ 目的語(Canada) ＋ 過去の表現(last week)」の順に並べます [cite: 336, 349, 356]。" },
+    { id: 44, type: "発展応用", cat: 4, q: "次の日本語を英作文しなさい（主語は I を使用すること）。<br>「私はすぐに新しい友だちができるでしょう」", a: "I will make new friends soon.", e: "「〜でしょう（推測）」なので助動詞 will を使い [cite: 1621, 1736]、I will make new friends soon. とします [cite: 1946]。" },
+    { id: 45, type: "発展応用", cat: 4, q: "次の日本語を、動名詞を主語にして英作文しなさい。<br>「テニスの試合を見ることはわくわくします」", a: "Watching tennis games is exciting.", e: "動名詞「Watching tennis games」を主語（単数扱い）とし [cite: 2204]、be動詞 is を繋げて表します [cite: 2204]。" },
+
+    // 第5ブロック：長文・対話文の読解・内容一致 (46-60)
+    { id: 46, type: "一問一答", cat: 5, q: "次の対話の（ &nbsp; ）に入る適切な表現を答えなさい。<br>A: How's it going?<br>B: Pretty （ &nbsp; ）. I'm enjoying my vacation.", a: "good", e: "「調子はどう？」という挨拶（How's it going?）に対して [cite: 243, 358]、「かなり良いよ」と答える定番フレーズ Pretty good. です [cite: 254, 362]。" },
+    { id: 47, type: "一問一答", cat: 5, q: "次のミニ長文を読み、質問に日本語で答えなさい。<br>「Miki visited Finland last week. She enjoyed the sauna there. It was very hot inside, but she relaxed a lot.」<br>質問：美希はサウナの中でどのように過ごしましたか。", a: "大いにくつろいだ。/とてもリラックスした。", e: "本文の最後にある「she relaxed a lot」から [cite: 197, 200]、「大いにくつろいだ、リラックスした」が正解です [cite: 200]。" },
+    { id: 48, type: "一問一答", cat: 5, q: "上のミニ長文（問47）に基づき、次の英語の質問に3語の英語で答えなさい。<br>Where did Miki go last week? &rightarrow; She went to （ &nbsp; ）.", a: "Finland", e: "「先週どこに行きましたか」という問いなので [cite: 191]、文章の冒頭にある Finland が入ります [cite: 191]。" },
+    { id: 49, type: "一問一答", cat: 5, q: "次のミニ長文を読み、質問に日本語で答えなさい。<br>「Miki found salmiakki at a supermarket. It is a bitter and salty candy. Many Finnish people like it, but Miki ate it only once during the trip.」<br>質問：サルミアッキとはどんな味のお菓子ですか。", a: "苦くて塩辛い味", e: "本文の「It is a bitter and salty candy.」から [cite: 427]、苦くて塩辛い味が正解です [cite: 427]。" },
+    { id: 50, type: "一問一答", cat: 5, q: "上のミニ長文（問49）に基づき、美希は旅行中に何回サルミアッキを食べましたか。日本語で答えなさい。", a: "一度だけ / 1回だけ", e: "本文に「Miki ate it only once」と書かれています [cite: 440]。" },
+    { id: 51, type: "一問一答", cat: 5, q: "次の対話を読み、質問に日本語で答えなさい。<br>Daniel: What time did the sun set in Finland?<br>Miki: About 2 p.m. And it didn't rise until 11 a.m.<br>質問：フィンランドでは、太陽は何時ごろに沈みましたか。", a: "午後2時ごろ", e: "Danielの「太陽は何時に沈んだの？（What time did the sun set?）」に対し [cite: 507]、Mikiが「About 2 p.m.（午後2時ごろ）」と答えています [cite: 517, 605]。" },
+    { id: 52, type: "一問一答", cat: 5, q: "上の対話（問51）に基づき、太陽が昇る時間は何時でしたか。日本語で答えなさい。", a: "午前11時", e: "「It didn't rise until 11 a.m.」は「午前11時まで昇らなかった」つまり午前11時に昇ったことを意味します [cite: 576, 599]。" },
+    { id: 53, type: "一問一答", cat: 5, q: "次の対話を読み、質問に英語（単語）で答えなさい。<br>Daniel: Did you have any other experiences in Finland?<br>Miki: Yes. I saw a reindeer on the road. It was amazing!<br>質問：美希が道路で見つけた動物は何ですか。", a: "reindeer", e: "Mikiの発言「I saw a reindeer on the road.」から [cite: 528]、トナカイ（reindeer）が正解です [cite: 528, 585]。" },
+    { id: 54, type: "一問一答", cat: 5, q: "次の絵本の紹介文を読み、主人公の名前を英語で答えなさい。<br>「It was a snowy winter day. Grandma Baba was at home. All her friends, a cat, a dog, and a fox, came into her house because they were very cold.」", a: "Grandma Baba", e: "本文の「Grandma Baba was at home.」という記述から [cite: 1032]、主人公の名前は Grandma Baba（ばばばあちゃん）です [cite: 1032, 1087]。" },
+    { id: 55, type: "一問一答", cat: 5, q: "上の文章（問54）に基づき、寒がって家の中に入ってきた動物をすべて日本語で答えなさい。", a: "ネコ、イヌ、キツネ", e: "「a cat, a dog, and a fox」と書かれているため [cite: 1026, 1049]、ネコ、イヌ、キツネの3種類になります [cite: 1089, 1091]。" },
+    { id: 56, type: "一問一答", cat: 5, q: "次の対話を読み、質問に日本語で答えなさい。<br>Miki: This will be my first long stay overseas. I'll do my best!<br>Daniel: Good luck. Tell me about your new school.<br>質問：ダニエルは美希に対して何について教えてほしいと言っていますか。", a: "（美希の）新しい学校について", e: "ダニエルのセリフ「Tell me about your new school.」から [cite: 1990]、新しい学校についてが正解です [cite: 1991, 2067]。" },
+    { id: 57, type: "発展応用", cat: 5, q: "お別れ会の対話文を読み、質問に日本語で答えなさい。<br>「Mao is planning a farewell party for Miki next Saturday. Miki is going to move to Canada next month. She is going to go to a local school there. She is a bit worried, but Daniel said, 'You'll make new friends soon.'」<br>質問：美希はなぜ少し心配（不安）しているのですか。理由を日本語で説明しなさい。", a: "来月カナダに引っ越し、現地の学校に通う予定だから。", e: "本文から、来月カナダへ引っ越すこと（move to Canada） [cite: 1827, 1831]、および現地の学校に通う予定であること（go to a local school）が [cite: 1924, 1925] 彼女の不安（worried）の理由です [cite: 1929, 1934]。" },
+    { id: 58, type: "発展応用", cat: 5, q: "上のお別れ会の文章（問57）に基づき、ダニエルは美希をどのようにはげましましたか。日本語で答えなさい。", a: "すぐに新しい友だちができるよ、ということ。", e: "ダニエルのセリフ「You'll make new friends soon.」が [cite: 1946] はげましの内容です [cite: 1965]。" },
+    { id: 59, type: "発展応用", cat: 5, q: "次のパーティーでの会話を読み、ダニエルが美希に対してさびしく思うかどうか、YesかNoの英語で答え、その理由を日本語で説明しなさい。<br>Miki: Say goodbye to everyone for me. <br>Daniel: Sure. I'll miss you. Take care!<br>質問：Will Daniel miss Miki?", a: "Yes. （理由：美希がいなくなるとさびしくなるから）", e: "Danielが「I'll miss you.（きみがいなくなるとさびしくなるよ）」と言っているため [cite: 2014, 2020]、答えは Yes となり、理由はその通りさびしく思うからです [cite: 2040, 2068]。" },
+    { id: 60, type: "発展応用", cat: 5, q: "次の海外滞在に関する英文を読み、下線部 this が指す内容を日本語で具体的に説明しなさい。<br>Miki is going to leave Japan next month. <u>This</u> will be her first long stay overseas. She will do her best.", a: "来月日本を出発して、海外に初めて長期滞在すること。", e: "This は直前の文「Miki is going to leave Japan next month」 [cite: 1771, 1852]、およびそれが初めての海外長期滞在（first long stay overseas）になることを指しています [cite: 2052, 2054]。" }
+];
+
+let timeLeft = 40 * 60;
+const timerDisplay = document.getElementById('timer');
+const userScores = new Array(questions.length).fill(null);
+
+function generateQuestions() {
+    questions.forEach(q => {
+        const container = document.getElementById(`questions-container-${q.cat}`);
+        const div = document.createElement('div');
+        div.className = 'question-item';
+        let content = `<span class="q-num">問${q.id}</span> <span class="q-type">${q.type}</span><br>${q.q}`;
+        
+        if (q.type === "記号選択" && q.options) {
+            content += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                content += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            content += `</div>`;
+        }
+        
+        div.innerHTML = content;
+        container.appendChild(div);
+    });
+
+    if (window.MathJax) {
+        MathJax.typesetPromise();
+    }
+}
+
+function showAnswers() {
+    clearInterval(countdown);
+    document.getElementById('test-page').classList.remove('active');
+    document.getElementById('answer-page').classList.add('active');
+    document.getElementById('score-bar').style.display = 'block';
+    
+    const container = document.getElementById('answers-container');
+    questions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'ans-item';
+        div.id = `ans-item-${idx}`;
+        
+        let qContent = `<div class="ans-q-text"><span class="q-num">問${q.id}</span> [${q.type}] ${q.q}`;
+        if (q.type === "記号選択" && q.options) {
+            qContent += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                qContent += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            qContent += `</div>`;
+        }
+        qContent += `</div>`;
+
+        let targetAnswer = q.a;
+        if (q.type === "記号選択" && q.ans_literal) {
+            targetAnswer = `${q.a} （${q.ans_literal}）`;
+        }
+
+        div.innerHTML = `
+            ${qContent}
+            <div><span class="ans-correct">正解：${targetAnswer}</span></div>
+            <div class="ans-explanation"><strong>解説:</strong> ${q.e}</div>
+            <div class="scoring-btns">
+                <button class="score-btn btn-correct" id="btn-c-${idx}" onclick="setScore(${idx}, true)">○ 正解</button>
+                <button class="score-btn btn-wrong" id="btn-w-${idx}" onclick="setScore(${idx}, false)">× 不正解</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+
+    if (window.MathJax) {
+        MathJax.typesetPromise();
+    }
+
+    window.scrollTo(0, 0);
+}
+
+const countdown = setInterval(() => {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+    timerDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    if (timeLeft <= 0) {
+        clearInterval(countdown);
+        alert('時間終了です！採点ページへ移ります。');
+        showAnswers();
+    }
+    timeLeft--;
+}, 1000);
+
+function setScore(idx, isCorrect) {
+    userScores[idx] = isCorrect;
+    document.getElementById(`btn-c-${idx}`).classList.toggle('selected', isCorrect);
+    document.getElementById(`btn-w-${idx}`).classList.toggle('selected', !isCorrect);
+    updateScore();
+}
+
+function updateScore() {
+    const correctCount = userScores.filter(s => s === true).length;
+    document.getElementById('correct-count').innerText = correctCount;
+    document.getElementById('score-val').innerText = Math.round((correctCount / questions.length) * 100);
+}
+
+generateQuestions();
+</script>
+
+</body>
+</html>

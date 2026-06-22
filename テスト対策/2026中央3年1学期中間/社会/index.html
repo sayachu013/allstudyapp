@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>歴史 60問実力テスト</title>
+    <style>
+        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f0f2f5; color: #333; }
+        .page { display: none; }
+        .active { display: block; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        h1 { color: #1a365d; text-align: center; border-bottom: 3px solid #1a365d; padding-bottom: 10px; }
+        #timer-bar, #score-bar { position: sticky; top: 0; background: #c53030; color: white; padding: 10px; text-align: center; font-weight: bold; border-radius: 5px; z-index: 1000; font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        #score-bar { background: #2f855a; top: 50px; display: none; }
+        .question-item { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #cbd5e0; }
+        .q-num { font-weight: bold; color: #2b6cb0; margin-right: 10px; }
+        .q-type { font-size: 0.8em; background: #edf2f7; padding: 2px 8px; border-radius: 4px; margin-left: 10px; color: #4a5568; }
+        .options-container { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .option-item { background: #fff; border: 1px solid #2b6cb0; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; color: #2b6cb0; }
+        .btn { display: block; width: 100%; padding: 15px; background: #2b6cb0; color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; text-align: center; margin-top: 20px; text-decoration: none; }
+        .btn:hover { background: #2c5282; }
+        .scoring-btns { margin-top: 10px; display: flex; gap: 10px; }
+        .score-btn { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-correct { background: #e6fffa; color: #234e52; border: 1px solid #38b2ac; }
+        .btn-correct.selected { background: #38b2ac; color: white; }
+        .btn-wrong { background: #fff5f5; color: #742a2a; border: 1px solid #f56565; }
+        .btn-wrong.selected { background: #f56565; color: white; }
+        .ans-item { margin-bottom: 20px; padding: 15px; background: #f7fafc; border-left: 4px solid #2f855a; }
+        .ans-q-text { font-size: 0.95em; color: #4a5568; margin: 10px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; }
+        .ans-correct { font-weight: bold; color: #2f855a; font-size: 1.1em; }
+        .ans-explanation { font-size: 0.9em; color: #4a5568; margin-top: 5px; background: #fff; padding: 10px; border-radius: 4px; }
+        .category-header { background: #4a5568; color: white; padding: 8px 15px; margin: 30px 0 15px 0; border-radius: 5px; font-size: 1em; }
+    </style>
+</head>
+<body>
+
+<div id="test-page" class="page active">
+    <div id="timer-bar">残り時間: <span id="timer">30:00</span></div>
+    <h1>歴史 実力判定テスト</h1>
+    <div class="card">
+        <p>※ノートを用意して解答を記入してください。最後に「採点ページへ」を押すと正解が表示されます。</p>
+        <div id="test-container">
+            <div class="category-header">第1ブロック：記号選択（20問）</div>
+            <div id="questions-container-1"></div>
+            <div class="category-header">第2ブロック：一問一答（20問）</div>
+            <div id="questions-container-2"></div>
+            <div class="category-header">第3ブロック：記述問題（10問）</div>
+            <div id="questions-container-3"></div>
+            <div class="category-header">第4ブロック：発展・応用・高難易度（10問）</div>
+            <div id="questions-container-4"></div>
+        </div>
+        <button class="btn" onclick="showAnswers()">テストを終了して採点ページへ</button>
+    </div>
+</div>
+
+<div id="answer-page" class="page">
+    <div id="score-bar">正答率: <span id="score-val">0</span>% (<span id="correct-count">0</span>/60問)</div>
+    <h1>解答・解説一覧</h1>
+    <div class="card" id="answers-container"></div>
+    <button class="btn" onclick="location.reload()">トップに戻る</button>
+</div>
+
+<script>
+const questions = [
+    // 記号選択 (1-20)
+    { id: 1, type: "記号選択", cat: 1, q: "幕末、最大の貿易相手国はどこか。", options: ["アメリカ", "ロシア", "イギリス", "オランダ"], a: "イギリス", e: "幕末、日本にとって最大の貿易相手国はイギリスでした 。" },
+    { id: 2, type: "記号選択", cat: 1, q: "日米修好通商条約において、日本に認められなかった権利は何か。", options: ["司法権", "関税自主権", "駐兵権", "宣戦布告権"], a: "関税自主権", e: "領事裁判権を認め、自国で関税を決められない関税自主権がない不平等な内容でした [cite: 630, 428]。" },
+    { id: 3, type: "記号選択", cat: 1, q: "1860年、大老の井伊直弼が暗殺された場所はどこか。", options: ["二条城", "桜田門外", "下関", "五稜郭"], a: "桜田門外", e: "安政の大獄での弾圧に反発した元水戸藩士らによって、桜田門外で暗殺されました [cite: 18, 19]。" },
+    { id: 4, type: "記号選択", cat: 1, q: "1863年、生麦事件の報復としてイギリス海軍が鹿児島を攻撃した事件は何か。", options: ["下関戦争", "薩英戦争", "江華島事件", "甲午農民戦争"], a: "薩英戦争", e: "1862年の生麦事件の報復として、翌年イギリス軍が鹿児島を攻撃しました [cite: 85, 88]。" },
+    { id: 5, type: "記号選択", cat: 1, q: "新政府が欧米を手本にして進めた、政治・経済・社会の変革を何というか。", options: ["文明開化", "富国強兵", "明治維新", "殖産興業"], a: "明治維新", e: "幕藩体制の国家から近代国家へ変わるための大規模な変革を明治維新といいます [cite: 154, 162]。" },
+    { id: 6, type: "記号選択", cat: 1, q: "1871年、藩を廃止して県を置き、中央から派遣された役職は何か。", options: ["知藩事", "府知事・県知事", "大名", "参議"], a: "府知事・県知事", e: "廃藩置県により、中央から新たに府知事や県知事が派遣されました [cite: 194, 196]。" },
+    { id: 7, type: "記号選択", cat: 1, q: "地租改正で、土地の所有者に発行された証明書は何か。", options: ["地券", "株札", "鑑札", "太政官札"], a: "地券", e: "土地の価格と所有者が明記された「地券」が発行されました [cite: 288]。" },
+    { id: 8, type: "記号選択", cat: 1, q: "1872年に操業を開始した、群馬県の官営模範工場はどこか。", options: ["新町紡績所", "長崎造船所", "富岡製糸場", "八幡製鉄所"], a: "富岡製糸場", e: "フランス人技師の指導のもと、群馬県に富岡製糸場が建設されました [cite: 380]。" },
+    { id: 9, type: "記号選択", cat: 1, q: "1872年、鉄道が最初に開通した区間はどこか。", options: ["東京・大阪", "神戸・大阪", "新橋・横浜", "上野・熊谷"], a: "新橋・横浜", e: "1872年、新橋（東京）と横浜の間に日本初の鉄道が開通しました [cite: 374, 404]。" },
+    { id: 10, type: "記号選択", cat: 1, q: "『学問のすゝめ』を著し、人間の平等と民主主義を説いた人物は誰か。", options: ["中江兆民", "板垣退助", "福沢諭吉", "伊藤博文"], a: "福沢諭吉", e: "福沢諭吉は『学問のすゝめ』を通じて人間の平等や民主主義を説きました [cite: 398, 400]。" },
+    { id: 11, type: "記号選択", cat: 1, q: "1875年、千島列島を日本領、樺太をロシア領と定めた条約は何か。", options: ["日露和親条約", "日朝修好条規", "下関条約", "樺太・千島交換条約"], a: "樺太・千島交換条約", e: "ロシアとの交渉により、樺太と千島列島の領有を交換し国境を定めました [cite: 435]。" },
+    { id: 12, type: "記号選択", cat: 1, q: "1881年に板垣退助を党首として結成された政党は何か。", options: ["立憲改進党", "自由党", "立憲政友会", "立憲国民党"], a: "自由党", e: "自由民権運動の盛り上がりの中で、板垣退助を党首とする自由党が結成されました [cite: 498, 529]。" },
+    { id: 13, type: "記号選択", cat: 1, q: "大日本帝国憲法の作成にあたり、伊藤博文が参考にした国はどこか。", options: ["イギリス", "フランス", "アメリカ", "ドイツ"], a: "ドイツ", e: "君主権の強いドイツ（プロイセン）やオーストリアの憲法が参考にされました [cite: 565, 587, 619]。" },
+    { id: 14, type: "記号選択", cat: 1, q: "1894年、領事裁判権の撤廃に成功した際の外務大臣は誰か。", options: ["岩倉具視", "青木周蔵", "陸奥宗光", "小村寿太郎"], a: "陸奥宗光", e: "陸奥宗光はイギリスとの間で領事裁判権の撤廃を含む日英通商航海条約を結びました [cite: 630, 698]。" },
+    { id: 15, type: "記号選択", cat: 1, q: "日清戦争が始まるきっかけとなった、朝鮮での農民軍の蜂起を何というか。", options: ["甲申事変", "甲午農民戦争", "義和団事件", "辛亥革命"], a: "甲午農民戦争", e: "朝鮮南部で起きた甲午農民戦争をきっかけに、日清両軍が出兵し戦争となりました [cite: 724, 726]。" },
+    { id: 16, type: "記号選択", cat: 1, q: "下関条約で日本に割譲されたが、三国干渉で清に返還した地域はどこか。", options: ["台湾", "澎湖諸島", "遼東半島", "済州島"], a: "遼東半島", e: "ロシア・ドイツ・フランスの要求（三国干渉）により、遼東半島を清へ返還しました [cite: 741, 749]。" },
+    { id: 17, type: "記号選択", cat: 1, q: "日露戦争の講和会議において、日本とロシアの間を仲介した人物は誰か。", options: ["ビスマルク", "ウィルソン", "ルーズベルト", "グラッドストン"], a: "ルーズベルト", e: "アメリカ大統領ルーズベルトの仲介でポーツマス条約が結ばれました [cite: 822]。" },
+    { id: 18, type: "記号選択", cat: 1, q: "1901年に操業を開始し、日本の重化学工業の発展を支えた製鉄所はどこか。", options: ["釜石製鉄所", "室蘭製鉄所", "八幡製鉄所", "倉敷製鉄所"], a: "八幡製鉄所", e: "日清戦争の賠償金などを投じて、官営の八幡製鉄所が福岡県に建設されました [cite: 923, 925]。" },
+    { id: 19, type: "記号選択", cat: 1, q: "足尾銅山から流れ出た有害物質による被害を訴えた人物は誰か。", options: ["田中正造", "幸徳秋水", "内村鑑三", "与謝野晶子"], a: "田中正造", e: "田中正造は、渡良瀬川周辺の被害住民とともに鉱山の操業停止を求めました [cite: 959]。" },
+    { id: 20, type: "記号選択", cat: 1, q: "黄熱病の研究で知られ、世界的に活躍した科学者は誰か。", options: ["北里柴三郎", "志賀潔", "野口英世", "長岡半太郎"], a: "野口英世", e: "野口英世は黄熱病の研究を行い、世界的に活躍しました [cite: 1032]。" },
+
+    // 一問一答 (21-40)
+    { id: 21, type: "一問一答", cat: 2, q: "幕末、天皇を尊ぶ考えと、外国勢力を排除しようとする考えが結びついた運動は？", a: "尊王攘夷運動", e: "天皇を尊ぶ尊王論と外国排除の攘夷論が結びついた運動です [cite: 5, 13]。" },
+    { id: 22, type: "一問一答", cat: 2, q: "1866年、坂本龍馬らの仲介で、薩摩藩と長州藩が結んだ軍事同盟は？", a: "薩長同盟", e: "土佐藩出身の坂本龍馬らが仲介し、秘密の軍事同盟が結ばれました [cite: 114, 122]。" },
+    { id: 23, type: "一問一答", cat: 2, q: "1867年、第15代将軍・徳川慶喜が政権を朝廷に返したことは？", a: "大政奉還", e: "土佐藩の勧めにより、政権を朝廷に返したことで江戸幕府が滅亡しました [cite: 96, 135]。" },
+    { id: 24, type: "一問一答", cat: 2, q: "1868年、天皇が神に誓う形で示した新しい政治の方針は？", a: "五箇条の御誓文", e: "広く世論を大切にすることや、智識を世界に求めることが示されました [cite: 166, 170, 176]。" },
+    { id: 25, type: "一問一答", cat: 2, q: "1871年、大名が支配する藩を廃止し、中央政府が県を置いた改革は？", a: "廃藩置県", e: "藩を廃止して県を置くことで、中央集権体制が整いました [cite: 194, 198]。" },
+    { id: 26, type: "一問一答", cat: 2, q: "1873年、地価を基準に、土地の所有者に現金で税を納めさせた改革は？", a: "地租改正", e: "財政を安定させるため、地価を基準に現金で納税する制度に改められました [cite: 287, 290]。" },
+    { id: 27, type: "一問一答", cat: 2, q: "1873年、満20歳になった男子に兵役の義務を課した法は？", a: "徴兵令", e: "近代的な軍隊を創るため、身分に関わらず兵役の義務を課しました [cite: 279, 280]。" },
+    { id: 28, type: "一問一答", cat: 2, q: "政府が近代化を主導し、欧米の技術を導入して建設した工場を何というか？", a: "官営模範工場", e: "近代産業を育てるため、政府が主導して各地に建設されました [cite: 378, 379]。" },
+    { id: 29, type: "一問一答", cat: 2, q: "1874年、板垣退助らが国会の開設を求めて政府に提出した文書は？", a: "民撰議院設立の建白書", e: "板垣らが提出し、自由民権運動の出発点となりました [cite: 498, 503]。" },
+    { id: 30, type: "一問一答", cat: 2, q: "1877年、西郷隆盛を中心とした鹿児島県の士族らが起こした反乱は？", a: "西南戦争", e: "不平士族による最大かつ最後の反乱でしたが、政府軍に鎮圧されました [cite: 548, 551]。" },
+    { id: 31, type: "一問一答", cat: 2, q: "1889年2月11日に発布された、天皇が定めた日本最初の憲法は？", a: "大日本帝国憲法", e: "天皇が国民に与える欽定憲法として発布されました [cite: 580, 594]。" },
+    { id: 32, type: "一問一答", cat: 2, q: "1894年、陸奥宗光が条約改正で撤廃に成功した司法上の不平等は？", a: "領事裁判権", e: "日英通商航海条約を結ぶことで領事裁判権の撤廃に成功しました [cite: 630, 698]。" },
+    { id: 33, type: "一問一答", cat: 2, q: "1895年、日清戦争の講和条約として調印された条約は？", a: "下関条約", e: "清は朝鮮の独立を認め、遼東半島や台湾などを割譲しました [cite: 738, 739, 741]。" },
+    { id: 34, type: "一問一答", cat: 2, q: "1902年、ロシアの南下政策に対抗するため、日本とイギリスが結んだ同盟は？", a: "日英同盟", e: "満州でのロシアの動きに対抗し、日本とイギリスが結んだ軍事同盟です [cite: 836, 837]。" },
+    { id: 35, type: "一問一答", cat: 2, q: "1905年、日本とロシアの間で結ばれた日露戦争の講和条約は？", a: "ポーツマス条約", e: "韓国での優越権や樺太南部の割譲などが認められました [cite: 822, 825, 843]。" },
+    { id: 36, type: "一問一答", cat: 2, q: "1910年、日本が韓国を完全に併合し、植民地支配を開始したことは？", a: "韓国併合", e: "1910年に併合が行われ、朝鮮総督府が置かれました [cite: 860, 882, 884]。" },
+    { id: 37, type: "一問一答", cat: 2, q: "1911年、孫文が中心となり、清を倒して中華民国を建国した革命は？", a: "辛亥革命", e: "1911年に発生し、アジア最初の共和国である中華民国が誕生しました [cite: 864, 905]。" },
+    { id: 38, type: "一問一答", cat: 2, q: "1911年、小村寿太郎が回復に成功した税制上の権利は？", a: "関税自主権", e: "日米新通商航海条約などを結ぶことで、関税自主権の完全回復を達成しました [cite: 630, 699]。" },
+    { id: 39, type: "一問一答", cat: 2, q: "三井・三菱・住友・安田など、政府の保護の下で多業種を独占した資本家グループを？", a: "財閥", e: "政府の保護や官営工場の払い下げを受け、巨大な資本を形成しました [cite: 931, 944]。" },
+    { id: 40, type: "一問一答", cat: 2, q: "1890年に出され、天皇への忠誠を国民の道徳の柱とした文書は？", a: "教育勅語", e: "天皇を親、国民を子として、国家への忠誠を説く道徳が示されました [cite: 602, 611]。" },
+
+    // 記述問題 (41-50)
+    { id: 41, type: "記述", cat: 3, q: "開港後、国内で生糸や茶などが品不足となり、物価が上昇したのはなぜか。", a: "貿易の開始により、海外からの強い需要に応じて大量の商品が輸出されたため。", e: "輸出量が国内供給を上回ったため、物価上昇や品不足が起きました [cite: 7, 29]。" },
+    { id: 42, type: "記述", cat: 3, q: "地租改正において、政府が税を現金で納めさせた最大の目的は何か。", a: "農作物の豊凶にかかわらず、政府の収入を安定させるため。", e: "収穫高（米）ではなく地価に応じた現金納税とすることで財政が安定しました [cite: 286, 294]。" },
+    { id: 43, type: "記述", cat: 3, q: "「徴兵告論」の「血税」という言葉が、農民にどのような誤解を招いたか。", a: "「実際に人間の血を抜いて税として納める」といった誤解を招いた。", e: "慣れない言葉により、文字通り血を納めるという噂が広まり一揆に繋がりました [cite: 300]。" },
+    { id: 44, type: "記述", cat: 3, q: "「廃藩置県」により、日本の政治体制はどのように変化したか。", a: "大名による地方支配を廃止し、中央政府が地方を直接治める中央集権の体制が整った。", e: "旧藩主の力を奪い、政府が全国を一括して統治する仕組みが完成しました [cite: 197, 198]。" },
+    { id: 45, type: "記述", cat: 3, q: "福沢諭吉が『学問のすゝめ』で説いた、人間の平等に関する考えを述べよ。", a: "人は生まれながらに平等だが、学問に励むか否かで貧富や身分の差が生じるという考え。", e: "実学を重んじ、個人の自立が国家の自立に繋がると説きました [cite: 398, 400]。" },
+    { id: 46, type: "記述", cat: 3, q: "大日本帝国憲法において、国民の自由（言論、集会など）はどのように制限されていたか。", a: "「法律の範囲内」においてのみ、認められるものとされていた。", e: "無制限の自由ではなく、法律による制限が前提の権利でした [cite: 578, 597, 623]。" },
+    { id: 47, type: "記述", cat: 3, q: "日清戦争後の「三国干渉」とは、どのような出来事か。", a: "ロシア・フランス・ドイツが、日本に対し遼東半島を清に返還するよう求めたこと。", e: "日本の大陸進出をはばもうとするロシア中心の外交勧告でした [cite: 749, 750]。" },
+    { id: 48, type: "記述", cat: 3, q: "1911年に成立した「工場法」が不十分であったとされる理由は何か。", a: "資本家側の反対で実施が遅れたり、多くの例外規定があったりして効果が限定的だったため。", e: "過酷な労働環境の改善を目指したものの、内容には制約が多かったです [cite: 955, 956]。" },
+    { id: 49, type: "記述", cat: 3, q: "アイヌの人々に対する明治政府の「同化政策」とはどのような内容か。", a: "伝統的な風習や文化を否定し、「日本国民」として本土の文化や言語を強制する政策。", e: "アイヌ特有の生活習慣が禁じられ、本土への同化が進められました [cite: 415, 470]。" },
+    { id: 50, type: "記述", cat: 3, q: "日露戦争の勝利は、欧米の支配下にあったアジア諸国にどのような影響を与えたか。", a: "アジアの小国が欧米の大国に勝ったことで、各地の独立運動や近代化に刺激を与えた。", e: "欧米列強への抵抗力として、アジア諸民族に希望を与えました [cite: 849, 854]。" },
+
+    // 発展・応用・高難易度 (51-60)
+    { id: 51, type: "発展", cat: 4, q: "幕末、金貨の価値が国際水準より低かったため、金貨が流出した仕組みを説明せよ。", a: "銀貨の価値が日本の方が高かったため、外国人が銀貨を持ち込み金貨に交換して持ち出したため。", e: "内外の金銀比価の差を利用し、安く金貨が国外へ持ち出されました 。" },
+    { id: 52, type: "発展", cat: 4, q: "大政奉還後、倒幕派が「王政復古の大号令」を出した最大の目的は何か。", a: "徳川慶喜を新政権から排除し、旧幕府の影響力を断って天皇中心の新政府を造ること。", e: "慶喜による政権主導権の維持を阻止するための政治的措置でした [cite: 111, 135]。" },
+    { id: 53, type: "発展", cat: 4, q: "「日朝修好条規」は、当時の国際慣習においてどのような不平等があったか。", a: "日本側のみに領事裁判権を認めさせ、朝鮮側の主権を著しく侵害していた点。", e: "かつて日本が欧米に強いられたのと同様の不平等条約でした [cite: 429, 466]。" },
+    { id: 54, type: "発展", cat: 4, q: "伊藤博文が憲法審議の際、「天皇が憲法に従うべきだ」と反論して押し切った主張は何か。", a: "「近代的な立憲国家を造るためには、憲法による制限が不可欠である」という主張。", e: "天皇を憲法の枠内に置くことで立憲国家の体裁を整えました [cite: 611]。" },
+    { id: 55, type: "発展", cat: 4, q: "日露戦争で勝利した日本が、講和条約で賠償金を得られなかったのはなぜか。", a: "戦力の限界に達しており、これ以上戦争を継続することが困難な状況だったため。", e: "両国とも継戦能力が限界だったため、妥協した形での講和となりました [cite: 806, 807, 834]。" },
+    { id: 56, type: "発展", cat: 4, q: "辛亥革命後、孫文が大総統の地位を袁世凱に譲った政治的理由は何か。", a: "袁世凱に清の皇帝を退位させる役割を担わせ、革命を決定づけるため。", e: "清の実力者である袁世凱を利用し、清朝の息の根を止めさせました [cite: 895, 905]。" },
+    { id: 57, type: "発展", cat: 4, q: "明治の産業革命において、生糸などの「軽工業」が先に発展した経済的理由は何か。", a: "少ない資本で始められ、生糸は輸出需要が非常に高く外貨獲得に適していたため。", e: "日本の主力輸出品である生糸が近代化の初期段階を支えました [cite: 915, 919]。" },
+    { id: 58, type: "発展", cat: 4, q: "大日本帝国憲法で、内閣は議会ではなく「天皇」に対して責任を負うとされた影響は？", a: "内閣の責任が議会に対して不明確になり、軍部などが天皇を盾に独立した行動をとりやすくなった点。", e: "天皇の輔弼（助言）を行うことが主目的の構造でした [cite: 595, 623]。" },
+    { id: 59, type: "発展", cat: 4, q: "1870年代、武力による「士族の反乱」が衰退し、自由民権運動へと移行したのはなぜか。", a: "近代的な軍隊を持つ政府軍に武力で勝つことは不可能だと悟ったため。", e: "西南戦争の敗北により、批判の手段が言論へと切り替わりました [cite: 506, 512, 556]。" },
+    { id: 60, type: "発展", cat: 4, q: "「教育勅語」が、天皇を「親」、国民を「子」と位置づけた狙いは何か。", a: "家族間の道徳を国家に応用し、国民に天皇への絶対的な忠誠を自然な義務として植え付けるため。", e: "天皇への孝（忠誠）を最高徳目として国民に共有させました [cite: 611]。" }
+];
+
+function generateQuestions() {
+    questions.forEach(q => {
+        const container = document.getElementById(`questions-container-${q.cat}`);
+        const div = document.createElement('div');
+        div.className = 'question-item';
+        let content = `<span class="q-num">問${q.id}</span> <span class="q-type">${q.type}</span><br>${q.q}`;
+        
+        if (q.type === "記号選択" && q.options) {
+            content += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                content += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            content += `</div>`;
+        }
+        
+        div.innerHTML = content;
+        container.appendChild(div);
+    });
+}
+
+function showAnswers() {
+    clearInterval(countdown);
+    document.getElementById('test-page').classList.remove('active');
+    document.getElementById('answer-page').classList.add('active');
+    document.getElementById('score-bar').style.display = 'block';
+    
+    const container = document.getElementById('answers-container');
+    questions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'ans-item';
+        div.id = `ans-item-${idx}`;
+        
+        let qContent = `<div class="ans-q-text"><span class="q-num">問${q.id}</span> [${q.type}] ${q.q}`;
+        if (q.type === "記号選択" && q.options) {
+            qContent += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                qContent += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            qContent += `</div>`;
+        }
+        qContent += `</div>`;
+
+        div.innerHTML = `
+            ${qContent}
+            <div><span class="ans-correct">正解：${q.a}</span></div>
+            <div class="ans-explanation"><strong>解説:</strong> ${q.e}</div>
+            <div class="scoring-btns">
+                <button class="score-btn btn-correct" id="btn-c-${idx}" onclick="setScore(${idx}, true)">○ 正解</button>
+                <button class="score-btn btn-wrong" id="btn-w-${idx}" onclick="setScore(${idx}, false)">× 不正解</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+    window.scrollTo(0, 0);
+}
+
+function setScore(idx, isCorrect) {
+    userScores[idx] = isCorrect;
+    document.getElementById(`btn-c-${idx}`).classList.toggle('selected', isCorrect);
+    document.getElementById(`btn-w-${idx}`).classList.toggle('selected', !isCorrect);
+    updateScore();
+}
+
+function updateScore() {
+    const correctCount = userScores.filter(s => s === true).length;
+    document.getElementById('correct-count').innerText = correctCount;
+    document.getElementById('score-val').innerText = Math.round((correctCount / 60) * 100);
+}
+
+let timeLeft = 30 * 60;
+const timerDisplay = document.getElementById('timer');
+const userScores = new Array(60).fill(null);
+
+const countdown = setInterval(() => {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+    timerDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    if (timeLeft <= 0) {
+        clearInterval(countdown);
+        alert('時間終了です！採点ページへ移ります。');
+        showAnswers();
+    }
+    timeLeft--;
+}, 1000);
+
+generateQuestions();
+</script>
+
+</body>
+</html>

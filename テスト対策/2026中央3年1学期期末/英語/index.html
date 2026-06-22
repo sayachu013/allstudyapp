@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3年英語 1学期期末対策テスト</title>
+    <style>
+        /* --- 画面表示用（通常スタイル） --- */
+        body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif; line-height: 1.6; max-width: 900px; margin: 0 auto; padding: 20px; background-color: #f0f2f5; color: #333; }
+        .page { display: none; }
+        .active { display: block; }
+        .card { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        h1 { color: #2c5282; text-align: center; border-bottom: 3px solid #2c5282; padding-bottom: 10px; margin-top: 10px; }
+        #timer-bar, #score-bar { position: sticky; top: 0; background: #c53030; color: white; padding: 10px; text-align: center; font-weight: bold; border-radius: 5px; z-index: 1000; font-size: 1.2em; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        #score-bar { background: #2f855a; top: 50px; display: none; }
+        .question-item { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px dashed #cbd5e0; position: relative; }
+        .q-num { font-weight: bold; color: #2b6cb0; margin-right: 10px; }
+        .q-type { font-size: 0.8em; background: #edf2f7; padding: 2px 8px; border-radius: 4px; margin-left: 10px; color: #4a5568; }
+        .options-container { margin-top: 10px; display: flex; gap: 10px; flex-wrap: wrap; }
+        .option-item { background: #fff; border: 1px solid #2b6cb0; padding: 5px 15px; border-radius: 20px; font-size: 0.9em; color: #2b6cb0; }
+        .btn { display: block; width: 100%; padding: 15px; background: #2b6cb0; color: white; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; text-align: center; margin-top: 20px; text-decoration: none; }
+        .btn:hover { background: #2c5282; }
+        .scoring-btns { margin-top: 10px; display: flex; gap: 10px; }
+        .score-btn { flex: 1; padding: 8px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn-correct { background: #e6fffa; color: #234e52; border: 1px solid #38b2ac; }
+        .btn-correct.selected { background: #38b2ac; color: white; }
+        .btn-wrong { background: #fff5f5; color: #742a2a; border: 1px solid #f56565; }
+        .btn-wrong.selected { background: #f56565; color: white; }
+        .ans-item { margin-bottom: 20px; padding: 15px; background: #f7fafc; border-left: 4px solid #2f855a; }
+        .ans-q-text { font-size: 0.95em; color: #4a5568; margin: 10px 0; border-bottom: 1px solid #e2e880; padding-bottom: 10px; }
+        .ans-correct { font-weight: bold; color: #2f855a; font-size: 1.1em; }
+        .ans-explanation { font-size: 0.9em; color: #4a5568; margin-top: 5px; background: #fff; padding: 10px; border-radius: 4px; }
+        .category-header { background: #4a5568; color: white; padding: 8px 15px; margin: 30px 0 15px 0; border-radius: 5px; font-size: 1em; }
+        
+        /* 画面上では印刷用解答欄を非表示 */
+        .print-ans-space, .print-score-table, .print-header-meta { display: none; }
+
+        /* --- 印刷用スタイル（Ctrl+Pで自動適用） --- */
+        @media print {
+            @page {
+                size: A4;
+                margin: 12mm 12mm 12mm 12mm; /* 余白を最適化してブラウザのヘッダーフッター（URL等）を自動カット */
+            }
+            body { background-color: #fff; color: #000; padding: 0; font-size: 10.5pt; max-width: 100%; }
+            .card { box-shadow: none; padding: 0; margin: 0; }
+            h1 { font-size: 18pt; color: #000; border-bottom: 2px solid #000; padding-bottom: 5px; margin-bottom: 5px; }
+            
+            /* 不要なパーツの非表示 */
+            #timer-bar, #score-bar, .btn, .scoring-btns, .q-type, .card > p { display: none !important; }
+            
+            /* 学校のテスト風ヘッダー情報欄 */
+            .print-header-meta { display: flex; justify-content: flex-end; gap: 20px; font-size: 11pt; margin-bottom: 15px; border-bottom: 1px solid #000; padding-bottom: 5px; }
+            .print-score-table { display: table; border-collapse: collapse; float: left; margin-right: 20px; }
+            .print-score-table td { border: 1px solid #000; padding: 5px 15px; text-align: center; font-size: 10pt; }
+            
+            /* ブロックヘッダーの簡素化 */
+            .category-header { background: none !important; color: #000 !important; font-weight: bold; font-size: 12pt; border: 1px solid #000; padding: 4px 10px; margin: 20px 0 10px 0; border-radius: 0; page-break-after: avoid; }
+            
+            /* 短い問題（第1・第2・第4ブロック）を省スペース化のため2段組（左右カラム）に配置 */
+            #questions-container-1, #questions-container-2, #questions-container-4 {
+                column-count: 2;
+                column-gap: 30px;
+                column-fill: auto;
+            }
+            
+            /* 問題がページの切れ目で泣き別れになるのを防ぐ */
+            .question-item { page-break-inside: avoid; break-inside: avoid; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dotted #ccc; }
+            .q-num { color: #000; }
+            
+            /* 選択肢をコンパクトに配置 */
+            .options-container { display: block; margin-top: 3px; }
+            .option-item { border: none; padding: 0; margin-right: 15px; display: inline-block; color: #000; font-size: 10pt; }
+            
+            /* 手書き用の解答スペースを自動生成 */
+            .print-ans-space { display: block; margin-top: 6px; font-size: 10pt; color: #666; }
+            .ans-line { display: inline-block; width: 80%; border-bottom: 1px solid #000; margin-left: 5px; height: 18px; vertical-align: bottom; }
+            .ans-box { border: 1px solid #000; min-height: 45px; margin-top: 5px; width: 95%; }
+            
+            /* 長文問題（第5ブロック）は2段組にせず、しっかり読めるように1段で表示 */
+            #questions-container-5 { column-count: 1 !important; }
+            
+            /* 解答解説ページも印刷時は無駄な色を省いてスッキリ配置 */
+            .ans-item { background: #fff; border: none; border-bottom: 1px dashed #000; padding: 10px 0; page-break-inside: avoid; }
+            .ans-q-text { color: #000; border-bottom: none; padding-bottom: 0; }
+            .ans-correct { color: #000; font-weight: bold; }
+            .ans-explanation { background: none; padding: 0; margin-top: 5px; font-size: 9.5pt; }
+        }
+    </style>
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            chtml: { matchFontHeight: false }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+
+<div id="test-page" class="page active">
+    <div id="timer-bar">残り時間: <span id="timer">40:00</span></div>
+    
+    <!-- 印刷時のみ自動表示されるテストヘッダー -->
+    <div class="print-header-meta">
+        <table class="print-score-table">
+            <tr><td>得点</td><td style="width:70px; height:25px;">/100</td></tr>
+        </table>
+        <div>3年 &nbsp; &nbsp; 組 &nbsp; &nbsp; 番 &nbsp; 氏名：____________________</div>
+    </div>
+
+    <h1>3年英語 1学期期末対策テスト（Program 2 & 3）</h1>
+    <div class="card">
+        <p>※ノートに解答を記入し、最後に「採点ページへ」を押して確認してください。</p>
+        <div id="test-container">
+            <div class="category-header">第1ブロック：記号選択（10問）［語彙・文法識別・重要表現］</div>
+            <div id="questions-container-1"></div>
+            <div class="category-header">第2ブロック：語形変化・空欄補充［現在完了・完了進行形・第5文型］（10問）</div>
+            <div id="questions-container-2"></div>
+            <div class="category-header">第3ブロック：並び替え問題［重要文法マスター］（15問）</div>
+            <div id="questions-container-3"></div>
+            <div class="category-header">第4ブロック：空欄補充・英作文【応用】（10問）</div>
+            <div id="questions-container-4"></div>
+            <div class="category-header">第5ブロック：長文・対話文の読解・内容一致（15問）</div>
+            <div id="questions-container-5"></div>
+        </div>
+        <button class="btn" onclick="showAnswers()">テストを終了して採点ページへ</button>
+    </div>
+</div>
+
+<div id="answer-page" class="page">
+    <div id="score-bar">正答率: <span id="score-val">0</span>% (<span id="correct-count">0</span>/60問)</div>
+    <h1>解答・解説一覧</h1>
+    <div class="card" id="answers-container"></div>
+    <button class="btn" onclick="location.reload()">テストTOPに戻る</button>
+</div>
+
+<script>
+const questions = [
+    // 第1ブロック：記号選択 (1-10)
+    { id: 1, type: "記号選択", cat: 1, q: "次の英文の空欄に入る最も適切な語を選びなさい。<br>I have ( &nbsp; ) finished my homework. I can play video games now.[cite: 1]", options: ["yet", "just", "since", "for"], a: "イ", ans_literal: "just", e: "「たった今〜したところだ」という現在完了の【完了】を表す文です[cite: 1]。肯定文のhaveの直後に置くことができるjust（ちょうど、たった今）が適切です[cite: 1]。yetは否定・疑問文の文末に使います[cite: 1]。" },
+    { id: 2, type: "記号選択", cat: 1, q: "動詞 get の過去分詞形として最も適切なものを選びなさい。[cite: 1]", options: ["get", "got", "gotten", "getting"], a: "ウ", ans_literal: "gotten", e: "getの活用は get - got - gotten（またはgot）です[cite: 1]。教科書P.26等の現在完了形でも I have just gotten a new video game. として登場する重要な不規則変化です[cite: 1]。" },
+    { id: 3, type: "記号選択", cat: 1, q: "次の日本語に合う適切な熟語を選びなさい。<br>「急いで、慌てて」[cite: 1]", options: ["in fact", "at least", "in a hurry", "as a result"], a: "ウ", ans_literal: "in a hurry", e: "「急いで」は in a hurry と表します[cite: 1]。in fact は「実際のところ」[cite: 1]、at least は「少なくとも」[cite: 1]、as a result は「その結果として」という意味です[cite: 1]。" },
+    { id: 4, type: "記号選択", cat: 1, q: "次の英文の空欄に入る最も適切な語を選びなさい。<br>We have been good friends ( &nbsp; ) eight years.[cite: 1]", options: ["since", "for", "during", "at"], a: "イ", ans_literal: "for", e: "「8年間」という特定の【期間】を表しているため[cite: 1]、現在完了の【継続】で期間を示す for が適切です[cite: 1]。sinceは「〜以来（過去の一時点）」を表すときに使います[cite: 1]。" },
+    { id: 5, type: "記号選択", cat: 1, q: "次の表現のうち、「〜に集中する」という意味の熟語を選びなさい。[cite: 1]", options: ["base on", "make up for", "concentrate on", "full of"], a: "ウ", ans_literal: "concentrate on", e: "concentrate on ~ で「〜に集中する」という意味になります[cite: 1]。base on は「〜に基づいている」[cite: 1]、make up for は「〜を補う」[cite: 1]、be full of は「〜で満ちている」です[cite: 1]。" },
+    { id: 6, type: "記号選択", cat: 1, q: "次の英文の空欄に入る適切な語を選びなさい。<br>This game is ( &nbsp; ) on a famous manga.[cite: 1]", options: ["based", "kept", "made", "left"], a: "ア", ans_literal: "based", e: "be based on ~ で「〜に基づいている、〜をもとに作られている」という重要表現になります[cite: 1]。" },
+    { id: 7, type: "記号選択", cat: 1, q: "次の文の（ &nbsp; ）に当てはまる最も適切な語を選びなさい。<br>The funny movie made us ( &nbsp; ) a lot.[cite: 1]", options: ["laugh", "laughed", "laughing", "to laugh"], a: "ア", ans_literal: "laugh", e: "「make ＋ 目的語 ＋ 動詞の原形」で「（目的語）に〜させる」という使役の表現になります[cite: 1]。madeの後ろに目的語の us があるため[cite: 1]、原形の laugh が正解です[cite: 1]。" },
+    { id: 8, type: "記号選択", cat: 1, q: "「少なくとも1日に6時間」を英語で表現するとき、空欄に入る語を選びなさい。<br>We need to sleep for ( &nbsp; ) least six hours a day.[cite: 1]", options: ["on", "at", "in", "for"], a: "イ", ans_literal: "at", e: "「少なくとも」は熟語で at least と表現します[cite: 1]。" },
+    { id: 9, type: "記号選択", cat: 1, q: "次の英文の意味として最も適切なものを選びなさい。<br>Please leave the door open.[cite: 1]", options: ["ドアを開けてください。", "ドアを開けたままにしておいてください。", "ドアを閉めないでください。", "ドアを開けるのを手伝ってください。"], a: "イ", ans_literal: "ドアを開けたままにしておいてください。", e: "「leave ＋ 目的語 ＋ 形容詞」で「〜を…の状態のままにしておく」という意味になります[cite: 1]。openは形容詞の「開いている状態」を指します[cite: 1]。" },
+    { id: 10, type: "記号選択", cat: 1, q: "「〜を補う」という意味を持つ熟語を次から選びなさい。[cite: 1]", options: ["look sleepy", "make up for", "fall asleep", "introduce to"], a: "イ", ans_literal: "make up for", e: "make up for ~ で「〜（不足など）を補う」という意味になります[cite: 1]。教科書では「睡眠不足をあとで補うことはできない」という文脈で登場します[cite: 1]。" },
+
+    // 第2ブロック：語形変化・空欄補充 (11-20)
+    { id: 11, type: "一問一答", cat: 2, q: "動詞 do の過去分詞形を書きなさい。[cite: 1]", a: "done", e: "doの活用は do - did - done です[cite: 1]。「I've just done mine.（ちょうど自分の宿題が終わったところだ）」などで使われます[cite: 1]。" },
+    { id: 12, type: "一問一答", cat: 2, q: "次の日本語に合うよう、（ &nbsp; ）に適切な語を1語入れなさい。<br>「私は今朝からずっと自分の部屋を掃除しています」<br>I have （ &nbsp; ） cleaning my room since this morning.[cite: 1]", a: "been", e: "「ずっと〜し続けている」という【現在完了進行形】の文です[cite: 1]。「have [has] ＋ been ＋ 動詞の-ing形」の形にするため[cite: 1]、beenが入ります[cite: 1]。" },
+    { id: 13, type: "一問一答", cat: 2, q: "次の（ &nbsp; ）に、完了の疑問文で「もう〜しましたか」を表す語を1語入れなさい。<br>Have you eaten lunch （ &nbsp; ）?[cite: 1]", a: "yet", e: "暗記必須の現在完了（完了・結果）の表現です[cite: 1]。疑問文や否定文の文末に置いて「もう」「まだ」の意味を表す語は yet です[cite: 1]。" },
+    { id: 14, type: "一問一答", cat: 2, q: "次の英文の（ &nbsp; ）内の動詞を適切な形に書き換えなさい。<br>The morning practice made you ( sleepy ).[cite: 1]", a: "sleepy", e: "「make ＋ 目的語 ＋ 形容詞」で「〜を…な状態にする」という第5文型の表現です[cite: 1]。sleepy（眠い）は形容詞なので[cite: 1]、そのままの形で正解です[cite: 1]。" },
+    { id: 15, type: "一問一答", cat: 2, q: "次の日本語に合うよう、（ &nbsp; ）に適切な過去分詞を1語入れなさい。<br>「早紀は2020年からここに住んでいます」<br>Saki has （ &nbsp; ） here since 2020.[cite: 1]", a: "lived", e: "「ずっと〜に住んでいる」という【継続】の表現です[cite: 1]。hasの後ろに動詞 live の過去分詞形である lived を入れます[cite: 1]。" },
+    { id: 16, type: "一問一答", cat: 2, q: "次の日本語に合うよう、（ &nbsp; ）に適切な語を1語入れなさい。<br>「温かい牛乳はあなたをぐっすり眠らせます」<br>Warm milk makes you （ &nbsp; ） well.[cite: 1]", a: "sleep", e: "「make ＋ 人 ＋ 動詞の原形」の使役表現です[cite: 1]。youの後ろには動詞の原形（sleep）が入ります[cite: 1]。" },
+    { id: 17, type: "一問一答", cat: 2, q: "次の文の（ &nbsp; ）に適切な語を1語入れなさい。<br>My mother always （ &nbsp; ） the kitchen clean.[cite: 1]", a: "keeps", e: "「〜を…の状態に保つ」は「keep ＋ 目的語 ＋ 形容詞」で表します[cite: 1]。主語がMy mother（三人称単数）で現在のことなので、sをつけた keeps が正解です[cite: 1]。" },
+    { id: 18, type: "一問一答", cat: 2, q: "次の（ &nbsp; ）に、期間の起点を表す「〜から、〜以来」という意味の語を1語入れなさい。<br>I have known her （ &nbsp; ） last year.[cite: 1]", a: "since", e: "last year（昨年）という過去の一時点から続いていることを表すため[cite: 1]、継続の起点を表す since（〜以来）を入れます[cite: 1]。" },
+    { id: 19, type: "一問一答", cat: 2, q: "次の文のカッコ内の動詞を適切な形に直しなさい。<br>I helped Ann ( carry ) her bag.[cite: 1]", a: "carry", e: "「help ＋ 目的語 ＋ 動詞の原形」で「（目的語）が〜するのを手伝う」という構文です[cite: 1]。カッコ内の carry を原形のまま使います[cite: 1]。" },
+    { id: 20, type: "一問一答", cat: 2, q: "次の日本語に合うよう、（ &nbsp; ）に適切な語を1語入れなさい。<br>「私はいつも元気いっぱいです」 &rightarrow; I'm always full （ &nbsp; ） energy.[cite: 1]", a: "of", e: "「〜でいっぱいである」は be full of ~ という熟語で表現します[cite: 1]。" },
+
+    // 第3ブロック：並び替え問題 (21-35)
+    { id: 21, type: "一問一答", cat: 3, q: "「私はちょうどこの本を読んだところです」という意味になるように語群を並び替えなさい。<br>[ read / have / this book / just / I ] .[cite: 1]", a: "I have just read this book.", e: "「主語 ＋ have just ＋ 過去分詞 ＋ 目的語」の語順になります[cite: 1]。readの過去分詞形はスペルは同じですが発音は「レッド」となります[cite: 1]。" },
+    { id: 22, type: "一問一答", cat: 3, q: "「私たちはまだその部屋を掃除していません」という意味になるように語群を並び替えなさい。<br>[ yet / cleaned / we / haven't / the room ] .[cite: 1]", a: "We haven't cleaned the room yet.", e: "現在完了の否定文「主語 ＋ haven't [hasn't] ＋ 過去分詞 ~」の語順で[cite: 1]、yetは文末に配置します[cite: 1]。" },
+    { id: 23, type: "一問一答", cat: 3, q: "「あなたはもう新しいラケットを買いましたか」という意味になるように語群を並び替えなさい。<br>[ yet / bought / you / have / the new racket ] ?[cite: 1]", a: "Have you bought the new racket yet?", e: "現在完了の疑問文は「Have [Has] ＋ 主語 ＋ 過去分詞 ~?」となり[cite: 1]、yetを文末に置きます[cite: 1]。" },
+    { id: 24, type: "一問一答", cat: 3, q: "「私の兄は1時間ずっと走り続けています」という意味になるように語群を並び替えなさい。<br>[ running / has / one hour / brother / been / my / for ] .[cite: 1]", a: "My brother has been running for one hour.", e: "現在完了進行形「主語 ＋ has been ＋ 動詞の-ing形」に[cite: 1]、期間を表す「for ＋ 時間」を繋げます[cite: 1]。" },
+    { id: 25, type: "一問一答", cat: 3, q: "「あなたはどのくらいの間ここで待っているのですか」という意味になるように語群を並び替えなさい。<br>[ waiting / have / long / you / how / been / here ] ?", a: "How long have you been waiting here?", e: "期間を尋ねる How long を文頭に置き[cite: 1]、その後に現在完了進行形の疑問文の語順（have ＋ 主語 ＋ been ＋ -ing）を続けます[cite: 1]。" },
+    { id: 26, type: "一問一答", cat: 3, q: "「そのニュースは私を疲れさせました」という意味になるように語群を並び替えなさい。<br>[ tired / made / the news / me ] .[cite: 1]", a: "The news made me tired.", e: "「made ＋ 目的語（me） ＋ 形容詞（tired）」の語順で「そのニュースは私を疲れさせた」となります[cite: 1]。" },
+    { id: 27, type: "一問一答", cat: 3, q: "「美希は私に、日本食が恋しいと言っています」という意味になるように語群を並び替えなさい。<br>[ tells / she / Japanese food / me / Miki / that / misses ] .[cite: 1]", a: "Miki tells me that she misses Japanese food.", e: "「tell ＋ 人 ＋ that ＋ 主語 ＋ 動詞」の構造です[cite: 1]。Miki tells me that...の語順になります[cite: 1]。" },
+    { id: 28, type: "一問一答", cat: 3, q: "「彼女はここに10年間住んでいます」という意味になるように語群を並び替えなさい。<br>[ here / lived / ten years / has / she / for ] .[cite: 1]", a: "She has lived here for ten years.", e: "現在完了（継続）の基本形「主語 ＋ has ＋ 過去分詞 ＋ 場所 ＋ for ＋ 期間」の語順です[cite: 1]。" },
+    { id: 29, type: "一問一答", cat: 3, q: "「その映画はダニエルを泣かせました」という意味になるように語群を並び替えなさい。<br>[ Daniel / cry / made / the movie ] .[cite: 1]", a: "The movie made Daniel cry.", e: "使役動詞の文「主語 ＋ made ＋ 目的語（Daniel） ＋ 動詞の原形（cry）」の語順です[cite: 1]。" },
+    { id: 30, type: "一問一答", cat: 3, q: "「先生はよく私に、健康は大切だと言います」という意味になるように語群を並び替えなさい。<br>[ is / important / that / me / teacher / health / tells / my / often ] .[cite: 1]", a: "My teacher often tells me that health is important.", e: "頻度を表す副詞oftenは一般動詞tellsの前。tells me that の後ろに「health is important」という完全な文を続けます[cite: 1]。" },
+    { id: 31, type: "一問一答", cat: 3, q: "「私は今朝からずっとこの絵を描き続けています」という意味になるように語群を並び替えなさい。<br>[ this morning / this picture / been / I / painting / have / since ] .[cite: 1]", a: "I have been painting this picture since this morning.", e: "現在完了進行形「I have been painting...」に目的語を置き[cite: 1]、最後に「since ＋ 起点（this morning）」を置きます[cite: 1]。" },
+    { id: 32, type: "一問一答", cat: 3, q: "「窓を開けたままにしておいてはいけません」という意味になるように語群を並び替えなさい。<br>[ leave / open / mustn't / the window / you ] .[cite: 1]", a: "You mustn't leave the window open.", e: "助動詞 mustn't の後ろに動詞の原形 leave[cite: 1]。その後に「目的語（the window） ＋ 形容詞（open）」を続けます[cite: 1]。" },
+    { id: 33, type: "一問一答", cat: 3, q: "「彼らはどのくらいの間その問題について話しているのですか」という意味になるように語群を並び替えなさい。<br>[ about / they / talking / long / have / how / been / the problem ] ?", a: "How long have they been talking about the problem?", e: "How longの後に「have ＋ 主語（they） ＋ been ＋ 動詞-ing形」を続け[cite: 1]、talk about the problemを繋げます[cite: 1]。" },
+    { id: 34, type: "一問一答", cat: 3, q: "「ジョンは友だちが歌を書くのを手伝います」という意味になるように語群を並び替えなさい。<br>[ write / John / friends / helps / songs / his ] .[cite: 1]", a: "John helps his friends write songs.", e: "「help ＋ 目的語（his friends） ＋ 動詞の原形（write）」の語順を構成します[cite: 1]。" },
+    { id: 35, type: "一問一答", cat: 3, q: "「父は私がコンサートに行くのを許してくれました」という意味になるように語群を並び替えなさい。<br>[ to the concert / let / me / my father / go ] .[cite: 1]", a: "My father let me go to the concert.", e: "「let ＋ 目的語（me） ＋ 動詞の原形（go）」で「〜が…するのを許す」という意味になります[cite: 1]。" },
+
+    // 第4ブロック：空欄補充・英作文【応用】 (36-45)
+    { id: 36, type: "発展応用", cat: 4, q: "次の2つの文がほぼ同じ意味になるように、（ &nbsp; ）に適切な語をそれぞれ1語ずつ入れなさい。<br>I moved to Sendai five years ago, and I still live there.<br>&rightarrow; I （ &nbsp; ） （ &nbsp; ） in Sendai for five years.[cite: 1]", a: "have lived", e: "「5年前に引っ越して今も住んでいる」ということは[cite: 1]、「5年間ずっと住んでいる」という現在完了（継続）に書き換えられます[cite: 1]。主語がIなので have lived とします[cite: 1]。" },
+    { id: 37, type: "発展応用", cat: 4, q: "次の日本語に合うように、（ &nbsp; ）に適切な英語を入れなさい。<br>「由美はちょうど宿題を終えたところです」<br>&rightarrow; Yumi （ &nbsp; ） （ &nbsp; ） finished her homework.[cite: 1]", a: "has just", e: "「ちょうど〜したところだ」は have/has just ＋ 過去分詞です[cite: 1]。主語のYumiは三人称単数なので has を使い[cite: 1]、その後に just を挟みます[cite: 1]。" },
+    { id: 38, type: "発展応用", cat: 4, q: "次の会話の空欄に入る適切な語を答えなさい。<br>A: Have you cleaned the living room yet?<br>B: No, I （ &nbsp; ）. I'll do it now.[cite: 1]", a: "haven't", e: "Have you ~? で聞かれた現在完了の疑問文に No で答える場合[cite: 1]、No, I haven't. となります[cite: 1]。" },
+    { id: 39, type: "発展応用", cat: 4, q: "次の日本語に合うように、（ &nbsp; ）に入る適切な英語を2語で答えなさい。<br>「そのおもしろい本はダニエルを大笑いさせました」<br>&rightarrow; The funny book made Daniel （ &nbsp; ） （ &nbsp; ）.[cite: 1]", a: "laugh a lot", e: "「大笑いさせる」は使役動詞madeの後ろに「目的語 ＋ 動詞の原形 ＋ a lot」で表現します[cite: 1]。したがって laugh a lot が適切です[cite: 1]。" },
+    { id: 40, type: "発展応用", cat: 4, q: "次の日本語を英文に直すとき、（ &nbsp; ）に適切な語を1語ずつ入れなさい。<br>「彼は私たちに、その喫茶店がこの近くにあると教えて（示して）くれました」<br>&rightarrow; He （ &nbsp; ） us （ &nbsp; ） the cafe was near here.[cite: 1]", a: "showed, that", e: "「（人）に〜だと示す、教える」は「show ＋ 人 ＋ that ＋ 主語 ＋ 動詞」の形を使います[cite: 1]。過去の出来事なので showed にします[cite: 1]。" },
+    { id: 41, type: "発展応用", cat: 4, q: "次の日本語に合うように、（ &nbsp; ）に入る適切な英語を答えなさい。<br>「いくつかの会社は短い昼寝の時間を導入しました」<br>&rightarrow; Some companies have （ &nbsp; ） a short nap time.[cite: 1]", a: "introduced", e: "「導入する」を意味する動詞 introduce を[cite: 1]、現在完了形（haveの後ろ）の形に合わせて過去分詞形 introduced にします[cite: 1]。" },
+    { id: 42, type: "発展応用", cat: 4, q: "次の日本語を英作文しなさい。<br>「私は3年間、新しいバットが欲しいと思っています」[cite: 1]", a: "I have wanted a new bat for three years.", e: "「ずっと欲しがっている」という状態の継続は、現在完了形（have wanted）で表します[cite: 1]。期間の「3年間」は for three years です[cite: 1]。" },
+    { id: 43, type: "発展応用", cat: 4, q: "次の日本語を英作文しなさい。<br>「ランニングはいつも私をお腹を空かせた状態にします（お腹がすきます）」[cite: 1]", a: "Running always makes me hungry.", e: "動名詞「Running」を主語にし[cite: 1]、「makes ＋ 目的語（me） ＋ 形容詞（hungry）」の第5文型を組み立てます[cite: 1]。alwaysはmakesの前に置きます[cite: 1]。" },
+    { id: 44, type: "発展応用", cat: 4, q: "次の日本語を英作文しなさい。<br>「彼女はどのくらいの間、大阪に住んでいますか」[cite: 1]", a: "How long has she lived in Osaka?", e: "期間を尋ねる How long を文頭に置き[cite: 1]、主語が she なので「has she lived ~?」という現在完了の疑問文の語順にします[cite: 1]。" },
+    { id: 45, type: "発展応用", cat: 4, q: "次の日本語を英作文しなさい。<br>「私はちょうど自分のが終わったところです」[cite: 1]", a: "I have just done mine.", e: "教科書本文の「いいわよ、私はちょうど自分のが終わったところよ（宿題など）」のフレーズです[cite: 1]。have just ＋ 過去分詞のdone[cite: 1]、そして「私のもの」を意味する mine を使います[cite: 1]。" },
+
+    // 第5ブロック：長文・対話文の読解・内容一致 (46-60)
+    { id: 46, type: "一問一答", cat: 5, q: "次の対話を読み、質問に日本語で答えなさい。<br>Daniel: Can you help me with my homework?<br>Mao: Sure, I've just done mine.<br>質問：真央がダニエルの宿題を手伝えるのはなぜですか。理由を説明しなさい。[cite: 1]", a: "自分の宿題がちょうど終わったところだから。", e: "Maoの発言「I've just done mine.（ちょうど自分のを終わらせたところよ）」から、手伝える理由が分かります[cite: 1]。" },
+    { id: 47, type: "一問一答", cat: 5, q: "次の対話を読み、質問に日本語で答えなさい。<br>Daniel: I want to eat ramen.<br>Mao: Really? You've just eaten three bowls of rice.<br>質問：ダニエルがラーメンを食べたいと言ったとき、真央が驚いている理由を説明しなさい。[cite: 1]", a: "ダニエルがちょうどご飯を3杯食べたところだから。", e: "Maoの「You've just eaten three bowls of rice.（ちょうどご飯を3杯食べたところじゃない）」という指摘から理由を読み取ります[cite: 1]。" },
+    { id: 48, type: "一問一答", cat: 5, q: "次の文章を読み、質問に日本語で答えなさい。<br>「Ken and Taku have been good friends for eight years. Taku came to this town when he was four years old. So he has lived here for ten years.」<br>質問：拓がこの町にやってきたのは何歳のときですか。[cite: 1]", a: "4歳のとき", e: "本文の「when he was four years old」から「4歳のとき」が正解です[cite: 1]。" },
+    { id: 49, type: "一問一答", cat: 5, q: "上の文章（問48）に基づき、健と拓が何年間よい友だちであるかを日本語で答えなさい。[cite: 1]", a: "8年間", e: "本文冒頭の「have been good friends for eight years」から「8年間」が正解です[cite: 1]。" },
+    { id: 50, type: "一問一答", cat: 5, q: "次の対話の一部を読み、フェリペが昨夜何時間しか眠れなかったか、数字（日本語）で答えなさい。<br>Felipe: I slept for only four hours last night.<br>Ms. Miller: Only four hours? You should know that sleep affects your health.[cite: 1]", a: "4時間", e: "Felipeが「slept for only four hours（4時間しか眠らなかった）」と言っています[cite: 1]。" },
+    { id: 51, type: "一問一答", cat: 5, q: "上の対話（問50）に基づき、ミラー先生は睡眠が何に影響を与えると言っていますか。日本語で答えなさい。[cite: 1]", a: "健康 / 体調", e: "ミラー先生の「sleep affects your health」というセリフから「健康（health）」に影響を与えることが分かります[cite: 1]。" },
+    { id: 52, type: "一問一答", cat: 5, q: "次の文章を読み、質問に日本語で答えなさい。<br>「Ms. Miller says it is important to take a bath 90 minutes before going to bed. Then your body temperature will be just right when you sleep.」<br>質問：ミラー先生によると、寝る何分前にお風呂に入るべきだと言っていますか。[cite: 1]", a: "90分前", e: "本文の「90 minutes before going to bed」から「90分前」となります[cite: 1]。" },
+    { id: 53, type: "一問一答", cat: 5, q: "上の文章（問52）に基づき、寝る前に入浴することで、眠るときに何がちょうどよくなると言っていますか。日本語で答えなさい。[cite: 1]", a: "体温", e: "本文の「your body temperature will be just right（体温がちょうどよくなるでしょう）」から「体温」が正解です[cite: 1]。" },
+    { id: 54, type: "一問一答", cat: 5, q: "次の解説文を読み、質問に日本語で答えなさい。<br>「If you look at the bright screen of your smartphone at night, your brain will believe it is daytime. Thus you will not be able to fall asleep easily.」<br>質問：夜にスマートフォンの明るい画面を見ると、脳はどう勘違いしてしまいますか。[cite: 1]", a: "日中（昼間）だと信じこんでしまう。", e: "本文の「your brain will believe it is daytime」から「日中（昼間）だと信じこんでしまう」が正解です[cite: 1]。" },
+    { id: 55, type: "一問一答", cat: 5, q: "上の文章（問54）に基づき、脳が勘違いした結果、どうなってしまうかを日本語で説明しなさい。[cite: 1]", a: "簡単に眠りに落ちることができなくなる。", e: "本文後半の「you will not be able to fall asleep easily」から「簡単に眠りに落ちることができなくなる」となります[cite: 1]。" },
+    { id: 56, type: "一問一答", cat: 5, q: "次のビジネスに関する英文を読み、いくつかの会社が午後早くに導入したものを日本語で答えなさい。<br>「Some companies have introduced a short nap time early in the afternoon. As a result, the employees have been working better.」[cite: 1]", a: "短い昼寝の時間", e: "本文の「introduced a short nap time（短い昼寝の時間を導入した）」から「短い昼寝の時間」が正解です[cite: 1]。" },
+    { id: 57, type: "発展応用", cat: 5, q: "上の文章（問56）に基づき、短い昼寝の時間を導入した「結果」として、従業員はどうなりましたか。日本語で説明しなさい。[cite: 1]", a: "よりよい状態で働き続けている。 / 工作の効率が上がった。", e: "後半の「the employees have been working better」から、従業員たちがより良い状態で働き続けていることが読み取れます[cite: 1]。" },
+    { id: 58, type: "発展応用", cat: 5, q: "次の対話文を読み、質問に日本語で答えなさい。<br>Mao: Do you like swimming, Felipe?<br>Felipe: Yes, but it makes me tired.<br>Mao: Felipe, what did you do last Sunday?<br>Felipe: I saw a movie. It made me sleepy.<br>質問：フェリペにとって「映画を見ること」は、彼をどのような状態にさせましたか。日本語で答えなさい。[cite: 1]", a: "眠い状態（眠くさせた）。", e: "フェリペのセリフ「I saw a movie. It made me sleepy.」から「眠くさせた」が正解です[cite: 1]。" },
+    { id: 59, type: "発展応用", cat: 5, q: "次の対話を読み、質問に英語（動詞1語）で答えなさい。<br>Daniel: It was a sad movie. It made me cry. Ken lent me a comic book. It made me laugh.<br>質問：What did the comic book make Daniel do? &rightarrow; It made him （ &nbsp; ）.[cite: 1]", a: "laugh", e: "「Ken lent me a comic book. It made me laugh.（マンガ本は僕を笑わせた）」とあるので[cite: 1]、laughが入ります[cite: 1]。" },
+    { id: 60, type: "発展応用", cat: 5, q: "次の対話文を読み、ダニエルが真央に対して「ぐっすり眠るため」に勧めている具体的な方法を日本語で説明しなさい。<br>Mao: I'm so tired today. I'll go to bed early tonight.<br>Daniel: You should get some rest. Warm milk makes you sleep well.[cite: 1]", a: "温かい牛乳を飲むこと。", e: "Danielが「Warm milk makes you sleep well.（温かい牛乳を飲めばぐっすり眠れるよ）」とアドバイスしていることから「温かい牛乳を飲むこと」となります[cite: 1]。" }
+];
+
+let timeLeft = 40 * 60;
+const timerDisplay = document.getElementById('timer');
+const userScores = new Array(questions.length).fill(null);
+
+function generateQuestions() {
+    questions.forEach(q => {
+        const container = document.getElementById(`questions-container-${q.cat}`);
+        const div = document.createElement('div');
+        div.className = 'question-item';
+        
+        let content = `<span class="q-num">問${q.id}</span> <span class="q-type">${q.type}</span><br>${q.q}`;
+        
+        if (q.type === "記号選択" && q.options) {
+            content += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                content += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            content += `</div>`;
+            
+            // 印刷用手書き欄（記号選択）
+            content += `<div class="print-ans-space">答：[ &nbsp; &nbsp; ]</div>`;
+        } else {
+            // 印刷用手書き欄（一問一答・英作文）
+            if (q.id >= 42 && q.id <= 45) {
+                // 英作文用には少し広めの書き込みボックスを用意
+                content += `<div class="print-ans-space">答：<div class="ans-box"></div></div>`;
+            } else {
+                content += `<div class="print-ans-space">答：<span class="ans-line"></span></div>`;
+            }
+        }
+        
+        div.innerHTML = content;
+        container.appendChild(div);
+    });
+
+    if (window.MathJax) {
+        MathJax.typesetPromise();
+    }
+}
+
+function showAnswers() {
+    clearInterval(countdown);
+    document.getElementById('test-page').classList.remove('active');
+    document.getElementById('answer-page').classList.add('active');
+    document.getElementById('score-bar').style.display = 'block';
+    
+    const container = document.getElementById('answers-container');
+    questions.forEach((q, idx) => {
+        const div = document.createElement('div');
+        div.className = 'ans-item';
+        div.id = `ans-item-${idx}`;
+        
+        let qContent = `<div class="ans-q-text"><span class="q-num">問${q.id}</span> [${q.type}] ${q.q}`;
+        if (q.type === "記号選択" && q.options) {
+            qContent += `<div class="options-container">`;
+            const labels = ["ア", "イ", "ウ", "エ"];
+            q.options.forEach((opt, i) => {
+                qContent += `<div class="option-item">${labels[i]}：${opt}</div>`;
+            });
+            qContent += `</div>`;
+        }
+        qContent += `</div>`;
+
+        let targetAnswer = q.a;
+        if (q.type === "記号選択" && q.ans_literal) {
+            targetAnswer = `${q.a} （${q.ans_literal}）`;
+        }
+
+        div.innerHTML = `
+            ${qContent}
+            <div><span class="ans-correct">正解：${targetAnswer}</span></div>
+            <div class="ans-explanation"><strong>解説:</strong> ${q.e}</div>
+            <div class="scoring-btns">
+                <button class="score-btn btn-correct" id="btn-c-${idx}" onclick="setScore(${idx}, true)">○ 正解</button>
+                <button class="score-btn btn-wrong" id="btn-w-${idx}" onclick="setScore(${idx}, false)">× 不正解</button>
+            </div>
+        `;
+        container.appendChild(div);
+    });
+
+    if (window.MathJax) {
+        MathJax.typesetPromise();
+    }
+
+    window.scrollTo(0, 0);
+}
+
+const countdown = setInterval(() => {
+    let minutes = Math.floor(timeLeft / 60);
+    let seconds = timeLeft % 60;
+    timerDisplay.innerText = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    if (timeLeft <= 0) {
+        clearInterval(countdown);
+        alert('時間終了です！採点ページへ移ります。');
+        showAnswers();
+    }
+    timeLeft--;
+}, 1000);
+
+function setScore(idx, isCorrect) {
+    userScores[idx] = isCorrect;
+    document.getElementById(`btn-c-${idx}`).classList.toggle('selected', isCorrect);
+    document.getElementById(`btn-w-${idx}`).classList.toggle('selected', !isCorrect);
+    updateScore();
+}
+
+function updateScore() {
+    const correctCount = userScores.filter(s => s === true).length;
+    document.getElementById('correct-count').innerText = correctCount;
+    document.getElementById('score-val').innerText = Math.round((correctCount / questions.length) * 100);
+}
+
+generateQuestions();
+</script>
+
+</body>
+</html>

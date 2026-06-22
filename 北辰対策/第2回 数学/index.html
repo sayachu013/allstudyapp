@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>埼玉県高校模試 数学大問1突破マスター</title>
+    <style>
+        :root {
+            --primary: #1e3a8a;
+            --primary-light: #eff6ff;
+            --success: #10b981;
+            --danger: #ef4444;
+            --dark: #1f2937;
+            --gray: #f3f4f6;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Helvetica Neue', Arial, sans-serif; }
+        body { background-color: #f8fafc; color: var(--dark); line-height: 1.6; padding: 15px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); position: relative; }
+        h1 { font-size: 20px; text-align: center; color: var(--primary); margin-bottom: 20px; border-bottom: 3px solid var(--primary); padding-bottom: 10px; padding-right: 90px; padding-left: 90px; }
+        h2 { font-size: 16px; margin-bottom: 15px; color: var(--primary); }
+        .btn { display: block; width: 100%; padding: 12px; margin: 10px 0; border: none; border-radius: 8px; font-size: 15px; font-weight: bold; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { background: #172554; }
+        .btn-gray { background: var(--gray); color: var(--dark); border: 1px solid #d1d5db; }
+        .btn-gray:hover { background: #e5e7eb; }
+        .hidden { display: none !important; }
+        
+        /* 右上ホームボタン */
+        .btn-home-top { position: absolute; top: 15px; right: 15px; width: auto; padding: 6px 12px; font-size: 12px; margin: 0; background: #64748b; color: white; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; z-index: 10; }
+        .btn-home-top:hover { background: #475569; }
+        
+        /* メニュー画面 */
+        .menu-section { margin-bottom: 20px; padding: 15px; background: var(--primary-light); border-radius: 8px; border-left: 5px solid var(--primary); }
+        .unit-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 8px 0; background: #ffffff; padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0; }
+        .unit-title { font-size: 14px; font-weight: bold; flex-grow: 1; color: var(--dark); }
+        .btn-sub { width: auto; min-width: 95px; padding: 8px 12px; font-size: 13px; margin: 0; border-radius: 6px; font-weight: bold; border: none; cursor: pointer; text-align: center; transition: all 0.3s ease; }
+        .btn-sub-basic { background: #e2e8f0; color: #334155; border: 1px solid #cbd5e1; }
+        .btn-sub-basic:hover { background: #cbd5e1; }
+        .btn-sub-advanced { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+        .btn-sub-advanced:hover { background: #fde68a; }
+        
+        /* テストセクション専用マルチボタンコンテナ */
+        .test-btn-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 5px; }
+        .btn-test-sub { padding: 10px 5px; font-size: 13px; font-weight: bold; border-radius: 6px; border: 1px solid #cbd5e1; cursor: pointer; background: #ffffff; color: #334155; transition: all 0.3s ease; }
+        .btn-test-sub:hover { background: #f1f5f9; }
+
+        /* 王冠クリア時のゴールドクラス仕様 */
+        .btn-gold-clear { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important; color: #ffffff !important; border: 1px solid #b45309 !important; box-shadow: 0 2px 4px rgba(217, 119, 6, 0.3); text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+        .btn-gold-clear:hover { background: linear-gradient(135deg, #d97706 0%, #b45309 100%) !important; }
+        
+        /* 問題画面 */
+        .status-bar { display: flex; justify-content: space-between; font-size: 13px; color: #6b7280; margin-bottom: 15px; font-weight: bold; padding-right: 90px; }
+        .instruction-box { background: #fef08a; padding: 10px; border-radius: 6px; font-size: 14px; margin-bottom: 15px; font-weight: bold; text-align: center; border: 1px solid #fef08a; }
+        .question-text { font-size: 22px; font-weight: bold; text-align: center; padding: 30px 10px; background: #fafafa; border: 2px dashed #cbd5e1; border-radius: 8px; margin-bottom: 20px; }
+        
+        /* 4択ボタン */
+        .choices-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 15px; }
+        .choice-btn { background: white; border: 2px solid #cbd5e1; padding: 15px; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; text-align: center; display: flex; justify-content: center; align-items: center; }
+        .choice-btn:hover { border-color: var(--primary); background: var(--primary-light); }
+        
+        /* 数学フォント用スタイル（明朝・イタリックベースに統一） */
+        .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; padding: 0 4px; font-size: 20px; font-family: 'Times New Roman', Georgia, serif; font-style: italic; font-weight: bold; }
+        .num { border-bottom: 2px solid var(--dark); padding-bottom: 2px; }
+        .den { padding-top: 2px; }
+        .math-inline { display: inline-flex; align-items: center; justify-content: center; font-family: 'Times New Roman', Georgia, serif; font-style: italic; font-weight: bold; font-size: 22px; }
+        
+        /* 連立方程式用の縦並びブロック配置 */
+        .sys-eq { display: inline-flex; align-items: center; font-size: 22px; font-family: 'Times New Roman', Georgia, serif; font-style: italic; font-weight: bold; vertical-align: middle; text-align: left; }
+        .sys-brace { font-size: 40px; font-weight: 100; font-family: 'Times New Roman', serif; margin-right: 2px; line-height: 1; }
+        .sys-lines { display: inline-flex; flex-direction: column; gap: 2px; }
+
+        /* 解答画面のスタイリッシュな正誤判定モジュール */
+        .result-alert { padding: 20px; border-radius: 14px; text-align: center; font-size: 26px; font-weight: 800; margin-bottom: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; letter-spacing: 1px; transition: all 0.4s ease; border: 1px solid transparent; }
+        .result-badge-icon { font-size: 36px; line-height: 1; margin-bottom: 2px; animation: popBadge 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .result-badge-sub { font-size: 13px; font-weight: 600; opacity: 0.8; letter-spacing: 0.5px; text-transform: uppercase; }
+        
+        .alert-success { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.15), 0 8px 10px -6px rgba(16, 185, 129, 0.1); }
+        .alert-danger { background: #fff5f5; color: #9b1c1c; border-color: #fee2e2; box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.12), 0 8px 10px -6px rgba(239, 68, 68, 0.08); }
+        
+        @keyframes popBadge {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .explanation-box { background: #f8fafc; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 15px; }
+        .exp-title { font-weight: bold; color: var(--primary); margin-bottom: 8px; font-size: 14px; }
+        .exp-text { font-size: 16px; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button id="btn-top-home" class="btn-home-top hidden" onclick="confirmGoHome()">ホームへ</button>
+
+    <h1>埼玉県高校模試 数学大問1突破マスター</h1>
+
+    <div id="screen-home">
+        <div class="menu-section">
+            <h2>🏆 全単元確認テスト</h2>
+            <p style="font-size:13px; color:#4b5563; margin-bottom:10px;">全単元から10問をランダム出題。正答率 9 割（90点）以上でクリア王冠👑が解放されます！</p>
+            <div class="test-btn-grid">
+                <button id="btn-test-basic" class="btn-test-sub" onclick="startTest('basic')">基本のみ</button>
+                <button id="btn-test-mix" class="btn-test-sub" onclick="startTest('mix')">基本+応用</button>
+                <button id="btn-test-advanced" class="btn-test-sub" onclick="startTest('advanced')">応用のみ</button>
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <h2>📂 単元別弱点特訓 (各10問・10連勝でクリア👑)</h2>
+            <div class="unit-row">
+                <span class="unit-title">単元①：文字式の加減</span>
+                <button id="btn-1-basic" class="btn-sub btn-sub-basic" onclick="startUnit(1, 'basic')">基本</button>
+                <button id="btn-1-advanced" class="btn-sub btn-sub-advanced" onclick="startUnit(1, 'advanced')">応用</button>
+            </div>
+            <div class="unit-row">
+                <span class="unit-title">単元②：正負の四則演算</span>
+                <button id="btn-2-basic" class="btn-sub btn-sub-basic" onclick="startUnit(2, 'basic')">基本</button>
+                <button id="btn-2-advanced" class="btn-sub btn-sub-advanced" onclick="startUnit(2, 'advanced')">応用</button>
+            </div>
+            <div class="unit-row">
+                <span class="unit-title">単元③：文字式の乗除</span>
+                <button id="btn-3-basic" class="btn-sub btn-sub-basic" onclick="startUnit(3, 'basic')">基本</button>
+                <button id="btn-3-advanced" class="btn-sub btn-sub-advanced" onclick="startUnit(3, 'advanced')">応用</button>
+            </div>
+            <div class="unit-row">
+                <span class="unit-title">単元④：式の代入値</span>
+                <button id="btn-4-basic" class="btn-sub btn-sub-basic" onclick="startUnit(4, 'basic')">基本</button>
+                <button id="btn-4-advanced" class="btn-sub btn-sub-advanced" onclick="startUnit(4, 'advanced')">応用</button>
+            </div>
+            <div class="unit-row">
+                <span class="unit-title">単元⑤：因数分解</span>
+                <button id="btn-5-basic" class="btn-sub btn-sub-basic" onclick="startUnit(5, 'basic')">基本</button>
+                <button id="btn-5-advanced" class="btn-sub btn-sub-advanced" onclick="startUnit(5, 'advanced')">応用</button>
+            </div>
+            <div class="unit-row">
+                <span class="unit-title">単元⑥：連立方程式（加減法・代入法）</span>
+                <button id="btn-6-basic" class="btn-sub btn-sub-basic" onclick="startUnit(6, 'basic')">基本</button>
+                <button id="btn-6-advanced" class="btn-sub btn-sub-advanced" onclick="startUnit(6, 'advanced')">応用</button>
+            </div>
+            <div class="unit-row">
+                <span class="unit-title">単元⑦：関数・比例・反比例の基礎</span>
+                <button id="btn-7-basic" class="btn-sub btn-sub-basic" onclick="startUnit(7, 'basic')">基本</button>
+                <button id="btn-7-advanced" class="btn-sub btn-sub-advanced" onclick="startUnit(7, 'advanced')">応用</button>
+            </div>
+            <div class="unit-row">
+                <span class="unit-title">単元⑧：1次方程式（分数・小数処理）</span>
+                <button id="btn-8-basic" class="btn-sub btn-sub-basic" onclick="startUnit(8, 'basic')">基本</button>
+                <button id="btn-8-advanced" class="btn-sub btn-sub-advanced" onclick="startUnit(8, 'advanced')">応用</button>
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <h2>🔄 復習メニュー</h2>
+            <p style="font-size:13px; color:#4b5563; margin-bottom:10px;">過去に間違えた問題データのみを抽出し、解き直すことができます。（※タブをリロードするとリセットされます）</p>
+            <button id="btn-review" class="btn btn-gray" onclick="startReviewMode()">間違えた問題を復習する (<span id="review-count">0</span>問)</button>
+        </div>
+    </div>
+
+    <div id="screen-quiz" class="hidden">
+        <div class="status-bar">
+            <span id="quiz-title">単元特訓</span>
+            <span id="quiz-progress">1 / 10 問目</span>
+        </div>
+        
+        <div id="phase-write">
+            <div id="combo-alert" class="instruction-box">【ステップ1】問題をノートに書き写して、最後まで解きなさい。</div>
+            <div id="question-area" class="question-text"></div>
+            <div style="text-align: center; margin-bottom: 10px;">※問題文をノートに写したら下のボタンを押してください。</div>
+            <button class="btn btn-primary" onclick="showChoicesPhase()">解き終わったので選択肢を見る</button>
+        </div>
+
+        <div id="phase-choose" class="hidden">
+            <div class="instruction-box">【ステップ2】自分の出した答えに合うものを選択しなさい。</div>
+            <div class="choices-grid" id="choices-area"></div>
+        </div>
+    </div>
+
+    <div id="screen-result" class="hidden">
+        <div id="result-judge" class="result-alert"></div>
+        
+        <div class="explanation-box">
+            <div class="exp-title">■ あなたの選んだ答え</div>
+            <div id="user-answer-display" style="font-size:18px; font-weight:bold; margin-bottom:15px; color:#475569;"></div>
+            
+            <div class="exp-title" style="color:#047857;">■ 正しい答え</div>
+            <div id="correct-answer-display" style="font-size:20px; font-weight:bold; margin-bottom:15px; color:#047857;"></div>
+            
+            <div class="exp-title">■ 正解の途中式・解説</div>
+            <div id="explanation-display" class="exp-text" style="color:#1f2937;"></div>
+        </div>
+        
+        <button id="btn-next" class="btn btn-primary" onclick="nextQuestion()">次の問題へ進む</button>
+    </div>
+
+    <div id="screen-score" class="hidden">
+        <h2 style="text-align: center; font-size: 22px; margin-bottom: 20px;">🎉 演習終了結果</h2>
+        <div id="score-report" style="text-align: center; font-size: 24px; font-weight: bold; margin-bottom: 20px; color: var(--primary);"></div>
+        <div id="score-comment" style="text-align: center; margin-bottom: 20px; font-size: 15px; padding: 10px; background: #f1f5f9; border-radius: 6px;"></div>
+        <button class="btn btn-primary" onclick="backToHome()">ホームメニューへ戻る</button>
+    </div>
+</div>
+
+<script>
+// --- アプリ共通データ管理 ---
+let reviewPool = JSON.parse(sessionStorage.getItem('math_review_pool')) || [];
+let crownRecords = JSON.parse(sessionStorage.getItem('math_clear_crowns')) || {};
+
+let currentMode = ''; 
+let currentUnitId = 0;
+let currentLevel = 'basic'; 
+let currentQuestions = [];
+let currentIndex = 0;
+let correctCount = 0; 
+let isInterrupted = false; 
+
+function updateReviewBadge() {
+    document.getElementById('review-count').innerText = reviewPool.length;
+    document.getElementById('btn-review').disabled = reviewPool.length === 0;
+}
+
+function updateCrownDisplays() {
+    for (let u = 1; u <= 8; u++) { 
+        let basicBtn = document.getElementById(`btn-${u}-basic`);
+        let advBtn = document.getElementById(`btn-${u}-advanced`);
+        
+        if (basicBtn) {
+            if (crownRecords[`${u}_basic`]) {
+                basicBtn.innerText = "👑 基本";
+                basicBtn.classList.add('btn-gold-clear');
+            } else {
+                basicBtn.innerText = "基本";
+                basicBtn.classList.remove('btn-gold-clear');
+            }
+        }
+        if (advBtn) {
+            if (crownRecords[`${u}_advanced`]) {
+                advBtn.innerText = "👑 応用";
+                advBtn.classList.add('btn-gold-clear');
+            } else {
+                advBtn.innerText = "応用";
+                advBtn.classList.remove('btn-gold-clear');
+            }
+        }
+    }
+    
+    let testBasicBtn = document.getElementById('btn-test-basic');
+    let testMixBtn = document.getElementById('btn-test-mix');
+    let testAdvBtn = document.getElementById('btn-test-advanced');
+    
+    if(testBasicBtn) {
+        if(crownRecords['test_basic']) { testBasicBtn.innerText = "👑 基本のみ"; testBasicBtn.classList.add('btn-gold-clear'); }
+        else { testBasicBtn.innerText = "基本のみ"; testBasicBtn.classList.remove('btn-gold-clear'); }
+    }
+    if(testMixBtn) {
+        if(crownRecords['test_mix']) { testMixBtn.innerText = "👑 基本+応用"; testMixBtn.classList.add('btn-gold-clear'); }
+        else { testMixBtn.innerText = "基本+応用"; testMixBtn.classList.remove('btn-gold-clear'); }
+    }
+    if(testAdvBtn) {
+        if(crownRecords['test_advanced']) { testAdvBtn.innerText = "👑 応用のみ"; testAdvBtn.classList.add('btn-gold-clear'); }
+        else { testAdvBtn.innerText = "応用のみ"; testAdvBtn.classList.remove('btn-gold-clear'); }
+    }
+}
+
+updateReviewBadge();
+updateCrownDisplays();
+
+function confirmGoHome() {
+    backToHome();
+}
+
+function setTopHomeButtonVisibility(visible) {
+    const homeBtn = document.getElementById('btn-top-home');
+    if (visible) {
+        homeBtn.classList.remove('hidden');
+    } else {
+        homeBtn.classList.add('hidden');
+    }
+}
+
+function getGCD(x, y) {
+    x = Math.abs(x); y = Math.abs(y);
+    while(y) { var t = y; y = x % y; x = t; }
+    return x;
+}
+
+function makeReducedFracHtml(num, den) {
+    let gcd = getGCD(num, den);
+    let rNum = num / gcd;
+    let rDen = den / gcd;
+    if (rDen === 1) return `${rNum}`;
+    return `<div class="frac"><span class="num">${rNum}</span><span class="den">${rDen}</span></div>`;
+}
+
+function cleanExpression(str) {
+    return str
+        .replace(/\b0[a-z]/g, '0')       
+        .replace(/\+ -/g, '- ')
+        .replace(/- -/g, '+ ')
+        .replace(/\+ \+/g, '+ ')
+        .replace(/\(\+(\d+)\)/g, '$1')   
+        .replace(/\b1([a-z])/g, '$1')   
+        .replace(/-1([a-z])/g, '-$1')   
+        .replace(/\s\+\s0\s/g, '')       
+        .replace(/\s-\s0\s/g, '')       
+        .trim();
+}
+
+function getRandomInt(min, max) {
+    let val = 0;
+    while(val === 0) { 
+        val = Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    return val;
+}
+
+function wrapNegative(num) {
+    return num < 0 ? `(${num})` : `${num}`;
+}
+
+function formatFactored(val) {
+    if (val > 0) return `+ ${val}`;
+    return `- ${Math.abs(val)}`;
+}
+
+// --- 単元別問題自動生成ロジックエンジン ---
+function generateQuestion(unitId, level) {
+    let qType = unitId;
+    if (unitId === 'random') qType = Math.floor(Math.random() * 8) + 1; 
+
+    let targetLevel = level;
+    if (level === 'mix') {
+        targetLevel = Math.random() > 0.5 ? 'basic' : 'advanced';
+    }
+
+    let html = '';
+    let correctAnsHtml = '';
+    let wrongAnsHtmls = [];
+    let explanationHtml = '';
+
+    switch(qType) {
+        case 1: { // 文字式の加減
+            let char = ['x', 'a', 'y', 'b', 'm'][Math.floor(Math.random()*5)];
+            let a = getRandomInt(-25, 25);
+            let b = getRandomInt(-25, 25);
+            while(a === b || a === -b) b = getRandomInt(-25, 25);
+            
+            if (targetLevel === 'advanced') { 
+                let c = getRandomInt(-25, 25);
+                let templatePattern = Math.random() > 0.5;
+                if(templatePattern) { 
+                    let bPart = b < 0 ? `- ${Math.abs(b)}${char}` : `+ ${b}${char}`;
+                    let cPart = c < 0 ? `- ${Math.abs(c)}${char}` : `+ ${c}${char}`;
+                    html = `<div class="math-inline">${cleanExpression(`${a}${char} ${bPart} ${cPart}`)}</div> を計算しなさい。`;
+                } else { 
+                    let aPart = a < 0 ? `- ${Math.abs(a)}${char}` : `+ ${a}${char}`;
+                    let bPart = b < 0 ? `- ${Math.abs(b)}${char}` : `+ ${b}${char}`;
+                    html = `<div class="math-inline">${cleanExpression(`${c}${char} ${aPart} ${bPart}`)}</div> を計算しなさい。`;
+                }
+                let ansVal = a + b + c;
+                let finalAnsText = ansVal === 0 ? "0" : cleanExpression(ansVal + char);
+                correctAnsHtml = `<div class="math-inline">${finalAnsText}</div>`;
+                [ansVal*-1, ansVal+3, ansVal-3, a+b].forEach(v => wrongAnsHtmls.push(`<div class="math-inline">${v === 0 ? "0" : cleanExpression(v+char)}</div>`));
+                explanationHtml = `同類項をまとめると、係数の和は ${a} + ${b} + ${c} = ${ansVal} となります。`;
+            } else { 
+                let bStr = b < 0 ? `- ${Math.abs(b)}${char}` : `+ ${b}${char}`;
+                html = `<div class="math-inline">${cleanExpression(`${a}${char} ${bStr}`)}</div> を計算しなさい。`;
+                let ansVal = a + b;
+                let finalAnsText = ansVal === 0 ? "0" : cleanExpression(ansVal + char);
+                correctAnsHtml = `<div class="math-inline">${finalAnsText}</div>`;
+                [ansVal*-1, ansVal+2, ansVal-2, a-b].forEach(v => wrongAnsHtmls.push(`<div class="math-inline">${v === 0 ? "0" : cleanExpression(v+char)}</div>`));
+                explanationHtml = `同類項の係数をまとめると、 ${a} + (${b}) = ${ansVal} となります。`;
+            }
+            break;
+        }
+        case 2: { // 正負の四則演算
+            let a = getRandomInt(-25, 25);
+            let b = getRandomInt(-8, 8);
+            let c = getRandomInt(-8, -2); 
+            
+            if (targetLevel === 'advanced') { 
+                let d = getRandomInt(-15, 15);
+                let isAltTemplate = Math.random() > 0.5;
+                if(isAltTemplate) { 
+                    html = `<div class="math-inline">${cleanExpression(`${a} + ${b} \\times (${c})² - ${wrapNegative(d)}`)}</div> を計算しなさい。`.replace('\\times', '×');
+                    let ansVal = a + (b * (c * c)) - d;
+                    correctAnsHtml = `<div class="math-inline">${ansVal}</div>`;
+                    [ansVal*-1, ansVal+5, ansVal-5].forEach(v => wrongAnsHtmls.push(`<div class="math-inline">${v}</div>`));
+                    explanationHtml = `累乗の処理を先に行い、次に掛け算を行います。`;
+                } else { 
+                    html = `<div class="math-inline">${cleanExpression(`(${c})² \\times ${b} + ${a} - ${wrapNegative(d)}`)}</div> を計算しなさい。`.replace('\\times', '×');
+                    let ansVal = (c * c) * b + a - d;
+                    correctAnsHtml = `<div class="math-inline">${ansVal}</div>`;
+                    [ansVal*-1, ansVal+10, ansVal-10].forEach(v => wrongAnsHtmls.push(`<div class="math-inline">${v}</div>`));
+                    explanationHtml = `先頭の累乗 (${c})² = ${c*c} を最初に計算して四則の順に解きます。`;
+                }
+            } else { 
+                html = `<div class="math-inline">${cleanExpression(`${a} + ${wrapNegative(b)} \\times ${wrapNegative(c)}`)}</div> を計算しなさい。`.replace('\\times', '×');
+                let ansVal = a + (b * c);
+                correctAnsHtml = `<div class="math-inline">${ansVal}</div>`;
+                [ansVal*-1, ansVal+5, ansVal-5, (a+b)*c].forEach(v => wrongAnsHtmls.push(`<div class="math-inline">${v}</div>`));
+                explanationHtml = `掛け算を優先して計算します。${wrapNegative(b)} × ${wrapNegative(c)} = ${b*c} です。`;
+            }
+            break;
+        }
+        case 3: { // 文字式の乗除
+            let b_den = Math.floor(Math.random() * 5) + 2; 
+            let factor = getRandomInt(2, 6);
+            let a_num = b_den * factor * (Math.random() > 0.5 ? 1 : -1);
+            let chars = ['a', 'x', 'm', 'p', 's'][Math.floor(Math.random()*5)];
+            let c2 = (chars === 'a') ? 'b' : 'y';
+
+            if (targetLevel === 'advanced') { 
+                let mult_coef = getRandomInt(2, 5);
+                let isReverse = Math.random() > 0.5;
+                if(isReverse) { 
+                    html = `<div class="math-inline">${cleanExpression(a_num + chars + '^{2}' + c2)} \\div ${cleanExpression(b_den + chars)} \\times ${mult_coef + chars}</div> を計算しなさい。`
+                            .replace('^{2}', '²').replace('\\div', '÷').replace('\\times', '×');
+                } else { 
+                    html = `<div class="math-inline">${cleanExpression(a_num + chars + '^{2}' + c2)} \\times ${mult_coef + chars} \\div ${cleanExpression(b_den + chars)}</div> を計算しなさい。`
+                            .replace('^{2}', '²').replace('\\div', '÷').replace('\\times', '×');
+                }
+                let finalCoef = (a_num / b_den) * mult_coef;
+                let ansStr = finalCoef === 0 ? "0" : cleanExpression(finalCoef + chars + '^{2}' + c2).replace('^{2}', '²');
+                correctAnsHtml = `<div class="math-inline">${ansStr}</div>`;
+                [finalCoef + chars + c2, (a_num/b_den) + chars + c2, (-finalCoef) + chars + '²' + c2].forEach(v => wrongAnsHtmls.push(`<div class="math-inline">${cleanExpression(v).replace('^{2}', '²')}</div>`));
+                explanationHtml = `分数に変換して分子・分母の文字数を正確に約分・計算します。`;
+            } else { 
+                html = `<div class="math-inline">${cleanExpression(a_num + chars + '^{2}' + c2)} \\div ${cleanExpression(b_den + chars)}</div> を計算しなさい。`
+                        .replace('^{2}', '²').replace('\\div', '÷');
+                let ansCoef = a_num / b_den;
+                let ansStr = ansCoef === 0 ? "0" : cleanExpression(ansCoef + chars + c2);
+                correctAnsHtml = `<div class="math-inline">${ansStr}</div>`;
+                [ansCoef + c2, ansCoef + chars + '²' + c2, (-ansCoef) + chars + c2].forEach(v => wrongAnsHtmls.push(`<div class="math-inline">${cleanExpression(v).replace('^{2}', '²')}</div>`));
+                explanationHtml = `分子に ${cleanExpression(a_num + chars + '²' + c2)}、分母に ${cleanExpression(b_den + chars)} を配置して約分します。`;
+            }
+            break;
+        }
+        case 4: { // 式の値
+            let x_val = getRandomInt(-5, 5);
+            while(x_val === 1 || x_val === -1) x_val = getRandomInt(-5, 5);
+            let a = getRandomInt(2, 12);
+            let b = getRandomInt(2, 6) * (Math.random() > 0.5 ? 1 : -1);
+            let ansVal;
+
+            if (targetLevel === 'advanced') { 
+                let y_val = Math.random() > 0.5 ? 3 : -3;
+                let isAltExpr = Math.random() > 0.5;
+                if(isAltExpr) { 
+                    html = ` <div class="math-inline">x = ${x_val}, y = ${y_val}</div> のとき、<div class="math-inline">${cleanExpression(a + 'x ' + (b > 0 ? '+ '+b : '- '+Math.abs(b)) + 'y^{2}')}</div> の値を求めなさい。`.replace('^{2}', '²');
+                    ansVal = (a * x_val) + (b * (y_val * y_val));
+                    correctAnsHtml = `<div class="math-inline">${ansVal}</div>`;
+                    [ansVal*-1, ansVal+10, ansVal-10].forEach(v => wrongAnsHtmls.push(`<div class="math-inline">${v}</div>`));
+                } else { 
+                    html = ` <div class="math-inline">x = ${x_val}, y = ${y_val}</div> のとき、<div class="math-inline">${cleanExpression(a + '(x + y) ' + (b > 0 ? '+ '+b : '- '+Math.abs(b)) + 'y^{2}')}</div> の値を求めなさい。`.replace('^{2}', '²');
+                    ansVal = (a * (x_val + y_val)) + (b * (y_val * y_val));
+                    correctAnsHtml = `<div class="math-inline">${ansVal}</div>`;
+                    [ansVal*-1, ansVal+8, ansVal-8].forEach(v => wrongAnsHtmls.push(`<div class="math-inline">${v}</div>`));
+                }
+                explanationHtml = `それぞれの文字に値を正確に代入して算術規則に従い計算します。`;
+            } else { 
+                html = ` <div class="math-inline">x = ${x_val}</div> のとき、<div class="math-inline">${cleanExpression(a + ' ' + (b > 0 ? '+ '+b : '- '+Math.abs(b)) + 'x^{2}')}</div> の値を求めなさい。`.replace('^{2}', '²');
+                ansVal = a + (b * (x_val * x_val));
+                correctAnsHtml = `<div class="math-inline">${ansVal}</div>`;
+                [ansVal*-1, ansVal+6, ansVal-6].forEach(v => wrongAnsHtmls.push(`<div class="math-inline">${v}</div>`));
+                explanationHtml = `xに ${wrapNegative(x_val)} を代入し、累乗を先に処理します。`;
+            }
+            break;
+        }
+        case 5: { // 因数分解
+            let n1 = getRandomInt(-7, 7);
+            let n2 = getRandomInt(-7, 7);
+            while(n1 === 0 || n2 === 0 || n1 === n2 || n1 === -n2) {
+                n1 = getRandomInt(-7, 7); n2 = getRandomInt(-7, 7);
+            }
+            let sum, prod, qStr;
+
+            if (targetLevel === 'advanced') { 
+                let common = Math.random() > 0.5 ? 2 : 3;
+                sum = (n1 + n2) * common;
+                prod = n1 * n2 * common;
+                qStr = `${common}x² ${sum > 0 ? '+ '+sum+'x' : '- '+Math.abs(sum)+'x'} ${prod > 0 ? '+ '+prod : '- '+Math.abs(prod)}`;
+                correctAnsHtml = `<div class="math-inline">${common}(x ${formatFactored(n1)})(x ${formatFactored(n2)})</div>`;
+                wrongAnsHtmls.push(`<div class="math-inline">(x ${formatFactored(n1)})(x ${formatFactored(n2)})</div>`);
+                wrongAnsHtmls.push(`<div class="math-inline">${common}(x ${formatFactored(-n1)})(x ${formatFactored(-n2)})</div>`);
+                wrongAnsHtmls.push(`<div class="math-inline">${common}(x ${formatFactored(sum)})(x ${formatFactored(prod)})</div>`);
+                explanationHtml = `すべての項から共通因数 ${common} を外にくくり出してから公式を適用します。`;
+            } else { 
+                sum = n1 + n2;
+                prod = n1 * n2;
+                qStr = `x² ${sum > 0 ? '+ '+sum+'x' : '- '+Math.abs(sum)+'x'} ${prod > 0 ? '+ '+prod : '- '+Math.abs(prod)}`;
+                correctAnsHtml = `<div class="math-inline">(x ${formatFactored(n1)})(x ${formatFactored(n2)})</div>`;
+                wrongAnsHtmls.push(`<div class="math-inline">(x ${formatFactored(-n1)})(x ${formatFactored(-n2)})</div>`);
+                wrongAnsHtmls.push(`<div class="math-inline">(x ${formatFactored(sum)})(x ${formatFactored(prod)})</div>`);
+                wrongAnsHtmls.push(`<div class="math-inline">(x ${formatFactored(n1)})(x ${formatFactored(-n2)})</div>`);
+                explanationHtml = `足して ${sum}、掛けて ${prod} になる数のペア（${n1} と ${n2}）を当てはめます。`;
+            }
+            html = `<div class="math-inline">${qStr}</div> を因数分解しなさい。`;
+            break;
+        }
+        case 6: { // 連立方程式
+            let x_ans = getRandomInt(-5, 5);
+            let y_ans = getRandomInt(-5, 5);
+            while(x_ans === y_ans) y_ans = getRandomInt(-5, 5);
+            
+            if(targetLevel === 'advanced') { 
+                let a = getRandomInt(2, 4);
+                let c1 = a * x_ans + y_ans;
+                let b = getRandomInt(2, 3);
+                let c2 = b * x_ans - 2 * y_ans;
+                
+                html = `連立方程式 <div class="sys-eq"><span class="sys-brace">{</span><span class="sys-lines"><span>y = -${a}x + ${c1}</span><span>${b}x - 2y = ${c2}</span></span></div> を解きなさい。`;
+                explanationHtml = `上の式を下の式に代入して $x$ を求め、その後 $y$ を導き出します。`;
+            } else { 
+                let c1 = x_ans + y_ans;
+                let c2 = 2 * x_ans - y_ans;
+                html = `連立方程式 <div class="sys-eq"><span class="sys-brace">{</span><span class="sys-lines"><span>x + y = ${c1}</span><span>2x - y = ${c2}</span></span></div> を解きなさい。`;
+                explanationHtml = `2つの式をそのまま足すことで $y$ を消去し、 $x$ を導きます。`;
+            }
+            
+            correctAnsHtml = `<div class="math-inline">x = ${x_ans}, y = ${y_ans}</div>`;
+            wrongAnsHtmls.push(`<div class="math-inline">x = ${y_ans}, y = ${x_ans}</div>`);
+            wrongAnsHtmls.push(`<div class="math-inline">x = ${x_ans + 1}, y = ${y_ans - 1}</div>`);
+            wrongAnsHtmls.push(`<div class="math-inline">x = ${-x_ans}, y = ${-y_ans}</div>`);
+            break;
+        }
+        case 7: { // 関数・比例・反比例（【要件クリア】解説・途中式エリア内の残存『$』記号を完全にクリーンアップ）
+            let a_coef = getRandomInt(3, 8) * (Math.random() > 0.5 ? 1 : -1);
+            if(targetLevel === 'advanced') { 
+                let x1 = 2; let y1 = a_coef * 3; 
+                let prop_a = x1 * y1;
+                let x2 = 4; let y2_ans = prop_a / x2;
+                if(prop_a % 4 !== 0) { prop_a = 24; y2_ans = 6; } 
+                
+                html = `関数 <span class="math-inline">y</span> は <span class="math-inline">x</span> に反比例し、 <span class="math-inline">x = 2</span> のとき <span class="math-inline">y = ${prop_a / 2}</span> です。 <span class="math-inline">x = 4</span> のときの <span class="math-inline">y</span> の値を求めなさい。`;
+                correctAnsHtml = `<div class="math-inline">y = ${y2_ans}</div>`;
+                [y2_ans+2, -y2_ans, prop_a].forEach(v => wrongAnsHtmls.push(`<div class="math-inline">y = ${v}</div>`));
+                explanationHtml = `反比例の式 <span class="math-inline">y = \\frac{a}{x}</span> より、比例定数 <span class="math-inline">a = x \\times y = 2 \\times ${prop_a/2} = ${prop_a}</span> です。 <span class="math-inline">x=4</span> を代入して <span class="math-inline">y</span> を出します。`;
+            } else { 
+                let x_pt = getRandomInt(2, 4);
+                let y_pt = a_coef * x_pt;
+                html = `関数 <span class="math-inline">y = ax</span> のグラフが点 <span class="math-inline">(${x_pt}, ${y_pt})</span> を通るとき、比例定数 <span class="math-inline">a</span> の値を求めなさい。`;
+                correctAnsHtml = `<div class="math-inline">a = ${a_coef}</div>`;
+                [a_coef+1, -a_coef, y_pt].forEach(v => wrongAnsHtmls.push(`<div class="math-inline">a = ${v}</div>`));
+                explanationHtml = `座標 <span class="math-inline">x = ${x_pt}, y = ${y_pt}</span> を <span class="math-inline">y = ax</span> に代入して <span class="math-inline">a</span> について解きます。`;
+            }
+            break;
+        }
+        case 8: { // 1次方程式
+            let ans = getRandomInt(-10, 10);
+            if(targetLevel === 'advanced') { 
+                let den = Math.random() > 0.5 ? 3 : 4;
+                let num_coef = getRandomInt(1, 2);
+                let b = getRandomInt(-5, 5);
+                let c = (num_coef * ans) + (b * den);
+                html = `方程式 <div class="frac"><span class="num">${num_coef === 1 ? 'x' : num_coef+'x'} ${b > 0 ? '+ '+b : '- '+Math.abs(b)}</span><span class="den">${den}</span></div> = ${c/den % 1 === 0 ? c/den : '<div class="frac"><span class="num">'+c+'</span><span class="den">'+den+'</span></div>'} を解きなさい。`;
+                explanationHtml = `分母を払うために、両辺全体に最小公倍数 ${den} を掛けてから整理します。`;
+            } else { 
+                let a = Math.random() > 0.5 ? 0.3 : 0.4;
+                let b = Math.random() > 0.5 ? 1.2 : 0.8;
+                let c = parseFloat((a * ans + b).toFixed(1));
+                html = `方程式 <div class="math-inline">${a}x + ${b} = ${c}</div> を解きなさい。`;
+                explanationHtml = `小数を解消するため、両辺を10倍してから移項と割り算を行います。`;
+            }
+            correctAnsHtml = `<div class="math-inline">x = ${ans}</div>`;
+            [ans+1, ans-1, -ans].forEach(v => wrongAnsHtmls.push(`<div class="math-inline">x = ${v}</div>`));
+            break;
+        }
+    }
+
+    wrongAnsHtmls = [...new Set(wrongAnsHtmls)].filter(v => v !== undefined && v !== "");
+    while(wrongAnsHtmls.length < 3) {
+        wrongAnsHtmls.push(`<div class="math-inline">${getRandomInt(11, 88)}</div>`);
+    }
+    wrongAnsHtmls = wrongAnsHtmls.slice(0, 3);
+    
+    return {
+        unitId: qType,
+        level: targetLevel,
+        questionHtml: html,
+        correctHtml: correctAnsHtml,
+        wrongs: wrongAnsHtmls,
+        explanation: explanationHtml
+    };
+}
+
+// --- 画面遷移・ゲームロジック群 ---
+function startUnit(unitId, level) {
+    currentMode = 'unit';
+    currentUnitId = unitId;
+    currentLevel = level || 'basic';
+    isInterrupted = false; 
+    currentIndex = 0; 
+    correctCount = 0; 
+    
+    const lvlName = currentLevel === 'advanced' ? '【応用】' : '【基本】';
+    document.getElementById('quiz-title').innerText = `単元特訓：NO.${unitId} ${lvlName}`;
+    setupQuizSet();
+}
+
+function startTest(testLevel) {
+    currentMode = 'test';
+    currentLevel = testLevel; 
+    isInterrupted = false;
+    currentIndex = 0;
+    correctCount = 0; 
+    
+    let titleText = "🏆 総合実力テスト";
+    if(testLevel === 'basic') titleText += " (基本のみ)";
+    if(testLevel === 'mix') titleText += " (基本+応用)";
+    if(testLevel === 'advanced') titleText += " (応用のみ)";
+    
+    document.getElementById('quiz-title').innerText = titleText;
+    setupQuizSet();
+}
+
+function startReviewMode() {
+    if (reviewPool.length === 0) return;
+    currentMode = 'review';
+    isInterrupted = false;
+    currentIndex = 0;
+    correctCount = 0;
+    document.getElementById('quiz-title').innerText = `🔄 弱点克服復習モード`;
+    
+    currentQuestions = [];
+    let poolCopy = [...reviewPool];
+    for(let i=0; i<10 && poolCopy.length > 0; i++) {
+        let idx = Math.floor(Math.random() * poolCopy.length);
+        currentQuestions.push(poolCopy.splice(idx, 1)[0]);
+    }
+    showQuiz();
+}
+
+function setupQuizSet() {
+    currentQuestions = [];
+    for(let i = 0; i < 10; i++) {
+        let q = (currentMode === 'test') ? generateQuestion('random', currentLevel) : generateQuestion(currentUnitId, currentLevel);
+        currentQuestions.push(q);
+    }
+    showQuiz();
+}
+
+function showQuiz() {
+    document.getElementById('screen-home').classList.add('hidden');
+    document.getElementById('screen-result').classList.add('hidden');
+    document.getElementById('screen-score').classList.add('hidden');
+    document.getElementById('screen-quiz').classList.remove('hidden');
+    
+    document.getElementById('phase-write').classList.remove('hidden');
+    document.getElementById('phase-choose').classList.add('hidden');
+    
+    let alertBox = document.getElementById('combo-alert');
+    if (currentMode === 'unit') {
+        alertBox.innerHTML = `🔥 【単元特訓】現在 <strong>${correctCount}問連続正解中</strong>！(間違えると1問目に戻る・10連勝でクリア)`;
+        document.getElementById('quiz-progress').innerText = `現在 ${correctCount} 連勝中 / 目標10連勝`;
+    } else {
+        alertBox.innerHTML = `【ステップ1】問題をノートに書き写して、最後まで解きなさい。`;
+        document.getElementById('quiz-progress').innerText = `${currentIndex + 1} / ${currentQuestions.length} 問目`;
+    }
+    
+    document.getElementById('question-area').innerHTML = currentQuestions[currentIndex].questionHtml;
+    setTopHomeButtonVisibility(true);
+}
+
+function showChoicesPhase() {
+    document.getElementById('phase-write').classList.add('hidden');
+    document.getElementById('phase-choose').classList.remove('hidden');
+    
+    let q = currentQuestions[currentIndex];
+    let choices = [
+        { isCorrect: true, html: q.correctHtml },
+        { isCorrect: false, html: q.wrongs[0] },
+        { isCorrect: false, html: q.wrongs[1] },
+        { isCorrect: false, html: q.wrongs[2] }
+    ];
+    choices.sort(() => Math.random() - 0.5);
+    
+    let choicesArea = document.getElementById('choices-area');
+    choicesArea.innerHTML = '';
+    
+    choices.forEach(c => {
+        let btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.innerHTML = c.html;
+        btn.onclick = () => selectAnswer(c.isCorrect, c.html);
+        choicesArea.appendChild(btn);
+    });
+}
+
+function selectAnswer(isCorrect, selectedHtml) {
+    document.getElementById('screen-quiz').classList.add('hidden');
+    document.getElementById('screen-result').classList.remove('hidden');
+    
+    let judge = document.getElementById('result-judge');
+    let q = currentQuestions[currentIndex];
+    
+    document.getElementById('user-answer-display').innerHTML = selectedHtml;
+    document.getElementById('correct-answer-display').innerHTML = q.correctHtml;
+    document.getElementById('explanation-display').innerHTML = q.explanation;
+    
+    if(isCorrect) {
+        correctCount++;
+        judge.innerHTML = `
+            <div class="result-badge-icon">✓</div>
+            <div>CORRECT</div>
+            <div class="result-badge-sub">正解です</div>
+        `;
+        judge.className = "result-alert alert-success";
+        reviewPool = reviewPool.filter(item => item.questionHtml !== q.questionHtml);
+    } else {
+        if(currentMode === 'unit') {
+            correctCount = 0;
+            currentIndex = -1; 
+            isInterrupted = true; 
+            currentQuestions = [];
+            for(let i = 0; i < 10; i++) {
+                currentQuestions.push(generateQuestion(currentUnitId, currentLevel));
+            }
+            judge.innerHTML = `
+                <div class="result-badge-icon">✗</div>
+                <div>FAILED</div>
+                <div class="result-badge-sub">不正解：1問目からリトライ</div>
+            `;
+        } else {
+            judge.innerHTML = `
+                <div class="result-badge-icon">✗</div>
+                <div>INCORRECT</div>
+                <div class="result-badge-sub">不正解です</div>
+            `;
+        }
+        judge.className = "result-alert alert-danger";
+        
+        if(!reviewPool.some(item => item.questionHtml === q.questionHtml)) {
+            reviewPool.push(q);
+        }
+    }
+    sessionStorage.setItem('math_review_pool', JSON.stringify(reviewPool));
+    updateReviewBadge();
+}
+
+function nextQuestion() {
+    if (currentMode === 'unit' && correctCount === 10) {
+        showScoreReport();
+        return;
+    }
+    
+    currentIndex++;
+    
+    if (currentMode !== 'unit' && currentIndex >= currentQuestions.length) {
+        showScoreReport();
+        return;
+    }
+    
+    showQuiz();
+}
+
+function showScoreReport() {
+    document.getElementById('screen-result').classList.add('hidden');
+    document.getElementById('screen-score').classList.remove('hidden');
+    setTopHomeButtonVisibility(false);
+    
+    let report = document.getElementById('score-report');
+    let comment = document.getElementById('score-comment');
+    
+    if (currentMode === 'unit' && correctCount === 10) {
+        crownRecords[`${currentUnitId}_${currentLevel}`] = true;
+        sessionStorage.setItem('math_clear_crowns', JSON.stringify(crownRecords));
+        updateCrownDisplays(); 
+        
+        report.innerText = `👑 完全制覇達成！`;
+        comment.innerHTML = `素晴らしい！1度も間違えずに伝説の<strong>10問連続正解</strong>を達成しました！<br>該当メニューボタンが<strong>ゴールドクリア状態👑</strong>へ解放されました！`;
+    } else {
+        let score = (correctCount / currentQuestions.length) * 100;
+        report.innerText = `得点: ${score} 点`;
+        
+        if(currentMode === 'test') {
+            if(score >= 90) {
+                crownRecords[`test_${currentLevel}`] = true;
+                sessionStorage.setItem('math_clear_crowns', JSON.stringify(crownRecords));
+                updateCrownDisplays(); 
+                
+                comment.innerHTML = "🎉 <strong>見事合格！👑</strong><br>埼玉大問1のシミュレーションテストに合格しました！メニューのテストボタンにクリアの証として<strong>王冠ゴールドカラー👑</strong>が灯りました！";
+            } else {
+                comment.innerHTML = "⚠️ <strong>不合格です（合格ライン9割）</strong><br>1問のミスが命取りになります。王冠獲得を目指して繰り返し反復演習をしましょう。";
+            }
+        } else {
+            comment.innerHTML = "復習お疲れ様でした！すべての弱点を克服していきましょう。";
+        }
+    }
+}
+
+function backToHome() {
+    document.getElementById('screen-quiz').classList.add('hidden');
+    document.getElementById('screen-result').classList.add('hidden');
+    document.getElementById('screen-score').classList.add('hidden');
+    document.getElementById('screen-home').classList.remove('hidden');
+    setTopHomeButtonVisibility(false);
+}
+</script>
+
+</body>
+</html>
