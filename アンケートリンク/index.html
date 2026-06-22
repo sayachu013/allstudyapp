@@ -44,6 +44,7 @@
         .date-select-group { display: flex; gap: 10px; }
         .period-group { display: flex; align-items: center; gap: 10px; }
         .btn-save { width: 100%; padding: 12px; background-color: #495057; color: white; border: none; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; }
+        .btn-save:disabled { background-color: #adb5bd; cursor: not-allowed; }
     </style>
 </head>
 <body>
@@ -51,8 +52,8 @@
 <div class="container">
 
     <div id="status-box" class="status-container status-closed">
-        <span id="status-badge" class="status-badge badge-closed">回答期間外</span>
-        <div id="target-month-display" class="current-month">未設定の月</div>
+        <span id="status-badge" class="status-badge badge-closed">読み込み中...</span>
+        <div id="target-month-display" class="current-month">データ同期中...</div>
         <div id="period-display" class="period-text">回答期間：未設定</div>
     </div>
     
@@ -110,14 +111,18 @@
             <input type="url" id="url-kou" placeholder="https://docs.google.com/forms/...">
         </div>
         
-        <button class="btn-save" onclick="saveUrls()">設定を更新する</button>
+        <button id="btn-save" class="btn-save" onclick="saveUrls()">設定を更新する</button>
     </div>
 
 </div>
 
 <script>
+// ⚠️ あなたのGASウェブアプリURLに差し替えてください
+const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwX5CPrhNWq4OrWFlqVmtB8YjR8MxgVaKQmspzTCG11fC6oyeU-4xdcpDh6G2X7APnj3g/exec";
+
 window.onload = function() {
-    loadSavedUrls();
+    // 最初にスプレッドシートから最新データを取得
+    fetchLatestSettings();
 };
 
 function checkPassword() {
@@ -135,6 +140,37 @@ function checkPassword() {
     }
 }
 
+// GASからデータを引っ張る処理
+function fetchLatestSettings() {
+    if (GAS_WEB_APP_URL === "YOUR_GAS_WEB_APP_URL_HERE") {
+        console.warn("GASのURLが未設定のため、ローカルストレージのデータを使用します。");
+        loadSavedUrls();
+        return;
+    }
+
+    fetch(GAS_WEB_APP_URL)
+        .then(response => response.json())
+        .then(data => {
+            // スプレッドシートにデータがあればローカルストレージを上書き同期
+            if (data.survey_month_year) localStorage.setItem('survey_month_year', data.survey_month_year);
+            if (data.survey_year_val) localStorage.setItem('survey_year_val', data.survey_year_val);
+            if (data.survey_month_val) localStorage.setItem('survey_month_val', data.survey_month_val);
+            if (data.survey_start_date) localStorage.setItem('survey_start_date', data.survey_start_date);
+            if (data.survey_end_date) localStorage.setItem('survey_end_date', data.survey_end_date);
+            if (data.survey_url_sho) localStorage.setItem('survey_url_sho', data.survey_url_sho);
+            if (data.survey_url_chu) localStorage.setItem('survey_url_chu', data.survey_url_chu);
+            if (data.survey_url_kou) localStorage.setItem('survey_url_kou', data.survey_url_kou);
+            
+            // 画面表示を更新
+            loadSavedUrls();
+        })
+        .catch(error => {
+            console.error("データ取得エラー:", error);
+            // 通信エラー時はバックアップとしてローカルストレージのデータで表示
+            loadSavedUrls();
+        });
+}
+
 function saveUrls() {
     const year = document.getElementById('select-year').value;
     const month = document.getElementById('select-month').value;
@@ -149,14 +185,60 @@ function saveUrls() {
         return;
     }
 
-    localStorage.setItem('survey_month_year', year + month);
-    localStorage.setItem('survey_year_val', year);
-    localStorage.setItem('survey_month_val', month);
-    localStorage.setItem('survey_start_date', startDate);
-    localStorage.setItem('survey_end_date', endDate);
-    localStorage.setItem('survey_url_sho', urlSho);
-    localStorage.setItem('survey_url_chu', urlChu);
-    localStorage.setItem('survey_url_kou', urlKou);
+    const payload = {
+        survey_month_year: year + month,
+        survey_year_val: year,
+        survey_month_val: month,
+        survey_start_date: startDate,
+        survey_end_date: endDate,
+        survey_url_sho: urlSho,
+        survey_url_chu: urlChu,
+        survey_url_kou: urlKou
+    };
+
+    // 連打防止
+    const saveBtn = document.getElementById('btn-save');
+    saveBtn.disabled = true;
+    saveBtn.innerText = "保存中...";
+
+    // GASへデータを送信
+    if (GAS_WEB_APP_URL !== "YOUR_GAS_WEB_APP_URL_HERE") {
+        fetch(GAS_WEB_APP_URL, {
+            method: "POST",
+            mode: "no-cors", // ローカルHTMLからのCORS制限を回避
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(() => {
+            // no-corsモードはレスポンスが不透明なため、送信成功とみなして処理
+            updateLocalAndUI(payload);
+        })
+        .catch(error => {
+            console.error("保存エラー:", error);
+            alert("サーバーへの保存に失敗しました。ローカルのみ更新します。");
+            updateLocalAndUI(payload);
+        });
+    } else {
+        updateLocalAndUI(payload);
+    }
+}
+
+// 共通のローカル更新・画面反映処理
+function updateLocalAndUI(payload) {
+    localStorage.setItem('survey_month_year', payload.survey_month_year);
+    localStorage.setItem('survey_year_val', payload.survey_year_val);
+    localStorage.setItem('survey_month_val', payload.survey_month_val);
+    localStorage.setItem('survey_start_date', payload.survey_start_date);
+    localStorage.setItem('survey_end_date', payload.survey_end_date);
+    localStorage.setItem('survey_url_sho', payload.survey_url_sho);
+    localStorage.setItem('survey_url_chu', payload.survey_url_chu);
+    localStorage.setItem('survey_url_kou', payload.survey_url_kou);
+
+    const saveBtn = document.getElementById('btn-save');
+    saveBtn.disabled = false;
+    saveBtn.innerText = "設定を更新する";
 
     alert('設定を更新しました！');
     loadSavedUrls();
@@ -178,7 +260,6 @@ function loadSavedUrls() {
     if (startDate && endDate) {
         document.getElementById('period-display').innerText = `回答期間：${startDate.replace(/-/g, '/')} ～ ${endDate.replace(/-/g, '/')}`;
         
-        // 今日（タブレットの現在時刻）の日付を取得（時間をリセットして純粋な日付比較にする）
         const today = new Date();
         today.setHours(0,0,0,0);
         const start = new Date(startDate);
@@ -186,7 +267,6 @@ function loadSavedUrls() {
         const end = new Date(endDate);
         end.setHours(0,0,0,0);
 
-        // 今日の日付が期間内かどうか
         if (today >= start && today <= end) {
             isWritable = true;
         }
@@ -198,10 +278,8 @@ function loadSavedUrls() {
     const statusBox = document.getElementById('status-box');
     const statusBadge = document.getElementById('status-badge');
     const warningMsg = document.getElementById('warning-message');
-    const buttons = [document.getElementById('link-sho'), document.getElementById('link-chu'), document.getElementById('link-kou')];
 
     if (isWritable) {
-        // 期間中の表示
         statusBox.className = "status-container status-active";
         statusBadge.className = "status-badge badge-active";
         statusBadge.innerText = "回答受付中";
@@ -211,7 +289,6 @@ function loadSavedUrls() {
         setLink('link-chu', savedChu, false);
         setLink('link-kou', savedKou, false);
     } else {
-        // 期間外の表示
         statusBox.className = "status-container status-closed";
         statusBadge.className = "status-badge badge-closed";
         statusBadge.innerText = "回答期間外";
