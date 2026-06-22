@@ -57,7 +57,6 @@
             color: #24292f;
         }
 
-        /* 📁 各セクション（見出し）のデザイン */
         .menu-section {
             margin-bottom: 8px;
             background-color: #fafafa;
@@ -81,7 +80,6 @@
         .section-title:hover {
             background-color: #eaeef2;
         }
-        /* 開閉用の矢印マーク */
         .section-title::after {
             content: '▼';
             font-size: 0.7rem;
@@ -92,7 +90,6 @@
             transform: rotate(180deg);
         }
 
-        /* 中身のナビゲーションリンク（最初は非表示） */
         nav {
             display: none;
             gap: 8px;
@@ -101,7 +98,6 @@
             background-color: #ffffff;
             border-top: 1px solid #e1e4e8;
         }
-        /* activeクラスがついたら中身を表示 */
         .menu-section.active nav {
             display: flex;
         }
@@ -153,8 +149,8 @@
         <div class="menu-section">
             <div class="section-title">🎯 北辰対策</div>
             <nav>
-                <a href="北辰対策/第2回 英語/index.html" target="content-frame">第2回 英語</a>
-                <a href="北辰対策/第2回 数学/index.html" target="content-frame">第2回 数学</a>
+                <a href="北辰対策/北辰対策第2回英語/index.html" target="content-frame">第2回 英語</a>
+                <a href="北辰対策/北辰対策第2回数学/index.html" target="content-frame">第2回 数学</a>
             </nav>
         </div>
 
@@ -176,9 +172,10 @@
         </div>
 
         <div class="menu-section">
-            <div class="section-title">🌿 普段の学習（英・国・理・社）</div>
+            <div class="section-title">🌿 普段の学習（英·国·理·社）</div>
             <nav>
-                <a href="【英文法】整除和文英訳マスター/index.html" target="content-frame">【英文法】整除和文英訳マスター</a>
+                <a href="【教科書＋入試】英単語マスター/index.html" target="content-frame">【教科書＋入試】英単語マスター</a>
+                <a href="【英文法】整序和文英訳マスター/index.html" target="content-frame">【英文法】整序和文英訳マスター</a>
                 <a href="国語語彙クエスト/index.html" target="content-frame">国語語彙クエスト</a>
                 <a href="【暗記帳】理社一問一答/index.html" target="content-frame">【暗記帳】理社一問一答</a>
                 <a href="【反復チャレンジ】理社一問一答/index.html" target="content-frame">【反復チャレンジ】理社一問一答</a>
@@ -208,7 +205,6 @@
     <iframe name="content-frame" id="main-frame" src="about:blank"></iframe>
 
     <script>
-        // メニュー全体の開閉用
         function toggleMenu() {
             const header = document.getElementById('app-header');
             const btnText = document.getElementById('btn-text');
@@ -220,7 +216,6 @@
             }
         }
 
-        // 📁 見出しごとの個別開閉用プログラム
         document.querySelectorAll('.section-title').forEach(title => {
             title.addEventListener('click', () => {
                 const section = title.parentElement;
