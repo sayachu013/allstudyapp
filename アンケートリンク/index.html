@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>アンケート管理アプリ</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f7f6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h2, h3 { text-align: center; margin-top: 0; }
+        
+        /* ステータス＆対象月表示 */
+        .status-container { text-align: center; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-weight: bold; }
+        .status-active { background-color: #e3faf2; border: 2px solid #2bc997; color: #0ca678; }
+        .status-closed { background-color: #fff0f6; border: 2px solid #ff8787; color: #c92a2a; }
+        
+        .status-badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 14px; color: white; margin-bottom: 5px; }
+        .badge-active { background-color: #2bc997; }
+        .badge-closed { background-color: #fa5252; }
+        
+        .current-month { font-size: 20px; margin-bottom: 5px; }
+        .period-text { font-size: 14px; color: #666; }
+        
+        /* 回答者用ボタン */
+        .btn-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-bottom: 30px; }
+        .btn-link { display: block; padding: 20px 10px; text-align: center; color: white; font-weight: bold; font-size: 18px; text-decoration: none; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.2s; }
+        .btn-sho { background-color: #ff6b6b; }
+        .btn-chu { background-color: #4dadf7; }
+        .btn-kou { background-color: #51cf66; }
+        .btn-link:active { transform: scale(0.98); }
+        
+        /* 期間外・無効化のスタイル */
+        .btn-link.disabled { background-color: #dee2e6 !important; color: #adb5bd !important; box-shadow: none !important; cursor: not-allowed; pointer-events: none; }
+        .warning-msg { text-align: center; color: #fa5252; font-weight: bold; margin-bottom: 20px; font-size: 15px; display: none; }
+        
+        /* 管理者用エリア */
+        .admin-toggle-container { text-align: right; margin-top: 40px; border-top: 1px solid #eee; padding-top: 15px; }
+        .btn-toggle { background: none; border: none; color: #999; cursor: pointer; font-size: 13px; text-decoration: underline; }
+        
+        .admin-section { display: none; margin-top: 20px; background-color: #fafafa; padding: 20px; border-radius: 8px; border: 2px dashed #ccc; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 14px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .date-select-group { display: flex; gap: 10px; }
+        .period-group { display: flex; align-items: center; gap: 10px; }
+        .btn-save { width: 100%; padding: 12px; background-color: #495057; color: white; border: none; font-size: 16px; font-weight: bold; border-radius: 5px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <div id="status-box" class="status-container status-closed">
+        <span id="status-badge" class="status-badge badge-closed">回答期間外</span>
+        <div id="target-month-display" class="current-month">未設定の月</div>
+        <div id="period-display" class="period-text">回答期間：未設定</div>
+    </div>
+    
+    <div id="warning-message" class="warning-msg">❌ 現在は回答期間外のため、送信は禁止されています。</div>
+    
+    <div class="btn-grid">
+        <a href="#" id="link-sho" class="btn-link btn-sho" target="_blank">小学部</a>
+        <a href="#" id="link-chu" class="btn-link btn-chu" target="_blank">中学部</a>
+        <a href="#" id="link-kou" class="btn-link btn-kou" target="_blank">高校部</a>
+    </div>
+
+    <div class="admin-toggle-container">
+        <button class="btn-toggle" onclick="checkPassword()">🔧 管理者設定を開く</button>
+    </div>
+
+    <div id="admin-panel" class="admin-section">
+        <h3>🔧 今月のURL・期間登録</h3>
+        
+        <div class="form-group">
+            <label>対象の年度・月</label>
+            <div class="date-select-group">
+                <select id="select-year">
+                    <option value="2026年">2026年</option>
+                    <option value="2027年">2027年</option>
+                    <option value="2028年">2028年</option>
+                </select>
+                <select id="select-month">
+                    <option value="1月分">1月分</option><option value="2月分">2月分</option>
+                    <option value="3月分">3月分</option><option value="4月分">4月分</option>
+                    <option value="5月分">5月分</option><option value="6月分">6月分</option>
+                    <option value="7月分">7月分</option><option value="8月分">8月分</option>
+                    <option value="9月分">9月分</option><option value="10月分">10月分</option>
+                    <option value="11月分">11月分</option><option value="12月分">12月分</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>回答許可期間</label>
+            <div class="period-group">
+                <input type="date" id="start-date"> <span>～</span> <input type="date" id="end-date">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="url-sho">小学部 GoogleフォームURL</label>
+            <input type="url" id="url-sho" placeholder="https://docs.google.com/forms/...">
+        </div>
+        <div class="form-group">
+            <label for="url-chu">中学部 GoogleフォームURL</label>
+            <input type="url" id="url-chu" placeholder="https://docs.google.com/forms/...">
+        </div>
+        <div class="form-group">
+            <label for="url-kou">高校部 GoogleフォームURL</label>
+            <input type="url" id="url-kou" placeholder="https://docs.google.com/forms/...">
+        </div>
+        
+        <button class="btn-save" onclick="saveUrls()">設定を更新する</button>
+    </div>
+
+</div>
+
+<script>
+window.onload = function() {
+    loadSavedUrls();
+};
+
+function checkPassword() {
+    const adminPanel = document.getElementById('admin-panel');
+    if (adminPanel.style.display === 'block') {
+        adminPanel.style.display = 'none';
+        return;
+    }
+    const password = prompt('管理者パスワードを入力してください：');
+    if (password === 'admin1234') {
+        adminPanel.style.display = 'block';
+        adminPanel.scrollIntoView({ behavior: 'smooth' });
+    } else if (password !== null) {
+        alert('パスワードが違います。');
+    }
+}
+
+function saveUrls() {
+    const year = document.getElementById('select-year').value;
+    const month = document.getElementById('select-month').value;
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
+    const urlSho = document.getElementById('url-sho').value;
+    const urlChu = document.getElementById('url-chu').value;
+    const urlKou = document.getElementById('url-kou').value;
+
+    if (!startDate || !endDate) {
+        alert('回答許可期間（開始日と終了日）を両方指定してください。');
+        return;
+    }
+
+    localStorage.setItem('survey_month_year', year + month);
+    localStorage.setItem('survey_year_val', year);
+    localStorage.setItem('survey_month_val', month);
+    localStorage.setItem('survey_start_date', startDate);
+    localStorage.setItem('survey_end_date', endDate);
+    localStorage.setItem('survey_url_sho', urlSho);
+    localStorage.setItem('survey_url_chu', urlChu);
+    localStorage.setItem('survey_url_kou', urlKou);
+
+    alert('設定を更新しました！');
+    loadSavedUrls();
+    document.getElementById('admin-panel').style.display = 'none';
+}
+
+function loadSavedUrls() {
+    const savedMonthText = localStorage.getItem('survey_month_year') || "未設定";
+    const startDate = localStorage.getItem('survey_start_date');
+    const endDate = localStorage.getItem('survey_end_date');
+    const savedSho = localStorage.getItem('survey_url_sho') || "#";
+    const savedChu = localStorage.getItem('survey_url_chu') || "#";
+    const savedKou = localStorage.getItem('survey_url_kou') || "#";
+
+    document.getElementById('target-month-display').innerText = savedMonthText + " アンケート";
+
+    // 期間の判定
+    let isWritable = false;
+    if (startDate && endDate) {
+        document.getElementById('period-display').innerText = `回答期間：${startDate.replace(/-/g, '/')} ～ ${endDate.replace(/-/g, '/')}`;
+        
+        // 今日（タブレットの現在時刻）の日付を取得（時間をリセットして純粋な日付比較にする）
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        const start = new Date(startDate);
+        start.setHours(0,0,0,0);
+        const end = new Date(endDate);
+        end.setHours(0,0,0,0);
+
+        // 今日の日付が期間内かどうか
+        if (today >= start && today <= end) {
+            isWritable = true;
+        }
+    } else {
+        document.getElementById('period-display').innerText = "回答期間：未設定";
+    }
+
+    // 表示の切り替え
+    const statusBox = document.getElementById('status-box');
+    const statusBadge = document.getElementById('status-badge');
+    const warningMsg = document.getElementById('warning-message');
+    const buttons = [document.getElementById('link-sho'), document.getElementById('link-chu'), document.getElementById('link-kou')];
+
+    if (isWritable) {
+        // 期間中の表示
+        statusBox.className = "status-container status-active";
+        statusBadge.className = "status-badge badge-active";
+        statusBadge.innerText = "回答受付中";
+        warningMsg.style.display = "none";
+        
+        setLink('link-sho', savedSho, false);
+        setLink('link-chu', savedChu, false);
+        setLink('link-kou', savedKou, false);
+    } else {
+        // 期間外の表示
+        statusBox.className = "status-container status-closed";
+        statusBadge.className = "status-badge badge-closed";
+        statusBadge.innerText = "回答期間外";
+        warningMsg.style.display = "block";
+        
+        setLink('link-sho', "#", true);
+        setLink('link-chu', "#", true);
+        setLink('link-kou', "#", true);
+    }
+
+    // 管理者画面の入力欄の復元
+    if(localStorage.getItem('survey_year_val')) document.getElementById('select-year').value = localStorage.getItem('survey_year_val');
+    if(localStorage.getItem('survey_month_val')) document.getElementById('select-month').value = localStorage.getItem('survey_month_val');
+    document.getElementById('start-date').value = startDate || "";
+    document.getElementById('end-date').value = endDate || "";
+    document.getElementById('url-sho').value = localStorage.getItem('survey_url_sho') || "";
+    document.getElementById('url-chu').value = localStorage.getItem('survey_url_chu') || "";
+    document.getElementById('url-kou').value = localStorage.getItem('survey_url_kou') || "";
+}
+
+function setLink(elementId, url, isDisabled) {
+    const element = document.getElementById(elementId);
+    if (isDisabled) {
+        element.href = "javascript:void(0);";
+        element.classList.add('disabled');
+    } else {
+        element.classList.remove('disabled');
+        if (url === "#" || url === "") {
+            element.href = "javascript:alert('URLが登録されていません。');";
+        } else {
+            element.href = url;
+        }
+    }
+}
+</script>
+
+</body>
+</html>
