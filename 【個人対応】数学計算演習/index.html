@@ -159,6 +159,7 @@ transform: rotate(180deg);
 <p style="font-weight: bold; margin-bottom: 5px;">1. まず学年を選択してください：</p>
 <select id="grade-select" onchange="filterStudentsByGrade()">
 <option value="">-- 学年を選択 --</option>
+<option value="中1">中学1年生</option>
 <option value="中2">中学2年生</option>
 <option value="中3">中学3年生</option>
 </select>
@@ -172,6 +173,12 @@ transform: rotate(180deg);
 
 <div id="menu-screen" class="hidden">
 <h2>挑戦する単元と難易度を選択してください</h2>
+
+<div class="grade-accordion-header" id="header-md1" onclick="toggleAccordion('md1')">
+<span>📗 中学1年生の単元 一覧</span>
+<span class="grade-accordion-icon">▼</span>
+</div>
+<div class="menu-grid hidden" id="menu-list-md1"></div>
 
 <div class="grade-accordion-header open" id="header-md2" onclick="toggleAccordion('md2')">
 <span>📘 中学2年生の単元 一覧</span>
@@ -236,14 +243,18 @@ let isAnswered = false;
 let selectedCategory = "";
 let selectedDifficulty = "";
 let currentContinuousCorrect = 0;
-let loginSelectedGrade = "中2"; // ログイン画面で選択された学年の保持用
+let loginSelectedGrade = "中2";
 
-// 【中2用メニュー構成】
+// 【中1用メニュー構成】
+const modeConfigs中1 = [
+{ category: "データの分析（中1）", difficulty: "基本", label: "📊 データの分析・活用（中1章末）" }
+];
+
+// 【中2用メニュー構成】★一般的な教科書の単元ロードマップ順に完璧にソート
 const modeConfigs中2 = [
 { category: "多項式の計算", difficulty: "基本", label: "多項式の計算（基本）" },
-{ category: "多項式の計算", difficulty: "標準", label: "多項式の計算（標準）" },
-{ category: "多項式の計算（分数）", difficulty: "発展", label: "多項式の計算（分数・発展）" },
 { category: "多項式の加減", difficulty: "基本", label: "多項式の加減（基本）" },
+{ category: "多項式の計算", difficulty: "標準", label: "多項式の計算（標準）" },
 { category: "多項式の加減", difficulty: "標準", label: "多項式の加減（標準）" },
 { category: "単項式の乗法・除法", difficulty: "基本", label: "単項式の乗法・除法（基本）" },
 { category: "単項式の乗法・除法", difficulty: "標準", label: "単項式の乗法・除法（標準）" },
@@ -255,25 +266,28 @@ const modeConfigs中2 = [
 { category: "文字式の利用", difficulty: "標準", label: "文字式の利用（説明・標準）" },
 { category: "文字式の利用", difficulty: "発展", label: "文字式の利用（説明・発展）" },
 { category: "図形への利用", difficulty: "発展", label: "図形・規則性の応用（発展）" },
+{ category: "等式の変形・式の利用", difficulty: "標準", label: "📝 式の計算：等式の変形・性質の証明" },
+{ category: "連立方程式の基礎", difficulty: "基本", label: "🔑 連立方程式：概念と計算の基礎" },
 { category: "加減法（基本）", difficulty: "基本", label: "連立方程式：加減法（基本）" },
 { category: "加減法（標準）", difficulty: "標準", label: "連立方程式：加減法（標準）" },
 { category: "代入法", difficulty: "標準", label: "連立方程式：代入法" },
-{ category: "かっこ・複雑な計算", difficulty: "標準", label: "連立方程式：かっこ・複雑な計算" }
+{ category: "かっこ・複雑な計算", difficulty: "標準", label: "連立方程式：かっこ・複雑な計算" },
+{ category: "多項式の計算（分数）", difficulty: "発展", label: "多項式の計算（分数・発展）" }
 ];
 
-// 【中3用メニュー構成】テスト対策の新規2単元
+// 【中3用メニュー構成】★一般的な教科書の単元ロードマップ順に完璧にソート
 const modeConfigs中3 = [
 { category: "式の計算の利用", difficulty: "基本", label: "式の計算の利用（基本）" },
 { category: "式の計算の利用", difficulty: "標準", label: "式の計算の利用（標準）" },
 { category: "式の計算の利用", difficulty: "発展", label: "式の計算の利用（発展）" },
+{ category: "展開・因数分解の応用", difficulty: "発展", label: "🔥中3テスト対策：展開・因数分解（応用）" },
 { category: "平方根の基礎", difficulty: "基本", label: "平方根の基礎（基本）" },
 { category: "平方根の基礎", difficulty: "標準", label: "平方根の基礎（標準）" },
 { category: "根号を含む式の計算", difficulty: "基本", label: "根号を含む式（基本）" },
 { category: "根号を含む式の計算", difficulty: "標準", label: "根号を含む式（標準）" },
-{ category: "展開・因数分解の応用", difficulty: "発展", label: "🔥中3テスト対策：展開・因数分解（応用）" },
 { category: "平方根の応用計算", difficulty: "発展", label: "🔥中3テスト対策：平方根の応用・新傾向" }
 ];
-const allModeConfigs = [...modeConfigs中2, ...modeConfigs中3];
+const allModeConfigs = [...modeConfigs中1, ...modeConfigs中2, ...modeConfigs中3];
 
 function formatMathText(text) {
 if (!text) return "";
@@ -333,7 +347,6 @@ document.getElementById("loading").innerHTML = "<p style='color:red; font-weight
 }
 };
 
-// 学年選択に応じた生徒名簿の2段階抽出処理
 function filterStudentsByGrade() {
 const gradeSelect = document.getElementById("grade-select");
 const studentSelectContainer = document.getElementById("student-select-container");
@@ -346,7 +359,7 @@ studentSelectContainer.classList.add("hidden");
 return;
 }
 
-loginSelectedGrade = gradeSelect.value; // 選択された学年を保持
+loginSelectedGrade = gradeSelect.value;
 let matchCount = 0;
 
 students.forEach(s => {
@@ -354,21 +367,26 @@ if (s && s.id) {
 const className = s.className || "";
 if (className.includes(loginSelectedGrade)) {
 const opt = document.createElement("option");
-opt.value = s.id;
+opt.value = String(s.id).trim(); 
 opt.textContent = `${s.className} ： ${s.name}`;
 studentSelect.appendChild(opt);
 matchCount++;
 }
 }
 });
-// 保険処理
+
 if (matchCount === 0) {
 students.forEach(s => {
 if (s && s.id) {
 const className = s.className || "";
-if (loginSelectedGrade === "中2" && !className.includes("中3")) {
+if (loginSelectedGrade === "中1" && className.includes("中1")) {
 const opt = document.createElement("option");
-opt.value = s.id;
+opt.value = String(s.id).trim();
+opt.textContent = `${s.className} ： ${s.name}`;
+studentSelect.appendChild(opt);
+} else if (loginSelectedGrade === "中2" && !className.includes("中3") && !className.includes("中1")) {
+const opt = document.createElement("option");
+opt.value = String(s.id).trim();
 opt.textContent = `${s.className} ： ${s.name}`;
 studentSelect.appendChild(opt);
 }
@@ -394,12 +412,18 @@ document.getElementById("quiz-screen").classList.add("hidden");
 document.getElementById("admin-screen").classList.add("hidden");
 document.getElementById("menu-screen").classList.remove("hidden");
 
-if (loginSelectedGrade === "中3") {
+if (loginSelectedGrade === "Condition1" || loginSelectedGrade === "中1") {
+setAccordionState('md1', true);
+setAccordionState('md2', false);
+setAccordionState('md3', false);
+} else if (loginSelectedGrade === "中3") {
 setAccordionState('md3', true);
 setAccordionState('md2', false);
+setAccordionState('md1', false);
 } else {
 setAccordionState('md2', true);
 setAccordionState('md3', false);
+setAccordionState('md1', false);
 }
 
 renderMenu();
@@ -430,7 +454,19 @@ list.classList.remove("hidden");
 }
 
 function renderMenu() {
-// 中2アコーディオン内のメニュー生成
+const menuList中1 = document.getElementById("menu-list-md1");
+menuList中1.innerHTML = "";
+modeConfigs中1.forEach(mode => {
+const key = `${currentStudentId}__${mode.category}__${mode.difficulty}`;
+const score = liveProgress[key] || 0;
+const isCleared = score >= 5;
+const btn = document.createElement("button");
+btn.className = `menu-btn ${isCleared ? 'cleared' : ''}`;
+btn.innerHTML = `<div><div>${mode.label}</div><div class="progress-text">連続正解数: ${score} / 5</div></div><div>${score >= 5 ? '<span class="crown"> 👑 クリア!</span>' : '<span>▶</span>'}</div>`;
+btn.onclick = () => startMode(mode.category, mode.difficulty);
+menuList中1.appendChild(btn);
+});
+
 const menuList中2 = document.getElementById("menu-list-md2");
 menuList中2.innerHTML = "";
 modeConfigs中2.forEach(mode => {
@@ -444,7 +480,6 @@ btn.onclick = () => startMode(mode.category, mode.difficulty);
 menuList中2.appendChild(btn);
 });
 
-// 中3アコーディオン内のメニュー生成
 const menuList中3 = document.getElementById("menu-list-md3");
 menuList中3.innerHTML = "";
 modeConfigs中3.forEach(mode => {
@@ -484,7 +519,7 @@ if (!currentModePool || currentModePool.length === 0) {
 buildQuestionPool();
 }
 if (!currentModePool || currentModePool.length === 0) {
-alert("この単元に該当する問題データが1件も見つかりません。スプレッドシートの単元名や難易度の文字を確認してください。");
+alert("この単元に該当する問題データが1件も見つかりません。");
 backToMenu();
 return;
 }
@@ -505,7 +540,7 @@ qTextDiv.style.textAlign = "center";
 qTextDiv.style.fontSize = "24px";
 }
 const instructionArea = document.getElementById("q-instruction");
-if (String(currentQuestion.category).includes("文字式") || String(currentQuestion.category).includes("利用") || String(currentQuestion.category).includes("基礎")) {
+if (String(currentQuestion.category).includes("分析") || String(currentQuestion.category).includes("文字式") || String(currentQuestion.category).includes("利用") || String(currentQuestion.category).includes("基礎")) {
 instructionArea.textContent = "問題文をよく読み、問いに対する正しい答えを選びなさい。";
 } else if (String(currentQuestion.category).includes("等式")) {
 instructionArea.textContent = "次の等式を指定された文字について解きなさい。";
@@ -519,7 +554,7 @@ instructionArea.textContent = "次の計算をしなさい。";
 document.getElementById("result-area").classList.add("hidden");
 document.getElementById("hint-area").classList.add("hidden");
 document.getElementById("next-btn").classList.add("hidden");
-document.getElementById("report-btn").classList.add("hidden"); // 出題時は報告ボタンを隠す
+document.getElementById("report-btn").classList.add("hidden"); 
 renderSheetChoices(currentQuestion.choices || [], currentQuestion.answer || "");
 triggerMathRender();
 }
@@ -582,7 +617,6 @@ resArea.textContent = "× 不正解... 【連勝ストップ！残り5連続】"
 }
 resArea.classList.remove("hidden");
 
-// 解答判定直後に報告ボタンを表示させる
 document.getElementById("report-btn").classList.remove("hidden");
 
 if (currentContinuousCorrect >= 5) {
@@ -596,6 +630,7 @@ document.getElementById("clear-modal-screen").classList.remove("hidden");
 document.getElementById("next-btn").classList.remove("hidden");
 }
 triggerMathRender();
+
 fetch(GAS_URL, {
 method: "POST",
 mode: "no-cors",
@@ -604,19 +639,17 @@ body: JSON.stringify({
 action: "logAnswer",
 studentId: currentStudentId,
 questionId: currentQuestion.id,
-isCorrect: isCorrect,
+isCorrect: isCorrect ? "〇" : "×", 
 userAnswer: chosenAnswer
 })
 });
 }
 
-// ★新設計：ワンタップ不具合報告の送信処理
 function sendErrorReport() {
 if (!currentQuestion) return;
 const student = students.find(s => s && s.id == currentStudentId);
 const studentName = student ? student.name : "不明の生徒";
 
-// スプレッドシート側で扱いやすいTSV形式の生データを裏側でビルド
 const rawTSV = [
 currentQuestion.id,
 currentQuestion.category,
@@ -644,12 +677,12 @@ questionId: currentQuestion.id,
 rawRawData: rawTSV
 })
 }).then(() => {
-alert("報告がスプレッドシートに送信されました。ご協力ありがとうございました！");
+alert("報告がスプレッドシートに送信されました。");
 document.getElementById("report-btn").textContent = "✅ 報告完了しました";
 }).catch(() => {
 alert("通信エラーが発生しました。");
 document.getElementById("report-btn").disabled = false;
-document.getElementById("report-btn").textContent = "⚠️ もう一度報告を送信する";
+document.getElementById("report-btn").textContent = "⚠️ もう一度送信する";
 });
 }
 
@@ -683,7 +716,7 @@ document.getElementById("user-display").textContent = "";
 }
 
 function resetStudentData() {
-if(confirm("この生徒の学習データをリセットして最初からやり直しますか？\n(※クリア状態や現在の連勝データがすべてリセットされます)")) {
+if(confirm("この生徒の学習データをリセットして最初からやり直しますか？")) {
 allModeConfigs.forEach(mode => {
 liveProgress[`${currentStudentId}__${mode.category}__${mode.difficulty}`] = 0;
 });
@@ -691,7 +724,6 @@ renderMenu();
 }
 }
 
-// 講師画面
 function openAdmin() {
 const password = prompt("講師用パスワードを入力してください：");
 if (password === "admin1234") {
@@ -700,15 +732,14 @@ document.getElementById("menu-screen").classList.add("hidden");
 document.getElementById("quiz-screen").classList.add("hidden");
 document.getElementById("admin-screen").classList.remove("hidden");
 renderAdminDashboard();
-} else if (password !== null) { alert("パスワードが違います。");
-}
+} else if (password !== null) { alert("パスワードが違います。"); }
 }
 
 function closeAdmin() { if(currentStudentId) { showMenuScreen(); } else { backToLogin(); } }
 
 function renderAdminDashboard() {
 const container = document.getElementById("admin-content");
-container.innerHTML = "<p style='font-size:12px; color:#64748b; margin-bottom:15px;'>※ スプレッドシートからリアルタイムに全生徒の正確なクリア状況を集計しています。</p>";
+container.innerHTML = "<p style='font-size:12px; color:#64748b; margin-bottom:15px;'>※ リアルタイム進捗ダッシュボード</p>";
 students.forEach(s => {
 if(s) {
 const card = document.createElement("div");
