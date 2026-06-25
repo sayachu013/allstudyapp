@@ -132,6 +132,27 @@
         .unit-item { display: flex; align-items: center; font-size: 14px; }
         .unit-item input { margin-right: 8px; transform: scale(1.1); }
 
+        /* 一括チェックボタンのスタイル */
+        .bulk-check-area {
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #e5e7eb;
+            text-align: left;
+        }
+        .btn-bulk {
+            background-color: #e0e7ff;
+            color: #4f46e5;
+            border: 1px solid #c7d2fe;
+            padding: 4px 10px;
+            font-size: 13px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-bulk:hover {
+            background-color: #c7d2fe;
+        }
+
         /* 範囲行のスタイル */
         .range-row {
             display: flex;
@@ -218,6 +239,98 @@
         .master-table th, .master-table td { border: 1px solid #e5e7eb; padding: 10px; text-align: left; word-wrap: break-word; }
         .master-table th { background: #f9fafb; position: sticky; top: 0; z-index: 2; }
 
+        /* 🌟 苦手集計エリアのレイアウト崩れ対策CSS改修 */
+        .weak-summary-box {
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        .weak-summary-title {
+            font-weight: bold;
+            color: #b45309;
+            margin-bottom: 12px;
+            text-align: left;
+            font-size: 15px;
+        }
+        .weak-summary-split {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr)); /* 横幅が絶対に潰れないように1frに強制固定 */
+            gap: 15px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .weak-sub-container {
+            background: #ffffff;
+            border: 1px solid #f3f4f6;
+            border-radius: 6px;
+            padding: 12px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            min-width: 0; /* 子要素のはみ出し防止 */
+        }
+        .weak-sub-title {
+            font-weight: bold;
+            font-size: 13px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .weak-badge {
+            background: #ef4444;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        .weak-items-list {
+            max-height: 160px;
+            overflow-y: auto;
+            font-size: 13px;
+            text-align: left;
+        }
+        .weak-row-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 8px 0;
+            border-bottom: 1px dashed #e5e7eb;
+            gap: 10px;
+        }
+        .weak-row-text {
+            color: #374151;
+            line-height: 1.4;
+            white-space: normal; /* 🌟 縦に潰れず、問題文が長い時は綺麗に自動折り返し */
+            word-break: break-all;
+            flex-grow: 1;
+            min-width: 0;
+        }
+        .btn-remove-weak {
+            background: #f3f4f6;
+            color: #ef4444;
+            border: 1px solid #e5e7eb;
+            padding: 3px 8px;
+            font-size: 11px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            flex-shrink: 0;
+            white-space: nowrap;
+            margin-top: 1px;
+            transition: all 0.1s;
+        }
+        .btn-remove-weak:hover {
+            background: #fee2e2;
+            border-color: #fca5a5;
+        }
+
         /* ロード専用オーバーレイ画面 */
         .loading-overlay {
             position: absolute;
@@ -296,22 +409,43 @@
     <div id="view-config" class="hidden">
         <h2 id="config-title">出題範囲の設定</h2>
         
-        <div class="config-section">
+        <div class="config-section hidden" id="config-subject-section">
+            <h3>出題対象の教科を指定</h3>
+            <div>
+                <input type="radio" name="weakSubjectTarget" value="all" id="ws-all" checked> <label for="ws-all" style="margin-right: 20px;">理科・社会すべて</label>
+                <input type="radio" name="weakSubjectTarget" value="science" id="ws-science"> <label for="ws-science" style="margin-right: 20px;">理科のみ</label>
+                <input type="radio" name="weakSubjectTarget" value="social" id="ws-social"> <label for="ws-social">社会のみ（地理・歴史・公民）</label>
+            </div>
+        </div>
+
+        <div class="config-section" id="config-unit-section">
             <h3>① 単元で指定（複数選択可）</h3>
             <input type="text" id="unit-search-input" class="search-box" placeholder="🔎 単元名で検索・絞り込み..." oninput="filterUnitContainers()">
             
             <div id="unit-accordion-container">
                 <button type="button" class="accordion-btn" onclick="toggleAccordion(this)">🗺️ 地理分野 <span class="arrow">▼</span></button>
-                <div class="accordion-panel" id="panel-geography"><div class="unit-grid" id="grid-geography"></div></div>
+                <div class="accordion-panel" id="panel-geography">
+                    <div class="bulk-check-area"><button type="button" class="btn-bulk" onclick="toggleBulkCheck('panel-geography')">この分野の全単元をチェックする</button></div>
+                    <div class="unit-grid" id="grid-geography"></div>
+                </div>
 
                 <button type="button" class="accordion-btn" onclick="toggleAccordion(this)">⏳ 歴史分野 <span class="arrow">▼</span></button>
-                <div class="accordion-panel" id="panel-history"><div class="unit-grid" id="grid-history"></div></div>
+                <div class="accordion-panel" id="panel-history">
+                    <div class="bulk-check-area"><button type="button" class="btn-bulk" onclick="toggleBulkCheck('panel-history')">この分野の全単元をチェックする</button></div>
+                    <div class="unit-grid" id="grid-history"></div>
+                </div>
 
                 <button type="button" class="accordion-btn" onclick="toggleAccordion(this)">⚖️ 公民分野 <span class="arrow">▼</span></button>
-                <div class="accordion-panel" id="panel-civics"><div class="unit-grid" id="grid-civics"></div></div>
+                <div class="accordion-panel" id="panel-civics">
+                    <div class="bulk-check-area"><button type="button" class="btn-bulk" onclick="toggleBulkCheck('panel-civics')">この分野の全単元をチェックする</button></div>
+                    <div class="unit-grid" id="grid-civics"></div>
+                </div>
 
                 <button type="button" class="accordion-btn" onclick="toggleAccordion(this)">🧪 理科分野 <span class="arrow">▼</span></button>
-                <div class="accordion-panel" id="panel-science"><div class="unit-grid" id="grid-science"></div></div>
+                <div class="accordion-panel" id="panel-science">
+                    <div class="bulk-check-area"><button type="button" class="btn-bulk" onclick="toggleBulkCheck('panel-science')">この分野の全単元をチェックする</button></div>
+                    <div class="unit-grid" id="grid-science"></div>
+                </div>
             </div>
         </div>
 
@@ -321,8 +455,8 @@
             <button type="button" class="btn btn-secondary" style="width:auto; padding:6px 15px; font-size:14px;" onclick="addRangeRow()">＋ 指定範囲を追加</button>
         </div>
 
-        <div class="config-section">
-            <h3>③ 各種条件設定</h3>
+        <div class="config-section" id="config-conditions-section">
+            <h3 id="config-conditions-title">③ 各種条件設定</h3>
             <div style="margin-bottom: 15px;">
                 <span style="font-weight:bold; display:inline-block; width:120px;">最大出題数:</span>
                 <input type="radio" name="qLimit" value="20" id="ql-20" checked> <label for="ql-20" style="margin-right: 20px;">20問</label>
@@ -349,7 +483,7 @@
         <div class="quiz-header">
             <div id="quiz-progress" style="font-size: 18px; font-weight: bold;">第 1 問 / 20 問</div>
             <div id="quiz-score" style="font-size: 16px; color: #4b5563;">正解数: 0</div>
-            <button class="btn btn-danger" style="padding: 4px 12px; font-size: 13px; width: auto;" onclick="abortQuiz()">テストを中断してホームに戻る</button>
+            <button class="btn btn-danger" style="padding: 4px 12px; font-size: 13px;" onclick="abortQuiz()">テストを中断してホームに戻る</button>
         </div>
         <div class="timer-bar-container">
             <div id="timer-bar" class="timer-bar"></div>
@@ -375,6 +509,25 @@
         <p style="font-size:13px; color:#4b5563; margin-bottom:15px; text-align: center;">
             チェックを入れると「苦手リスト」に即時登録され、苦手テストに出題されるようになります。
         </p>
+
+        <div class="weak-summary-box">
+            <div class="weak-summary-title">🔍 現在の苦手リスト登録状況 (ここから直接解除できます)</div>
+            <div class="weak-summary-split">
+                <div class="weak-sub-container">
+                    <div class="weak-sub-title">🧪 理科分野 <span id="weak-count-science" class="weak-badge">0件</span></div>
+                    <div id="weak-list-science" class="weak-items-list">
+                        <div style="color:#9ca3af; text-align:center; padding-top:10px;">登録はありません</div>
+                    </div>
+                </div>
+                <div class="weak-sub-container">
+                    <div class="weak-sub-title">🗺️ 社会分野 (地理/歴史/公民) <span id="weak-count-social" class="weak-badge">0件</span></div>
+                    <div id="weak-list-social" class="weak-items-list">
+                        <div style="color:#9ca3af; text-align:center; padding-top:10px;">登録はありません</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <input type="text" id="master-search" class="search-box" placeholder="🔎 問題文、単元名、ページ、解答などでリアルタイム検索..." oninput="filterMasterList()">
         
         <div id="master-accordion-wrapper"></div>
@@ -386,9 +539,7 @@
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbzTSNymbN5SwEPSXbsZBPyiKiqaNwflnvKCvcQzTb2ThbDeO7Bzt2RyovpLtE__doss/exec";
 
-    // 🌟 PDFデータ（理科13、社会27）に完全準拠した、最新の一元管理用全40単元マスタ
     const pdfUnitsMaster = [
-        // 理科（13単元）
         { category: "science", value: "1 生物の分類" },
         { category: "science", value: "2 身のまわりの物質" },
         { category: "science", value: "3 身のまわりの現象" },
@@ -402,7 +553,6 @@
         { category: "science", value: "11 運動とエネルギー" },
         { category: "science", value: "12 地球と宇宙" },
         { category: "science", value: "13 自然環境・科学技術" },
-        // 地理（11単元）
         { category: "geography", value: "1 世界と日本の姿" },
         { category: "geography", value: "2 世界各地の人々の生活と環境" },
         { category: "geography", value: "3 世界の諸地域 アジア・ヨーロッパ・アフリカ" },
@@ -410,7 +560,6 @@
         { category: "geography", value: "9 日本の地域的特色と地域区分" },
         { category: "geography", value: "10 日本の諸地域 九州・中国四国・近畿・中部" },
         { category: "geography", value: "11 日本の諸地域 関東・東北・北海道" },
-        // 歴史（11単元）
         { category: "history", value: "5 世界の古代文明と宗教のおこり" },
         { category: "history", value: "6 日本の歴史① 縄文~奈良" },
         { category: "history", value: "7 日本の歴史② 平安・鎌倉" },
@@ -423,7 +572,6 @@
         { category: "history", value: "17 日本の歴史⑨ 第一次世界大戦と国際協調" },
         { category: "history", value: "18 日本の歴史⑩ 第二次世界大戦と敗戦" },
         { category: "history", value: "19 日本の歴史⑪ 戦後の民主主義化と現代日本" },
-        // 公民（8単元）
         { category: "civics", value: "20 現代社会と私たち" },
         { category: "civics", value: "21 個人の尊重と日本国憲法" },
         { category: "civics", value: "22 現代の民主政治① 民主主義と国会" },
@@ -447,9 +595,10 @@
     let timerLimitSeconds = 10;
     let masterCachedItems = [];    
 
-    // 🌟 起動時にPDF準拠のチェックボックス群を各エリアへ動的に一発生成する処理
+    let pendingWeakUpdates = {}; 
+    let fullMasterRawList = []; 
+
     function renderConfigUnitCheckboxes() {
-        // コンテナの初期化
         document.getElementById("grid-geography").innerHTML = "";
         document.getElementById("grid-history").innerHTML = "";
         document.getElementById("grid-civics").innerHTML = "";
@@ -466,8 +615,28 @@
         });
     }
 
+    function toggleBulkCheck(panelId) {
+        const panel = document.getElementById(panelId);
+        if(!panel) return;
+        
+        const visibleCheckboxes = [];
+        panel.querySelectorAll(".unit-item").forEach(item => {
+            if(item.style.display !== "none") {
+                const cb = item.querySelector(".unit-cb");
+                if(cb) visibleCheckboxes.push(cb);
+            }
+        });
+
+        if(visibleCheckboxes.length === 0) return;
+
+        const isAllChecked = visibleCheckboxes.every(cb => cb.checked);
+        visibleCheckboxes.forEach(cb => {
+            cb.checked = !isAllChecked;
+        });
+    }
+
     window.onload = async function() {
-        renderConfigUnitCheckboxes(); // 単元設定画面のチェックボックスを自動組み立て
+        renderConfigUnitCheckboxes(); 
         showLoading(true); 
         try {
             const res = await callGAS("getInitData");
@@ -626,17 +795,26 @@
     function openConfigView(mode) {
         currentMode = mode;
         const titleEl = document.getElementById("config-title");
+        const subjectSec = document.getElementById("config-subject-section");
+        const unitSec = document.getElementById("config-unit-section");
         const rangeSec = document.getElementById("config-range-section");
+        const conditionsTitle = document.getElementById("config-conditions-title");
 
         document.querySelectorAll('.unit-cb').forEach(cb => cb.checked = false);
         document.getElementById("range-list").innerHTML = "";
 
         if(mode === 'weak') {
             titleEl.innerText = "🔥 苦手克服テストの設定";
+            subjectSec.classList.remove("hidden"); 
+            unitSec.classList.add("hidden");  
             rangeSec.classList.add("hidden"); 
+            conditionsTitle.innerText = "① 各種条件設定";
         } else {
             titleEl.innerText = "🚀 通常実力テストの設定";
+            subjectSec.classList.add("hidden");    
+            unitSec.classList.remove("hidden");
             rangeSec.classList.remove("hidden");
+            conditionsTitle.innerText = "③ 各種条件設定";
             addRangeRow(); 
         }
         showView("view-config");
@@ -664,12 +842,13 @@
         timerLimitSeconds = Number(timeRadio.value) || 10;
 
         const checkedUnits = [];
-        document.querySelectorAll('.unit-cb:checked').forEach(cb => {
-            checkedUnits.push(cb.value);
-        });
-
         const ranges = [];
+
         if(currentMode === 'normal') {
+            document.querySelectorAll('.unit-cb:checked').forEach(cb => {
+                checkedUnits.push(cb.value);
+            });
+
             document.querySelectorAll('.range-set').forEach(row => {
                 const sp = row.querySelector('.r-sp').value;
                 const sn = row.querySelector('.r-sn').value;
@@ -686,12 +865,15 @@
             });
         }
 
+        const weakSubjectRadio = document.querySelector('input[name="weakSubjectTarget"]:checked');
+
         selectedConditions = {
-            mode: currentMode,
+            mode: currentMode === 'weak' ? 'weakOnly' : 'normal', 
             limit: limitRadio.value,
             units: checkedUnits,
             ranges: ranges,
-            gameMode: modeRadio.value 
+            gameMode: modeRadio.value,
+            subjectTarget: currentMode === 'weak' ? weakSubjectRadio.value : 'all' 
         };
 
         await loadAndStartQuiz(selectedConditions);
@@ -703,9 +885,28 @@
         try {
             const res = await callGAS("getQuestions", { conditions: conditions });
             if(res.success) {
-                quizList = res.questions;
+                let filteredQuestions = res.questions;
+                
+                if (conditions.mode === 'weakOnly' && conditions.subjectTarget !== 'all') {
+                    filteredQuestions = filteredQuestions.filter(q => {
+                        if (conditions.subjectTarget === 'science') {
+                            return q.subject === '理科';
+                        } else if (conditions.subjectTarget === 'social') {
+                            return q.subject === '社会' || q.subject === '地理' || q.subject === '歴史' || q.subject === '公民';
+                        }
+                        return true;
+                    });
+                }
+
+                quizList = filteredQuestions;
+
                 if(quizList.length === 0) {
-                    alert("指定された範囲に問題がスプレッドシートに登録されていません。\n【データ流し込み】を先に行ってください。");
+                    if (conditions.mode === 'weakOnly') {
+                        const subName = conditions.subjectTarget === 'science' ? '理科の' : (conditions.subjectTarget === 'social' ? '社会の' : '');
+                        alert(`選択された${subName}苦手リストに問題が登録されていません。マスタ管理画面からチェックを入れるか、通常テストで間違えた問題を登録してください。`);
+                    } else {
+                        alert("指定された範囲に問題がスプレッドシートに登録されていません。\n【データ流し込み】を先に行ってください。");
+                    }
                     showLoading(false);
                     document.body.style.cursor = "default";
                     return;
@@ -818,14 +1019,14 @@
             correctCount++;
             alert("⭕ 正解！");
             if(q.isWeak) {
-                await callGAS("toggleWeak", { id: q.id, isWeak: false });
+                pendingWeakUpdates[q.id] = false;
             }
         } else {
             alert(`❌ 不正解...\n\nあなたの選んだ答: ${selectedChoice}\n正しい正解: ${q.answer}`);
-            await callGAS("toggleWeak", { id: q.id, isWeak: true });
+            pendingWeakUpdates[q.id] = true;
             
             if(selectedConditions.gameMode === 'survival') {
-                alert("💥 間間違えたためサバイバル終了です！結果画面へ移ります。");
+                alert("💥 間違えたためサバイバル終了です！結果画面へ移ります。");
                 finishQuiz();
                 return;
             }
@@ -840,8 +1041,9 @@
         document.body.style.cursor = "wait";
 
         let rangeSummary = "";
-        if(selectedConditions.mode === 'weak') {
-            rangeSummary = "苦手克服テスト";
+        if(selectedConditions.mode === 'weakOnly') {
+            const subText = selectedConditions.subjectTarget === 'science' ? '理科のみ' : (selectedConditions.subjectTarget === 'social' ? '社会のみ' : 'すべて');
+            rangeSummary = `苦手克服テスト (${subText})`;
         } else {
             const unitsStr = selectedConditions.units.length > 0 ? selectedConditions.units.join(", ") : "";
             const rangeStr = selectedConditions.ranges.map(r => `p.${r.startPage}~${r.endPage}`).join(" / ");
@@ -869,6 +1071,14 @@
         document.body.style.cursor = "default";
 
         try {
+            for (const qId in pendingWeakUpdates) {
+                await callGAS("toggleWeak", { id: qId, isWeak: pendingWeakUpdates[qId] });
+            }
+        } catch(e) {
+            console.log("一括苦手同期に一部失敗しました", e);
+        }
+
+        try {
             await callGAS("saveResult", {
                 rangeSummary: rangeSummary,
                 scoreDisplay: `${correctCount}問正解 (挑戦:${currentIndex}問 / 全体:${quizList.length}問)`
@@ -886,6 +1096,72 @@
         }
     }
 
+    function renderWeakSubjectSummary() {
+        const scienceListEl = document.getElementById("weak-list-science");
+        const socialListEl = document.getElementById("weak-list-social");
+        
+        scienceListEl.innerHTML = "";
+        socialListEl.innerHTML = "";
+
+        const scienceWeaks = fullMasterRawList.filter(q => q.isWeak && q.subject === "理科");
+        const socialWeaks = fullMasterRawList.filter(q => q.isWeak && (q.subject === "社会" || q.subject === "地理" || q.subject === "歴史" || q.subject === "公民"));
+
+        document.getElementById("weak-count-science").innerText = `${scienceWeaks.length}件`;
+        document.getElementById("weak-count-social").innerText = `${socialWeaks.length}件`;
+
+        if(scienceWeaks.length === 0) {
+            scienceListEl.innerHTML = `<div style="color:#9ca3af; text-align:center; padding-top:10px;">登録はありません</div>`;
+        } else {
+            scienceWeaks.forEach(q => {
+                const row = document.createElement("div");
+                row.className = "weak-row-item";
+                row.innerHTML = `
+                    <span class="weak-row-text">p.${q.page} No.${q.num} : ${q.question}</span>
+                    <button type="button" class="btn-remove-weak" onclick="removeWeakDirectly('${q.id}')">❌ 解除</button>
+                `;
+                scienceListEl.appendChild(row);
+            });
+        }
+
+        if(socialWeaks.length === 0) {
+            socialListEl.innerHTML = `<div style="color:#9ca3af; text-align:center; padding-top:10px;">登録はありません</div>`;
+        } else {
+            socialWeaks.forEach(q => {
+                const row = document.createElement("div");
+                row.className = "weak-row-item";
+                row.innerHTML = `
+                    <span class="weak-row-text">p.${q.page} No.${q.num} : ${q.question}</span>
+                    <button type="button" class="btn-remove-weak" onclick="removeWeakDirectly('${q.id}')">❌ 解除</button>
+                `;
+                socialListEl.appendChild(row);
+            });
+        }
+    }
+
+    async function removeWeakDirectly(qId) {
+        const targetProblem = fullMasterRawList.find(q => q.id === qId);
+        if(targetProblem) {
+            targetProblem.isWeak = false;
+        }
+
+        if (masterCachedItems.length > 0) {
+            const cacheObj = masterCachedItems.find(item => item.text.startsWith(qId.toLowerCase()));
+            if(cacheObj && cacheObj.rowElement) {
+                const cb = cacheObj.rowElement.querySelector("input[type='checkbox']");
+                if(cb) cb.checked = false;
+            }
+        }
+
+        renderWeakSubjectSummary();
+
+        try {
+            await callGAS("toggleWeak", { id: qId, isWeak: false });
+        } catch(e) {
+            alert("苦手ステータスの更新に失敗しました。再試行してください。");
+            openMasterView(); 
+        }
+    }
+
     async function openMasterView() {
         showView("view-master");
         const wrapper = document.getElementById("master-accordion-wrapper");
@@ -898,6 +1174,9 @@
             if(res.success) {
                 wrapper.innerHTML = "";
                 masterCachedItems = []; 
+                fullMasterRawList = res.master; 
+
+                renderWeakSubjectSummary();
                 
                 const groupedData = {};
                 res.master.forEach(q => {
@@ -1026,6 +1305,12 @@
     }
 
     async function toggleMasterWeak(id, isChecked) {
+        const targetProblem = fullMasterRawList.find(q => q.id === id);
+        if(targetProblem) {
+            targetProblem.isWeak = isChecked;
+        }
+        renderWeakSubjectSummary();
+
         try {
             await callGAS("toggleWeak", { id: id, isWeak: isChecked });
         } catch(e) {
