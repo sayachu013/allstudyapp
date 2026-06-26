@@ -176,6 +176,7 @@
             padding-bottom: 10px;
             border-bottom: 2px solid #e5e7eb;
         }
+        .quiz-score { font-size: 16px; color: #4b5563; }
         .quiz-meta { color: #6b7280; font-size: 14px; margin-bottom: 10px; text-align: center; }
         .quiz-question-box {
             background: #f9fafb;
@@ -239,7 +240,7 @@
         .master-table th, .master-table td { border: 1px solid #e5e7eb; padding: 10px; text-align: left; word-wrap: break-word; }
         .master-table th { background: #f9fafb; position: sticky; top: 0; z-index: 2; }
 
-        /* 🌟 苦手集計エリアのレイアウト崩れ対策CSS改修 */
+        /* 苦手集計エリアのレイアウト崩れ対策CSS */
         .weak-summary-box {
             background: #fffbeb;
             border: 1px solid #fef3c7;
@@ -257,7 +258,7 @@
         }
         .weak-summary-split {
             display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr)); /* 横幅が絶対に潰れないように1frに強制固定 */
+            grid-template-columns: repeat(2, minmax(0, 1fr)); 
             gap: 15px;
             width: 100%;
             box-sizing: border-box;
@@ -270,7 +271,7 @@
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
-            min-width: 0; /* 子要素のはみ出し防止 */
+            min-width: 0; 
         }
         .weak-sub-title {
             font-weight: bold;
@@ -307,7 +308,7 @@
         .weak-row-text {
             color: #374151;
             line-height: 1.4;
-            white-space: normal; /* 🌟 縦に潰れず、問題文が長い時は綺麗に自動折り返し */
+            white-space: normal; 
             word-break: break-all;
             flex-grow: 1;
             min-width: 0;
@@ -330,6 +331,57 @@
             background: #fee2e2;
             border-color: #fca5a5;
         }
+
+        /* マイセット管理用UIスタイル */
+        .myset-management-area {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            text-align: left;
+            font-size: 13px;
+        }
+        .myset-title { font-weight: bold; color: #166534; margin-bottom: 8px; }
+        .myset-controls { display: flex; gap: 8px; margin-bottom: 8px; }
+        .myset-select { padding: 6px; border: 1px solid #ccd; border-radius: 4px; flex-grow: 1; font-size: 13px; }
+        .myset-input { padding: 6px; border: 1px solid #ccd; border-radius: 4px; width: 150px; font-size: 13px; }
+        .myset-btn-group { display: flex; gap: 4px; }
+        .btn-myset { padding: 6px 12px; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; font-weight: bold; color: white; }
+        .btn-myset-save { background-color: #16a34a; }
+        .btn-myset-load { background-color: #2563eb; }
+        .btn-myset-delete { background-color: #dc2626; }
+
+        /* 演習ミス問題専用表示ボックスのスタイル */
+        .missed-summary-box {
+            background: #fef2f2;
+            border: 1px solid #fca5a5;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        .missed-summary-title {
+            font-weight: bold;
+            color: #991b1b;
+            margin-bottom: 12px;
+            text-align: left;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .btn-clear-missed {
+            background: #ffffff;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+            padding: 3px 10px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-clear-missed:hover { background: #fee2e2; }
 
         /* ロード専用オーバーレイ画面 */
         .loading-overlay {
@@ -393,7 +445,7 @@
             </div>
             <div class="menu-card" onclick="openConfigView('weak')">
                 <h3>苦手テストを始める 🔥</h3>
-                <p>チェックした「苦手リスト」の中から優先的にランダム出題されます。</p>
+                <p>チェックした「苦手リスト」や演習ミス、マイセットから復習テストに挑戦します。</p>
             </div>
             <div class="menu-card" onclick="openMasterView()">
                 <h3>苦手リストの編集・確認 📋</h3>
@@ -410,8 +462,20 @@
         <h2 id="config-title">出題範囲の設定</h2>
         
         <div class="config-section hidden" id="config-subject-section">
-            <h3>出題対象の教科を指定</h3>
+            <div style="margin-bottom: 20px;">
+                <label style="font-weight: bold; display: block; margin-bottom: 8px;">【出題元のデータを選択】</label>
+                <select id="weak-source-select" class="form-control" style="width: 100%; max-width: 400px;" onchange="onWeakSourceSelectChange()">
+                    <option value="default_weak">通常の苦手リスト（手動で登録した問題）</option>
+                    <option value="missed_history">演習ミス問題リスト（自動蓄積されたデータ）</option>
+                    <option value="slot1">マイセット：スロット1</option>
+                    <option value="slot2">マイセット：スロット2</option>
+                    <option value="slot3">マイセット：スロット3</option>
+                    <option value="slot4">マイセット：スロット4</option>
+                    <option value="slot5">マイセット：スロット5</option>
+                </select>
+            </div>
             <div>
+                <label style="font-weight: bold; display: block; margin-bottom: 8px;">【出題対象の教科を指定】</label>
                 <input type="radio" name="weakSubjectTarget" value="all" id="ws-all" checked> <label for="ws-all" style="margin-right: 20px;">理科・社会すべて</label>
                 <input type="radio" name="weakSubjectTarget" value="science" id="ws-science"> <label for="ws-science" style="margin-right: 20px;">理科のみ</label>
                 <input type="radio" name="weakSubjectTarget" value="social" id="ws-social"> <label for="ws-social">社会のみ（地理・歴史・公民）</label>
@@ -470,7 +534,7 @@
             </div>
             <div>
                 <span style="font-weight:bold; display:inline-block; width:120px;">1問の制限時間:</span>
-                <input type="radio" name="timeLimit" value="10" id="t-10" checked> <label for="t-10" style="margin-right: 20px;">10秒</label>
+                <input type="radio" name="timeLimit" value="10" id="t-10" checked> <label for="t-10">10秒</label>
                 <input type="radio" name="timeLimit" value="4" id="t-4"> <label for="t-4">4秒</label>
             </div>
         </div>
@@ -483,7 +547,7 @@
         <div class="quiz-header">
             <div id="quiz-progress" style="font-size: 18px; font-weight: bold;">第 1 問 / 20 問</div>
             <div id="quiz-score" style="font-size: 16px; color: #4b5563;">正解数: 0</div>
-            <button class="btn btn-danger" style="padding: 4px 12px; font-size: 13px;" onclick="abortQuiz()">テストを中断してホームに戻る</button>
+            <button class="btn btn-danger" style="padding: 4px 12px; font-size: 13px; width: auto;" onclick="abortQuiz()">テストを中断してホームに戻る</button>
         </div>
         <div class="timer-bar-container">
             <div id="timer-bar" class="timer-bar"></div>
@@ -510,20 +574,54 @@
             チェックを入れると「苦手リスト」に即時登録され、苦手テストに出題されるようになります。
         </p>
 
+        <div class="missed-summary-box">
+            <div class="missed-summary-title">
+                <span>🔴 演習でミスした問題の一覧 (自動蓄積)</span>
+                <button type="button" class="btn-clear-missed" onclick="clearAllMissedHistory()">演習ミスをすべてクリア</button>
+            </div>
+            <div class="weak-summary-split">
+                <div class="weak-sub-container">
+                    <div class="weak-sub-title">🧪 理科ミス問題 <span id="missed-count-science" class="weak-badge">0件</span></div>
+                    <div id="missed-list-science" class="weak-items-list"><div style="color:#9ca3af; text-align:center; padding-top:10px;">ミスデータはありません</div></div>
+                </div>
+                <div class="weak-sub-container">
+                    <div class="weak-sub-title">🗺️ 社会ミス問題 <span id="missed-count-social" class="weak-badge">0件</span></div>
+                    <div id="missed-list-social" class="weak-items-list"><div style="color:#9ca3af; text-align:center; padding-top:10px;">ミスデータはありません</div></div>
+                </div>
+            </div>
+        </div>
+
         <div class="weak-summary-box">
-            <div class="weak-summary-title">🔍 現在の苦手リスト登録状況 (ここから直接解除できます)</div>
+            <div class="weak-summary-title">⭐ 手動で登録した苦手問題の一覧 (ここから直接解除できます)</div>
+            
+            <div class="myset-management-area">
+                <div class="myset-title">💾 苦手マイセット保存・読込スロット</div>
+                <div class="myset-controls">
+                    <select id="myset-slot-select" class="myset-select" onchange="onMysetSlotChange()">
+                        <option value="">-- スロットを選択してください --</option>
+                        <option value="slot1">スロット1 (未保存)</option>
+                        <option value="slot2">スロット2 (未保存)</option>
+                        <option value="slot3">スロット3 (未保存)</option>
+                        <option value="slot4">スロット4 (未保存)</option>
+                        <option value="slot5">スロット5 (未保存)</option>
+                    </select>
+                    <input type="text" id="myset-name-input" class="myset-input" placeholder="セットの名前">
+                    <div class="myset-btn-group">
+                        <button type="button" class="btn-myset btn-myset-save" onclick="saveMyset()">保存</button>
+                        <button type="button" class="btn-myset btn-myset-load" onclick="loadMyset()">読込</button>
+                        <button type="button" class="btn-myset btn-myset-delete" onclick="deleteMyset()">削除</button>
+                    </div>
+                </div>
+            </div>
+
             <div class="weak-summary-split">
                 <div class="weak-sub-container">
                     <div class="weak-sub-title">🧪 理科分野 <span id="weak-count-science" class="weak-badge">0件</span></div>
-                    <div id="weak-list-science" class="weak-items-list">
-                        <div style="color:#9ca3af; text-align:center; padding-top:10px;">登録はありません</div>
-                    </div>
+                    <div id="weak-list-science" class="weak-items-list"><div style="color:#9ca3af; text-align:center; padding-top:10px;">登録はありません</div></div>
                 </div>
                 <div class="weak-sub-container">
                     <div class="weak-sub-title">🗺️ 社会分野 (地理/歴史/公民) <span id="weak-count-social" class="weak-badge">0件</span></div>
-                    <div id="weak-list-social" class="weak-items-list">
-                        <div style="color:#9ca3af; text-align:center; padding-top:10px;">登録はありません</div>
-                    </div>
+                    <div id="weak-list-social" class="weak-items-list"><div style="color:#9ca3af; text-align:center; padding-top:10px;">登録はありません</div></div>
                 </div>
             </div>
         </div>
@@ -532,7 +630,7 @@
         
         <div id="master-accordion-wrapper"></div>
 
-        <button class="btn btn-secondary" style="margin-top:20px;" onclick="showView('view-menu')">メニュー画面に戻る</button>
+        <button class="btn btn-secondary" style="margin-top:20px;" onclick="showView('view-menu')">メニューに戻る</button>
     </div>
 </div>
 
@@ -595,8 +693,8 @@
     let timerLimitSeconds = 10;
     let masterCachedItems = [];    
 
-    let pendingWeakUpdates = {}; 
-    let fullMasterRawList = []; 
+    let pendingWeakUpdates = {}; // 演習中に変動した苦手ステータス蓄積用
+    let fullMasterRawList = [];  // マイセット処理・集計用マスタキャッシュ
 
     function renderConfigUnitCheckboxes() {
         document.getElementById("grid-geography").innerHTML = "";
@@ -792,6 +890,23 @@
         });
     }
 
+    function updateWeakSourceSelectLabels() {
+        const select = document.getElementById("weak-source-select");
+        const studentKey = currentStudent || "default";
+        for (let i = 1; i <= 5; i++) {
+            const savedData = localStorage.getItem(`myset_${studentKey}_slot${i}`);
+            const option = select.options[i + 1];
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                option.innerText = `マイセット：スロット${i} (${parsed.name || "名称なし"})`;
+                option.disabled = false;
+            } else {
+                option.innerText = `マイセット：スロット${i} (未保存データ)`;
+                option.disabled = true; // 未保存スロットはテスト選択肢から弾く
+            }
+        }
+    }
+
     function openConfigView(mode) {
         currentMode = mode;
         const titleEl = document.getElementById("config-title");
@@ -806,6 +921,7 @@
         if(mode === 'weak') {
             titleEl.innerText = "🔥 苦手克服テストの設定";
             subjectSec.classList.remove("hidden"); 
+            updateWeakSourceSelectLabels(); // 🌟 苦手テスト画面を開いたときにスロット名ラベルを動的更新
             unitSec.classList.add("hidden");  
             rangeSec.classList.add("hidden"); 
             conditionsTitle.innerText = "① 各種条件設定";
@@ -834,10 +950,15 @@
         wrapper.appendChild(div);
     }
 
+    function onWeakSourceSelectChange() {
+        // 必要に応じてソース切替時の個別イベント制御スペース（現状はそのまま維持）
+    }
+
     async function generateTest() {
         const limitRadio = document.querySelector('input[name="qLimit"]:checked');
         const modeRadio = document.querySelector('input[name="gameMode"]:checked');
         const timeRadio = document.querySelector('input[name="timeLimit"]:checked');
+        const weakSourceSelect = document.getElementById("weak-source-select");
 
         timerLimitSeconds = Number(timeRadio.value) || 10;
 
@@ -873,50 +994,93 @@
             units: checkedUnits,
             ranges: ranges,
             gameMode: modeRadio.value,
-            subjectTarget: currentMode === 'weak' ? weakSubjectRadio.value : 'all' 
+            subjectTarget: currentMode === 'weak' ? weakSubjectRadio.value : 'all',
+            weakSource: currentMode === 'weak' ? weakSourceSelect.value : 'default_weak' // 🌟 出題元の指定フラグを統合
         };
 
         await loadAndStartQuiz(selectedConditions);
     }
 
+    // 🌟 クイズ開始要求。選ばれた出題元データ（ソース）に応じて、配列をクライアント側ですり替える
     async function loadAndStartQuiz(conditions) {
         showLoading(true); 
         document.body.style.cursor = "wait"; 
+        pendingWeakUpdates = {}; 
         try {
-            const res = await callGAS("getQuestions", { conditions: conditions });
-            if(res.success) {
-                let filteredQuestions = res.questions;
-                
-                if (conditions.mode === 'weakOnly' && conditions.subjectTarget !== 'all') {
-                    filteredQuestions = filteredQuestions.filter(q => {
-                        if (conditions.subjectTarget === 'science') {
-                            return q.subject === '理科';
-                        } else if (conditions.subjectTarget === 'social') {
-                            return q.subject === '社会' || q.subject === '地理' || q.subject === '歴史' || q.subject === '公民';
-                        }
-                        return true;
-                    });
-                }
+            // 出題元が「演習ミス」または「マイセット」の場合は、まずマスタ生データを全件回収して処理元を作る
+            if (conditions.mode === 'weakOnly' && conditions.weakSource !== 'default_weak') {
+                const res = await callGAS("getAllMaster");
+                if (res.success) {
+                    let sourcePool = [];
+                    const studentKey = currentStudent || "default";
 
-                quizList = filteredQuestions;
-
-                if(quizList.length === 0) {
-                    if (conditions.mode === 'weakOnly') {
-                        const subName = conditions.subjectTarget === 'science' ? '理科の' : (conditions.subjectTarget === 'social' ? '社会の' : '');
-                        alert(`選択された${subName}苦手リストに問題が登録されていません。マスタ管理画面からチェックを入れるか、通常テストで間違えた問題を登録してください。`);
+                    if (conditions.weakSource === 'missed_history') {
+                        // 1. 演習ミス問題プールからIDを抽出
+                        const localMissed = JSON.parse(localStorage.getItem(`missed_problems_${studentKey}`) || "[]");
+                        const missedIds = localMissed.map(item => item.id);
+                        sourcePool = res.master.filter(q => missedIds.includes(q.id));
                     } else {
-                        alert("指定された範囲に問題がスプレッドシートに登録されていません。\n【データ流し込み】を先に行ってください。");
+                        // 2. マイセット(slot1〜5)からIDを抽出
+                        const savedData = localStorage.getItem(`myset_${studentKey}_${conditions.weakSource}`);
+                        if (savedData) {
+                            const parsed = JSON.parse(savedData);
+                            const mysetIds = parsed.weakIds || [];
+                            sourcePool = res.master.filter(q => mysetIds.includes(q.id));
+                        }
                     }
-                    showLoading(false);
-                    document.body.style.cursor = "default";
-                    return;
+
+                    // 教科の絞り込みフィルター
+                    if (conditions.subjectTarget !== 'all') {
+                        sourcePool = sourcePool.filter(q => {
+                            if (conditions.subjectTarget === 'science') return q.subject === '理科';
+                            return q.subject === '社会' || q.subject === '地理' || q.subject === '歴史' || q.subject === '公民';
+                        });
+                    }
+
+                    // ランダムに並び替えて出題数制限をかける
+                    sourcePool.sort(() => Math.random() - 0.5);
+                    quizList = sourcePool.slice(0, Number(conditions.limit) || 20);
+                    
+                    // 各問題の選択肢をランダムシャッフル
+                    quizList.forEach(q => {
+                        q.choices.sort(() => Math.random() - 0.5);
+                    });
+
+                    startQuizOrAlert(conditions);
+                } else {
+                    alert("マスタデータの読み込みに失敗しました。");
                 }
-                currentIndex = 0;
-                correctCount = 0;
-                showView("view-quiz");
-                renderQuestion();
             } else {
-                alert("指定された範囲に問題が見つかりません。");
+                // 通常の苦手リストまたは通常範囲指定テスト（従来通りのGAS直結処理）
+                const res = await callGAS("getQuestions", { conditions: conditions });
+                if(res.success) {
+                    let filteredQuestions = res.questions;
+                    
+                    // 🌟 完璧な防衛ガード：HTML側でも通常テスト時に指定ページ範囲内にあるかを二重チェック（バグ②への対策）
+                    if (conditions.mode === 'normal' && conditions.ranges && conditions.ranges.length > 0) {
+                        filteredQuestions = filteredQuestions.filter(q => {
+                            return conditions.ranges.some(r => {
+                                if (q.page < r.startPage || q.page > r.endPage) return false;
+                                if (q.page === r.startPage && q.num < r.startNum) return false;
+                                if (q.page === r.endPage && q.num > r.endNum) return false;
+                                return true;
+                            });
+                        });
+                    }
+
+                    // 苦手テスト（通常）での教科フィルターの二重ガード
+                    if (conditions.mode === 'weakOnly' && conditions.subjectTarget !== 'all') {
+                        filteredQuestions = filteredQuestions.filter(q => {
+                            if (conditions.subjectTarget === 'science') return q.subject === '理科';
+                            return q.subject === '社会' || q.subject === '地理' || q.subject === '歴史' || q.subject === '公民';
+                        });
+                    }
+
+                    quizList = filteredQuestions;
+                    startQuizOrAlert(conditions);
+                } else {
+                    alert("指定された範囲に問題が見つかりません。");
+                }
             }
         } catch (e) {
             console.error("エラー詳細:", e); 
@@ -925,6 +1089,24 @@
             showLoading(false); 
             document.body.style.cursor = "default"; 
         }
+    }
+
+    function startQuizOrAlert(conditions) {
+        if(quizList.length === 0) {
+            if (conditions.mode === 'weakOnly') {
+                let sourceName = "苦手リスト";
+                if(conditions.weakSource === 'missed_history') sourceName = "演習ミス問題リスト";
+                else if(conditions.weakSource.startsWith('slot')) sourceName = "選択されたマイセット";
+                alert(`対象の【${sourceName}】に対象教科の問題が1問も入っていません。`);
+            } else {
+                alert("指定された範囲に問題が登録されていません。\n【データ流し込み】を先に行ってください。");
+            }
+            return;
+        }
+        currentIndex = 0;
+        correctCount = 0;
+        showView("view-quiz");
+        renderQuestion();
     }
 
     function renderQuestion() {
@@ -996,6 +1178,11 @@
             finishQuiz();
         } else {
             alert("⏰ 時間切れ！次の問題に進みます。");
+            
+            // 🌟 修正：時間切れも不正解扱いとし、ローカルミス問題プールへ退避（バグ④対策）
+            const q = quizList[currentIndex];
+            saveMissedProblemToLocal(q);
+
             currentIndex++;
             renderQuestion();
         }
@@ -1018,15 +1205,14 @@
         if(isCorrect) {
             correctCount++;
             alert("⭕ 正解！");
-            if(q.isWeak) {
-                pendingWeakUpdates[q.id] = false;
-            }
         } else {
             alert(`❌ 不正解...\n\nあなたの選んだ答: ${selectedChoice}\n正しい正解: ${q.answer}`);
-            pendingWeakUpdates[q.id] = true;
+            
+            // 🌟 修正：間違えた問題をローカルの生徒別ミス問題プールへ退避保存（バグ④対策）
+            saveMissedProblemToLocal(q);
             
             if(selectedConditions.gameMode === 'survival') {
-                alert("💥 間違えたためサバイバル終了です！結果画面へ移ります。");
+                alert("💥 間職えたためサバイバル終了です！結果画面へ移ります。");
                 finishQuiz();
                 return;
             }
@@ -1036,14 +1222,41 @@
         renderQuestion();
     }
 
+    // 🌟 新設：演習ミス問題をローカルの独立プールに生徒別に退避保存する関数（バグ④対策）
+    function saveMissedProblemToLocal(qObj) {
+        const studentKey = currentStudent || "default";
+        const storageKey = `missed_problems_${studentKey}`;
+        let missedList = [];
+        try {
+            const existing = localStorage.getItem(storageKey);
+            if(existing) missedList = JSON.parse(existing);
+        } catch(e) {}
+
+        if(!missedList.some(item => item.id === qObj.id)) {
+            missedList.push({
+                id: qObj.id,
+                page: qObj.page,
+                num: qObj.num,
+                subject: qObj.subject,
+                unit: qObj.unit,
+                question: qObj.question,
+                answer: qObj.answer
+            });
+            localStorage.setItem(storageKey, JSON.stringify(missedList));
+        }
+    }
+
     async function finishQuiz() {
         clearInterval(timerId);
         document.body.style.cursor = "wait";
 
         let rangeSummary = "";
         if(selectedConditions.mode === 'weakOnly') {
+            let srcName = "手動登録リスト";
+            if(selectedConditions.weakSource === 'missed_history') srcName = "演習ミス問題";
+            else if(selectedConditions.weakSource.startsWith('slot')) srcName = "マイセット";
             const subText = selectedConditions.subjectTarget === 'science' ? '理科のみ' : (selectedConditions.subjectTarget === 'social' ? '社会のみ' : 'すべて');
-            rangeSummary = `苦手克服テスト (${subText})`;
+            rangeSummary = `苦手克服テスト [出題元:${srcName}] (${subText})`;
         } else {
             const unitsStr = selectedConditions.units.length > 0 ? selectedConditions.units.join(", ") : "";
             const rangeStr = selectedConditions.ranges.map(r => `p.${r.startPage}~${r.endPage}`).join(" / ");
@@ -1059,7 +1272,11 @@
         document.getElementById("result-score").innerText = `${correctCount} / ${currentIndex} 問正解`;
         
         let comment = "次も頑張りましょう！";
-        if(currentIndex > 0) {
+        
+        // 🌟 修正：サバイバルモード中途終了時と完走時でコメントを厳密に分岐（仕様維持）
+        if(selectedConditions.gameMode === 'survival' && correctCount < quizList.length) {
+            comment = "💥 サバイバルモード終了！次は全問正解を目指してがんばろう！🔥";
+        } else if(currentIndex > 0) {
             const rate = correctCount / currentIndex;
             if(rate === 1) comment = "🥇 完璧です！素晴らしい全問正解！";
             else if(rate >= 0.8) comment = "🥈 高得点！その調子です！";
@@ -1070,6 +1287,7 @@
         showView("view-result");
         document.body.style.cursor = "default";
 
+        // 🌟 解答中のラグゼロ化用一括バックグラウンド処理（もしあれば連動）
         try {
             for (const qId in pendingWeakUpdates) {
                 await callGAS("toggleWeak", { id: qId, isWeak: pendingWeakUpdates[qId] });
@@ -1096,6 +1314,75 @@
         }
     }
 
+    // 🌟 新設：演習ミス問題プールをマスタ管理画面に綺麗に2カラム描画する処理（バグ④対策）
+    function renderMissedProblemsSummary() {
+        const scienceMissedEl = document.getElementById("missed-list-science");
+        const socialMissedEl = document.getElementById("missed-list-social");
+        scienceMissedEl.innerHTML = "";
+        socialMissedEl.innerHTML = "";
+
+        const studentKey = currentStudent || "default";
+        let missedList = [];
+        try {
+            const existing = localStorage.getItem(`missed_problems_${studentKey}`);
+            if(existing) missedList = JSON.parse(existing);
+        } catch(e) {}
+
+        const scienceMisses = missedList.filter(q => q.subject === "理科");
+        const socialMisses = missedList.filter(q => q.subject === "社会" || q.subject === "地理" || q.subject === "歴史" || q.subject === "公民");
+
+        document.getElementById("missed-count-science").innerText = `${scienceMisses.length}件`;
+        document.getElementById("missed-count-social").innerText = `${socialMisses.length}件`;
+
+        if(scienceMisses.length === 0) {
+            scienceMissedEl.innerHTML = `<div style="color:#9ca3af; text-align:center; padding-top:10px;">ミスデータはありません</div>`;
+        } else {
+            scienceMisses.forEach(q => {
+                const row = document.createElement("div");
+                row.className = "weak-row-item";
+                row.innerHTML = `
+                    <span class="weak-row-text">p.${q.page} No.${q.num} : ${q.question}</span>
+                    <button type="button" class="btn-remove-weak" onclick="removeMissedProblemDirectly('${q.id}')">❌ 削除</button>
+                `;
+                scienceMissedEl.appendChild(row);
+            });
+        }
+
+        if(socialMisses.length === 0) {
+            socialMissedEl.innerHTML = `<div style="color:#9ca3af; text-align:center; padding-top:10px;">ミスデータはありません</div>`;
+        } else {
+            socialMisses.forEach(q => {
+                const row = document.createElement("div");
+                row.className = "weak-row-item";
+                row.innerHTML = `
+                    <span class="weak-row-text">p.${q.page} No.${q.num} : ${q.question}</span>
+                    <button type="button" class="btn-remove-weak" onclick="removeMissedProblemDirectly('${q.id}')">❌ 削除</button>
+                `;
+                socialMissedEl.appendChild(row);
+            });
+        }
+    }
+
+    function removeMissedProblemDirectly(qId) {
+        const studentKey = currentStudent || "default";
+        const storageKey = `missed_problems_${studentKey}`;
+        try {
+            let missedList = JSON.parse(localStorage.getItem(storageKey) || "[]");
+            missedList = missedList.filter(q => q.id !== qId);
+            localStorage.setItem(storageKey, JSON.stringify(missedList));
+        } catch(e) {}
+        renderMissedProblemsSummary();
+    }
+
+    function clearAllMissedHistory() {
+        if(confirm("蓄積された演習ミス問題をすべてクリアしますか？")) {
+            const studentKey = currentStudent || "default";
+            localStorage.removeItem(`missed_problems_${studentKey}`);
+            renderMissedProblemsSummary();
+        }
+    }
+
+    // 手動苦手リスト集計の2カラムレンダリング
     function renderWeakSubjectSummary() {
         const scienceListEl = document.getElementById("weak-list-science");
         const socialListEl = document.getElementById("weak-list-social");
@@ -1162,6 +1449,126 @@
         }
     }
 
+    function updateMysetSlotLabels() {
+        const select = document.getElementById("myset-slot-select");
+        const studentKey = currentStudent || "default";
+        for (let i = 1; i <= 5; i++) {
+            const savedData = localStorage.getItem(`myset_${studentKey}_slot${i}`);
+            const option = select.options[i];
+            if (savedData) {
+                const parsed = JSON.parse(savedData);
+                option.innerText = `スロット${i} (${parsed.name || "名称なし"})`;
+            } else {
+                option.innerText = `スロット${i} (未保存)`;
+            }
+        }
+    }
+
+    function onMysetSlotChange() {
+        const select = document.getElementById("myset-slot-select");
+        const nameInput = document.getElementById("myset-name-input");
+        const studentKey = currentStudent || "default";
+        const selectedSlot = select.value;
+
+        if (!selectedSlot) {
+            nameInput.value = "";
+            return;
+        }
+        const savedData = localStorage.getItem(`myset_${studentKey}_${selectedSlot}`);
+        if (savedData) {
+            const parsed = JSON.parse(savedData);
+            nameInput.value = parsed.name || "";
+        } else {
+            nameInput.value = "";
+        }
+    }
+
+    async function saveMyset() {
+        const slot = document.getElementById("myset-slot-select").value;
+        const name = document.getElementById("myset-name-input").value.trim();
+        if (!slot) { alert("保存先のスロットを選択してください。"); return; }
+        if (!name) { alert("セットの名前を入力してください。"); return; }
+
+        const studentKey = currentStudent || "default";
+        const currentWeakIds = fullMasterRawList.filter(q => q.isWeak).map(q => q.id);
+
+        const mysetData = {
+            name: name,
+            weakIds: currentWeakIds
+        };
+
+        localStorage.setItem(`myset_${studentKey}_${slot}`, JSON.stringify(mysetData));
+        updateMysetSlotLabels();
+        alert(`${name} としてスロットにローカル保存しました。`);
+    }
+
+    // 🌟 劇的改善：一括差分同期（bulkToggleWeak）を呼び出すマイセット読込高速化ロジック（バグ①解消）
+    async function loadMyset() {
+        const slot = document.getElementById("myset-slot-select").value;
+        if (!slot) { alert("読み込み元のスロットを選択してください。"); return; }
+
+        const studentKey = currentStudent || "default";
+        const savedData = localStorage.getItem(`myset_${studentKey}_${slot}`);
+        if (!savedData) { alert("選択されたスロットにデータが保存されていません。"); return; }
+
+        if (!confirm("現在の苦手リスト設定が上書きされます。よろしいですか？")) return;
+
+        showLoading(true);
+        const parsed = JSON.parse(savedData);
+        const targetWeakIds = parsed.weakIds || [];
+
+        const addIds = [];
+        const removeIds = [];
+
+        // 現在の状態と比較し、追加が必要なIDと削除が必要なIDを仕分ける
+        fullMasterRawList.forEach(q => {
+            const nextState = targetWeakIds.includes(q.id);
+            if (q.isWeak !== nextState) {
+                if (nextState) addIds.push(q.id);
+                else removeIds.push(q.id);
+            }
+            q.isWeak = nextState;
+        });
+
+        // 画面のチェックボックス状態を同期
+        masterCachedItems.forEach(item => {
+            if (item.rowElement) {
+                const cb = item.rowElement.querySelector("input[type='checkbox']");
+                const qId = item.text.split(" ")[0].toUpperCase();
+                if (cb) cb.checked = targetWeakIds.includes(qId);
+            }
+        });
+
+        renderWeakSubjectSummary();
+
+        try {
+            // 🚀 通信を1件ずつ何百回も回さず、新設した一括アクションへ配列で1発送信する
+            if (addIds.length > 0 || removeIds.length > 0) {
+                await callGAS("bulkToggleWeak", { addIds: addIds, removeIds: removeIds });
+            }
+            alert(`マイセット「${parsed.name}」の高速読み込みが完了しました！\n(追加: ${addIds.length}件 / 削除: ${removeIds.length}件 を1回で同期しました)`);
+        } catch(e) {
+            alert("GASへの一括同期中にエラーが発生しました。");
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    function deleteMyset() {
+        const slot = document.getElementById("myset-slot-select").value;
+        if (!slot) { alert("削除するスロットを選択してください。"); return; }
+
+        const studentKey = currentStudent || "default";
+        if (!localStorage.getItem(`myset_${studentKey}_${slot}`)) { alert("保存データがありません。"); return; }
+
+        if (confirm("スロットのマイセットデータを削除しますか？")) {
+            localStorage.removeItem(`myset_${studentKey}_${slot}`);
+            document.getElementById("myset-name-input").value = "";
+            updateMysetSlotLabels();
+            alert("マイセットデータを削除しました。");
+        }
+    }
+
     async function openMasterView() {
         showView("view-master");
         const wrapper = document.getElementById("master-accordion-wrapper");
@@ -1176,7 +1583,9 @@
                 masterCachedItems = []; 
                 fullMasterRawList = res.master; 
 
-                renderWeakSubjectSummary();
+                renderMissedProblemsSummary(); 
+                updateMysetSlotLabels();      
+                renderWeakSubjectSummary();    
                 
                 const groupedData = {};
                 res.master.forEach(q => {
