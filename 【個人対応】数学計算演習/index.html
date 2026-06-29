@@ -250,7 +250,7 @@ const modeConfigs中1 = [
 { category: "データの分析（中1）", difficulty: "基本", label: "📊 データの分析・活用（中1章末）" }
 ];
 
-// 【中2用メニュー構成】★一般的な教科書の単元ロードマップ順に完璧にソート
+// 【中2用メニュー構成】
 const modeConfigs中2 = [
 { category: "多項式の計算", difficulty: "基本", label: "多項式の計算（基本）" },
 { category: "多項式の加減", difficulty: "基本", label: "多項式の加減（基本）" },
@@ -275,7 +275,7 @@ const modeConfigs中2 = [
 { category: "多項式の計算（分数）", difficulty: "発展", label: "多項式の計算（分数・発展）" }
 ];
 
-// 【中3用メニュー構成】★一般的な教科書の単元ロードマップ順に完璧にソート
+// 【中3用メニュー構成】
 const modeConfigs中3 = [
 { category: "式の計算の利用", difficulty: "基本", label: "式の計算の利用（基本）" },
 { category: "式の計算の利用", difficulty: "標準", label: "式の計算の利用（標準）" },
@@ -317,7 +317,7 @@ function cleanCompareText(str) {
 if (!str) return "";
 return String(str)
 .replace(/^(\Suppress|\$\$|\\\(|\\\[|\\\]|\\\)|$)/g, "")
-.replace(/(\$\$|\\\)|\\\]|\\\(|$)/g, "")
+.replace(/(\Suppress|\$\$|\\\)|\\\]|\\\(|$)/g, "")
 .replace(/math|xmlns|display|block|<|>|\//g, "")
 .replace(/\\frac|\\div|\\times|\{|\}/g, "")
 .replace(/\s+/g, "")
@@ -555,6 +555,12 @@ document.getElementById("result-area").classList.add("hidden");
 document.getElementById("hint-area").classList.add("hidden");
 document.getElementById("next-btn").classList.add("hidden");
 document.getElementById("report-btn").classList.add("hidden"); 
+
+// 【不具合修正】次の問題に進む際に、報告ボタンの状態を初期位置へと完全リセットする
+const reportBtn = document.getElementById("report-btn");
+reportBtn.disabled = false;
+reportBtn.textContent = "⚠️ この問題の誤植・不具合をワンタップ報告する";
+
 renderSheetChoices(currentQuestion.choices || [], currentQuestion.answer || "");
 triggerMathRender();
 }
