@@ -11,7 +11,7 @@
     .screen { display: none; }
     .screen.active { display: block; }
     label { font-weight: bold; display: block; margin-top: 15px; margin-bottom: 5px; }
-    select, button { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
+    select, input[type="password"], button { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
     button { background-color: #3498db; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 20px; transition: background 0.2s; }
     button:hover { background-color: #2980b9; }
     .unit-list { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 15px; }
@@ -21,7 +21,6 @@
     .unit-item.cleared { background: #d4edda; border-color: #c3e6cb; color: #155724; }
     .unit-item.cleared .cleared-label::after { content: '✓ クリア済み'; font-size: 12px; font-weight: bold; margin-right: 10px; }
     
-    /* リセット用ゴミ箱ボタンのスタイル */
     .btn-reset-unit { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 16px; width: auto; padding: 5px 10px; margin: 0; transition: transform 0.1s; }
     .btn-reset-unit:hover { transform: scale(1.2); }
 
@@ -30,10 +29,16 @@
     .word-jp { font-size: 24px; font-weight: bold; text-align: center; margin: 20px 0; color: #2c3e50; }
     .answer-box { min-height: 50px; border-bottom: 3px solid #3498db; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; align-items: center; padding: 10px; }
     .letters-box { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 20px; min-height: 60px; }
+    
+    /* タイルのベーススタイル */
     .tile { background: white; border: 2px solid #bdc3c7; border-radius: 6px; width: 45px; height: 45px; display: flex; justify-content: center; align-items: center; font-size: 20px; font-weight: bold; cursor: pointer; user-select: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: all 0.1s; }
     .tile:active { transform: scale(0.95); }
-    .tile.selected { background: #e8f4fd; border-color: #3498db; color: #3498db; }
-    .tile.answer-tile { background: #3498db; color: white; border-color: #3498db; }
+    .tile.selected { background: #e8f4fd; border-color: #3498db; color: #3498db; opacity: 0.5; cursor: not-allowed; }
+    
+    /* 回答用タイルのホバー効果（1文字削除を視覚化） */
+    .tile.answer-tile { background: #3498db; color: white; border-color: #3498db; transition: background-color 0.1s, border-color 0.1s; }
+    .tile.answer-tile:hover { background: #c0392b; border-color: #c0392b; }
+    
     .nav-btns { display: flex; gap: 10px; }
     .btn-secondary { background-color: #95a5a6; }
     .btn-secondary:hover { background-color: #7f8c8d; }
@@ -63,17 +68,25 @@
   <div id="screen-login" class="screen active">
     <h1>英単語学習アプリ</h1>
     
-    <label for="grade-select">1. 学年を選択してください</label>
-    <select id="grade-select" onchange="onGradeChange()">
-      <option value="">読込中...</option>
-    </select>
+    <div id="login-step-1">
+      <label for="grade-select">1. 学年を選択してください</label>
+      <select id="grade-select" onchange="onGradeChange()">
+        <option value="">読込中...</option>
+      </select>
+    </div>
     
-    <label for="student-select" style="margin-top: 20px;">2. 生徒名を選択してください</label>
-    <select id="student-select" disabled>
-      <option value="">学年を先に選択してください</option>
-    </select>
+    <div id="login-step-2" style="display: none; margin-top: 20px;">
+      <label for="password-input">2. パスワードを入力してください</label>
+      <input type="password" id="password-input" placeholder="パスワードを入力">
+      <button id="btn-verify-password" onclick="verifyPassword()">パスワードを確認</button>
+    </div>
     
-    <button id="btn-login" onclick="login()">進む</button>
+    <div id="login-step-3" style="display: none; margin-top: 20px;">
+      <label for="student-select">3. 名前を確認して進んでください</label>
+      <select id="student-select">
+        </select>
+      <button id="btn-login" onclick="login()">進む</button>
+    </div>
   </div>
 
   <div id="screen-menu" class="screen">
@@ -105,7 +118,7 @@
     <div id="letters-box" class="letters-box"></div>
     
     <div class="nav-btns">
-      <button class="btn-secondary" onclick="clearAnswer()">リセット</button>
+      <button class="btn-secondary" onclick="clearAnswer()">全リセット</button>
       <button onclick="submitAnswer()">決定</button>
     </div>
   </div>
@@ -132,19 +145,21 @@
 </div>
 
 <script>
+  // ※ご自身のGASのウェブアプリURLを設定してください
   const GAS_URL = "https://script.google.com/macros/s/AKfycbyHgcZu5J1mYYKKjsdY4ChH_0a8hXq9-ilU_wWFz45b2X7ueaX3cwCqVwnNrav8vv0/exec";
 
   let studentName = "";
   let clearedUnits = [];
   let currentCategory = ""; 
   let currentUnit = "";
-  let currentGradeContext = ""; // Sunshineの時にどの中学学年を指すか
+  let currentGradeContext = ""; 
   let questions = [];
   let currentIdx = 0;
   let correctCount = 0;
-  let currentAnswer = [];
+  let currentAnswer = []; // { letter: 文字, originIdx: 選択肢ボックス内でのインデックス }
   let initialData = null;
   let isWeakTestMode = false;
+  let studentPasswords = {}; // GASから取得する生徒個別パスワードマップ
 
   async function callGAS(payload) {
     document.getElementById('loading').style.display = 'flex';
@@ -174,6 +189,9 @@
       const gradeSelect = document.getElementById('grade-select');
       gradeSelect.innerHTML = '<option value="">学年を選択してください</option>';
       
+      // 個別パスワード情報をグローバル変数に保持
+      studentPasswords = initialData.passwords || {};
+      
       const grades = Object.keys(initialData.students).sort();
       grades.forEach(grade => {
         let opt = document.createElement('option');
@@ -184,30 +202,57 @@
     }
   };
 
+  // ステップ1: 学年が選択された時
   function onGradeChange() {
     const gradeSelect = document.getElementById('grade-select');
-    const studentSelect = document.getElementById('student-select');
     const selectedGrade = gradeSelect.value;
     
-    studentSelect.innerHTML = '';
+    // ステップ2と3をリセットして隠す
+    document.getElementById('password-input').value = "";
+    document.getElementById('login-step-2').style.display = 'none';
+    document.getElementById('login-step-3').style.display = 'none';
     
-    if (!selectedGrade) {
-      studentSelect.innerHTML = '<option value="">学年を先に選択してください</option>';
-      studentSelect.disabled = true;
+    if (!selectedGrade) return;
+    
+    // ステップ2 (パスワード入力) を表示
+    document.getElementById('login-step-2').style.display = 'block';
+  }
+
+  // ステップ2: 個別パスワードの検証
+  function verifyPassword() {
+    const gradeSelect = document.getElementById('grade-select');
+    const passwordInput = document.getElementById('password-input');
+    const studentSelect = document.getElementById('student-select');
+    
+    const selectedGrade = gradeSelect.value;
+    const inputPassword = passwordInput.value.trim();
+    
+    if (!inputPassword) {
+      alert("パスワードを入力してください。");
       return;
     }
     
-    studentSelect.innerHTML = '<option value="">生徒名を選択してください</option>';
-    const students = initialData.students[selectedGrade] || [];
+    // 選択された学年に所属する生徒一覧を取得
+    const studentsInGrade = initialData.students[selectedGrade] || [];
+    let matchedStudent = null;
     
-    students.forEach(name => {
-      let opt = document.createElement('option');
-      opt.value = name;
-      opt.textContent = name;
-      studentSelect.appendChild(opt);
-    });
+    // 入力されたパスワードが、この学年のどの生徒のものかを照合
+    for (let name of studentsInGrade) {
+      if (studentPasswords[name] && studentPasswords[name].toString().trim() === inputPassword) {
+        matchedStudent = name;
+        break;
+      }
+    }
     
-    studentSelect.disabled = false;
+    if (!matchedStudent) {
+      alert("該当する生徒のパスワードが確認できませんでした。");
+      document.getElementById('login-step-3').style.display = 'none';
+      return;
+    }
+    
+    // ステップ3: パスワードに合致した生徒の名前のみをセレクトボックスに表示
+    studentSelect.innerHTML = `<option value="${matchedStudent}">${matchedStudent}</option>`;
+    document.getElementById('login-step-3').style.display = 'block';
   }
 
   function changeScreen(screenId) {
@@ -223,8 +268,9 @@
     
     if (screenId === 'login') {
       document.getElementById('grade-select').value = "";
-      document.getElementById('student-select').innerHTML = '<option value="">学年を先に選択してください</option>';
-      document.getElementById('student-select').disabled = true;
+      document.getElementById('password-input').value = "";
+      document.getElementById('login-step-2').style.display = 'none';
+      document.getElementById('login-step-3').style.display = 'none';
     }
   }
 
@@ -288,7 +334,6 @@
     saveWeakList(list);
   }
 
-  // 単元選択画面の生成（履歴リセット機能付き）
   function showUnits(category, gradeContext = '') {
     isWeakTestMode = false;
     currentCategory = category;
@@ -300,11 +345,10 @@
     const listDiv = document.getElementById('unit-list');
     listDiv.innerHTML = '';
     
-    // 空白対策：データが存在する有効な単元のみ取得
     const units = category === 'Sunshine' ? (initialData.sunshineUnits[gradeContext] || []) : initialData.examUnits;
     
     units.forEach(unit => {
-      if (!unit || unit.toString().trim() === "") return; // 念のための空白防止
+      if (!unit || unit.toString().trim() === "") return;
       
       const item = document.createElement('div');
       item.className = 'unit-item';
@@ -314,7 +358,6 @@
         item.classList.add('cleared');
       }
       
-      // クリック領域（テスト開始）
       const clickArea = document.createElement('div');
       clickArea.className = 'unit-clickable';
       
@@ -329,18 +372,16 @@
       clickArea.onclick = function() { startQuiz(unit); };
       item.appendChild(clickArea);
       
-      // 学習履歴リセットボタン（ゴミ箱マーク）
       const resetBtn = document.createElement('button');
       resetBtn.className = 'btn-reset-unit';
       resetBtn.innerHTML = '🗑️';
-      resetBtn.title = 'この単員のクリア履歴をリセットする';
+      resetBtn.title = 'この単元のクリア履歴をリセットする';
       resetBtn.onclick = async function(e) {
-        e.stopPropagation(); // テスト開始イベントの発火を防ぐ
+        e.stopPropagation();
         if (confirm(`「${unit}」のクリア履歴をリセットして未クリア状態に戻しますか？`)) {
           await callGAS({ action: 'resetUnitHistory', studentName: studentName, unitKey: unitKey });
-          // 最新の履歴状況を再読込
           clearedUnits = await callGAS({ action: 'getClearedUnits', studentName: studentName }) || [];
-          showUnits(currentCategory, currentGradeContext); // 画面再描画
+          showUnits(currentCategory, currentGradeContext);
         }
       };
       item.appendChild(resetBtn);
@@ -417,8 +458,8 @@
     q.choices.forEach((letter, idx) => {
       const tile = document.createElement('div');
       tile.className = 'tile';
+      tile.id = 'tile-choice-' + idx; // 選択肢タイルに一意のIDを設定
       tile.textContent = letter;
-      tile.dataset.idx = idx;
       tile.onclick = function() { selectLetter(tile, letter, idx); };
       lettersBox.appendChild(tile);
     });
@@ -430,11 +471,40 @@
     tile.classList.add('selected');
     currentAnswer.push({ letter: letter, originIdx: idx });
     
+    renderAnswerTiles();
+  }
+
+  // 解答欄タイルの描画と1文字修正イベントの設定
+  function renderAnswerTiles() {
     const ansBox = document.getElementById('answer-box');
-    const ansTile = document.createElement('div');
-    ansTile.className = 'tile answer-tile';
-    ansTile.textContent = letter;
-    ansBox.appendChild(ansTile);
+    ansBox.innerHTML = '';
+    
+    currentAnswer.forEach((ansObj, orderIdx) => {
+      const ansTile = document.createElement('div');
+      ansTile.className = 'tile answer-tile';
+      ansTile.textContent = ansObj.letter;
+      ansTile.title = "クリックでこの文字を取り消す";
+      // クリック時にこの文字単体を取り消すイベント
+      ansTile.onclick = function() { removeSingleLetter(orderIdx); };
+      ansBox.appendChild(ansTile);
+    });
+  }
+
+  // 特定の文字だけをピンポイントで消去・修正する関数
+  function removeSingleLetter(targetOrderIdx) {
+    const removedItem = currentAnswer[targetOrderIdx];
+    
+    // 下部選択肢のグレーアウト(selected)を解除して再選択可能にする
+    const originTile = document.getElementById('tile-choice-' + removedItem.originIdx);
+    if (originTile) {
+      originTile.classList.remove('selected');
+    }
+    
+    // 解答配列から削除
+    currentAnswer.splice(targetOrderIdx, 1);
+    
+    // 解答欄を再描画
+    renderAnswerTiles();
   }
 
   function clearAnswer() {
